@@ -5,4 +5,4 @@ Vous pourrez isoler les opérations liées à la lecture ou à l’écriture d�
 dans une image dans un sous module pixels.[h/c] dans lequel pour pourrez aussi avantageusement
  définir des constantes symboliques (en utilisant un enum par exemple) RED, GREEN et BLUE pour accéder directement à ces composantes dans les pixels.
 */
-;
+enum PIXEL_TYPES{RED,GREEN,BLUE};

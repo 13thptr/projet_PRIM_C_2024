@@ -7,11 +7,10 @@
       pour contenir la valeur max des octets.*/
 #define MAX_BYTE 255
 
-#define BW_PIXEL_SIZE 1
-#define RGB_PIXEL_SIZE 3 
+
 typedef unsigned char byte; /* sizeof(char) == 1 */
 
-enum channel_number{GREY_PICTURE = 1, RGB_PICTURE = 3};
+enum channel_number{BW_PIXEL_SIZE = 1, RGB_PIXEL_SIZE = 3};
 /*
     Une structure picture similaire à celle utilisée dans le TP 6 qui contiendra
     - Une hauteur, une largeur
