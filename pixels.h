@@ -12,7 +12,7 @@ dans une image dans un sous module pixels.[h/c] dans lequel pour pourrez aussi a
 enum PIXEL_TYPES{RED,GREEN,BLUE};
 
 
-void write_component_rgb(picture p, int i, int j, int value, enum PIXEL_TYPES c);
+void write_component_rgb(picture p, int i, int j, enum PIXEL_TYPES c, int value);
 
 void write_pixel_rgb(picture p,int i, int j, byte red, byte green, byte blue);
 
