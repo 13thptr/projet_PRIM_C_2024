@@ -10,38 +10,26 @@ dans une image dans un sous module pixels.[h/c] dans lequel pour pourrez aussi a
 #define PIXELS_H
 
 enum PIXEL_TYPES{RED,GREEN,BLUE};
-/**
- * Ecriture du pixel/triplet de valeurs red,green,blue dans la "case" i,j du champ "data" de p.
- * @param [in] p la structure "picture" à modifier.
- * @param [in] i ligne du pixel à modifier
- * @param [in] j colonne du pixel à modifier
- * 
- * @ensures p structure valide
- * @ensures i,j indices valides (assert)
- * @ensures red,green,blue entre 0 et 255.
- * 
- * @assigns p.data
- *   
- * @return rien
- * 
- */
+
+
+void write_component_rgb(picture p, int i, int j, int value, enum PIXEL_TYPES c);
+
 void write_pixel_rgb(picture p,int i, int j, byte red, byte green, byte blue);
 
-/**
- * Ecriture du pixel/triplet de valeur "value" dans la "case" i,j du champ "data" de p.
- * @param [in] p la structure "picture" à modifier.
- * @param [in] i ligne du pixel à modifier
- * @param [in] j colonne du pixel à modifier
- * 
- * @ensures p structure valide
- * @ensures i,j indices valides (assert)
- * @ensures value entre 0 et 255.
- * 
- * @assigns p.data
- *   
- * @return rien
- * 
- */
+/*Since write_component_bw would be the same as write_pixel_bw, there's no need to write it.*/
 void write_pixel_bw(picture p, int i, int j, byte value);
+
+
+/*
+Lecture: 1) par retour, composante par composante 2)par effet, pixel par pixel.
+*/
+
+byte read_component_rgb(picture p, int i, int j, enum PIXEL_TYPES c);
+byte read_component_bw(picture p, int i, int j);
+
+/*read_pixel_rgb might not be as useful as the previous function read_component_rgb.*/
+void read_pixel_rgb(picture p, int i, int j, byte *red, byte *green, byte *blue);
+/*read_pixel_bw might not be as useful as the previous function read_component_bw.*/
+void read_pixel_bw(picture p, int i, int j, byte *value);
 
 #endif /*PIXELS_H*/

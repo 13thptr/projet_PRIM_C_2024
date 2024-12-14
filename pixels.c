@@ -1,6 +1,38 @@
 #include <assert.h>
+#include <stdlib.h>
 #include "pixels.h"
-
+byte read_component_rgb(picture p, int i, int j, enum PIXEL_TYPES c){
+    assert(0<=i&&i<p.height);
+    assert(0<=j&&j<p.width);
+    assert(c==RED||c==GREEN||c==BLUE);
+    return p.data[(i*p.width+j)*3+c];
+}
+byte read_component_bw(picture p, int i, int j){
+    assert(0<=i&&i<p.height);
+    assert(0<=j&&j<p.width);
+    return p.data[i*p.width+j];
+}
+void write_component_rgb(picture p, int i, int j, int value, enum PIXEL_TYPES c){
+    assert(0<=i&&i<p.height);
+    assert(0<=j&&j<p.width);
+    assert(c==RED||c==GREEN||c==BLUE);
+    int index =  ((i*p.width)+j)*3;
+    p.data[index+c] = value;
+/**
+ * Ecriture du pixel/triplet de valeurs red,green,blue dans la "case" i,j du champ "data" de p.
+ * @param [in] p la structure "picture" à modifier.
+ * @param [in] i ligne du pixel à modifier
+ * @param [in] j colonne du pixel à modifier
+ * 
+ * @ensures p structure valide
+ * @ensures i,j indices valides (assert)
+ * @ensures red,green,blue entre 0 et 255.
+ * 
+ * @assigns p.data
+ *   
+ * @return rien
+ * 
+ */
 void write_pixel_rgb(picture p, int i, int j, byte red, byte green, byte blue){
     assert(0<=i&&i<p.height);
     assert(0<=j&&j<p.width);
@@ -9,8 +41,69 @@ void write_pixel_rgb(picture p, int i, int j, byte red, byte green, byte blue){
     p.data[index+1] = green;
     p.data[index+2] = blue;
 }
+/**
+ * Ecriture du pixel/singleton de valeur "value" dans la "case" i,j du champ "data" de p.
+ * @param [in] p la structure "picture" à modifier.
+ * @param [in] i ligne du pixel à modifier
+ * @param [in] j colonne du pixel à modifier
+ * 
+ * @ensures p structure valide
+ * @ensures i,j indices valides (assert)
+ * @ensures value entre 0 et 255.
+ * 
+ * @assigns p.data
+ *   
+ * @return rien
+ */
 void write_pixel_bw(picture p, int i, int j,byte value){
     assert(0<=i&&i<p.height);
     assert(0<=j&&j<p.width);
     p.data[(i*p.width)+j] = value;
+}
+
+/**
+ * Lecture du pixel/triplet de la "case" i,j du champ "data" de p. Assignation aux pointeurs red,green,blue de type byte*.
+ * @param [in] p la structure "picture" à lire.
+ * @param [in] i ligne du pixel à lire (entier)
+ * @param [in] j colonne du pixel à lire (entier)
+ * @param [in] red pointeur stockant l'addresse d'une case mémoire stockant la valeur du canal "rouge" 
+ * @param [in] green pointeur stockant l'addresse d'une case mémoire stockant la valeur du canal "vert" 
+ * @param [in] blue pointeur stockant l'addresse d'une case mémoire stockant la valeur du canal "bleu" 
+ * @ensures p structure valide
+ * @ensures i,j indices valides (assert)
+ * @ensures value entre 0 et 255.
+ * 
+ * @assigns red,green,blue (modification par effet de bord)
+ *   
+ * @return rien
+ */
+void read_pixel_rgb(picture p, int i, int j, byte *red, byte *green, byte *blue){
+    assert(0<=i&&i<p.height);
+    assert(0<=j&&j<p.width);
+    assert(red!=NULL&&green!=NULL&&blue!=NULL);
+    int index =  ((i*p.width)+j)*3;
+    *red = p.data[index];
+    *green = p.data[index+1];
+    *blue = p.data[index+2];   
+}
+/**
+ * Lecture du pixel/triplet de la "case" i,j du champ "data" de p. Assignation aux pointeurs red,green,blue de type byte*.
+ * @param [in] p la structure "picture" à lire.
+ * @param [in] i ligne du pixel à lire (entier)
+ * @param [in] j colonne du pixel à lire (entier)
+ * @param [in] value pointeur stockant l'addresse d'une case mémoire stockant la valeur du pixel.
+
+ * @ensures p structure valide
+ * @ensures i,j indices valides (assert)
+ * @ensures value entre 0 et 255.
+ * 
+ * @assigns value (modification par effet de bord)
+ *   
+ * @return rien
+ */
+void read_pixel_bw(picture p, int i, int j, byte *value){
+    assert(0<=i&&i<p.height);
+    assert(0<=j&&j<p.width);
+    assert(value!=NULL);
+    *value = p.data[(i*p.width)+j];
 }
