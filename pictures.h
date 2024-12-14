@@ -6,7 +6,7 @@
      On pourra aussi définir une constante MAX_BYTE 255
       pour contenir la valeur max des octets.*/
 #define MAX_BYTE 255
-
+#include <stdbool.h>
 
 typedef unsigned char byte; /* sizeof(char) == 1 */
 
@@ -26,12 +26,27 @@ typedef struct{
     byte *data;
 }picture;
 
+/*Création,nettoyage et copie*/
 picture read_picture(char * filename);
-
 int write_picture(picture p, char * filename);
+picture create_picture(unsigned int width, unsigned int height, unsigned int channels, byte max);
+void clean_picture(picture *p);
+picture copy_picture(picture p);
 
+/*Information*/
+bool is_empty_picture(picture p);
+bool is_gray_picture(picture p);
+bool is_color_picture(picture p);
+void info_picture(picture p);
 
+/*Conversion*/
+picture convert_to_color_picture(picture p);
+picture convert_to_gray_picture(picture p);
 
+/*Séparation*/
+picture * split_picture(picture p);
 
+/*Mélange*/
+picture merge_picture(picture red, picture green, picture blue);
 
 #endif /*PICTURES_H*/

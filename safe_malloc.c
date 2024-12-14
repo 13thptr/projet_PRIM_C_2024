@@ -15,7 +15,7 @@ void *myalloc(size_t mem_size)
         i++;
     }
     if(i==MAX_MALLOC_TRIES){
-        printf("Could not allocate memory!");
+        fprintf(stderr,"Could not allocate memory!\n");
         abort();
     }
     return mem_ptr;

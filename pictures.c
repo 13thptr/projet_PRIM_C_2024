@@ -3,9 +3,11 @@
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>
-
+#include <stdbool.h>
+#include <assert.h>
 #include "safe_malloc.h"
 #include "pictures.h"
+#include "pixels.h"
 /*#include "pixels.h"*/
 /*
 La troisième ligne contient la valeur maximale des pixels à lire dans ce qui suit ...: Ici 255.
@@ -88,6 +90,7 @@ picture read_picture(char *filename){
     @requires "p" structure de type "picture" valide (avec champs width, height, chan_num et data valides).
     @requires "filename" chemin (potentiel) valide.
     @assigns rien
+    @ensures ce qu'il faut
     @return un entier indiquant le statut de succès(0) ou d'échec de l'appel à la fonction.
 */
 int write_picture(picture p, char * filename){
@@ -107,4 +110,174 @@ int write_picture(picture p, char * filename){
     fwrite(p.data ,p.chan_num, p.width * p.height, f);
     fclose (f);
     return 0;
+}
+/**
+ * Création d'une image (sans)
+ * @param [in] width la largeur de l'image à créer
+ * @param [in] height la hauteur de l'image à créer
+ * @param [in] channels le nombre de canaux
+ * @param [in] max ????
+
+ * @assigns value  zones de mémoires modifiéres
+ * 
+ * @ensures 
+ * @ensures
+ *   
+ * @return rien
+ */
+picture create_picture(unsigned int width, unsigned int height, unsigned int channels, byte max){
+    //assert(width>0&&height>0);
+    assert(channels == RGB_PIXEL_SIZE||channels == BW_PIXEL_SIZE);
+    printf("max:%d\n",max);//éviter "unused parameter". à enlever.
+    picture res;
+    res.width = width;
+    res.height = height;
+    res.chan_num = channels;
+    res.data = myalloc(width*height*channels);
+    return res;
+}
+void clean_picture(picture *p){
+    assert(p!=NULL);
+    p->chan_num = 0;
+    p->width = 0;
+    p->height = 0;
+    if(p->data!=NULL){
+        free(p->data);
+    }
+}
+picture copy_picture(picture p){
+    assert(p.width>0&&p.height>0);
+    assert(p.data!=NULL);
+    assert(p.chan_num == BW_PIXEL_SIZE || p.chan_num == RGB_PIXEL_SIZE);
+
+    picture res = create_picture(p.width,p.height,p.chan_num,MAX_BYTE);
+
+    for(int k = 0; k<p.width*p.height;k++){
+        res.data[k] = p.data[k];
+    }
+    return res;
+}/*
+Obtention d’informations sur une image
+
+    Indication d’image vide (si un de ses champs est nul) : int is_empty_picture(picture p);
+
+        [in] p l’image à inspecter
+        [out] une valeur non nulle si p est vide, 0 sinon.
+*/
+bool is_empty_picture(picture p){
+    return !(p.width&&p.height&&p.chan_num);
+}
+bool is_gray_picture(picture p){
+    return p.chan_num == BW_PIXEL_SIZE;
+}
+bool is_color_picture(picture p){
+    return p.chan_num == RGB_PIXEL_SIZE;
+}
+void info_picture(picture p){
+    printf("%d x% d x %d\n",p.width,p.height,p.chan_num);
+}
+/*
+Convertir une image en niveau de gris vers une image en couleur : picture convert_to_color_picture(picture p);
+        en répétant les valeurs de niveau de gris dans chaque canal R, V, B.
+        [in] p l’image à convertir en couleurs
+        [out] l’image couleur convertie en couleurs.
+            Si p était déjà en couleur on se contentera de faire une copie
+            Si pétait une image en niveaux de gris on répétera la composante de niveau de gris dans chacune des composantes (rouge, vert, bleu) de l’image résultat.
+*/
+picture convert_to_color_picture(picture p){
+    assert(!is_empty_picture(p));
+
+    if(p.chan_num == RGB_PIXEL_SIZE){
+        return copy_picture(p);
+    }
+    assert(p.chan_num == BW_PIXEL_SIZE);
+    picture res = create_picture(p.width,p.height,RGB_PIXEL_SIZE,MAX_BYTE);
+
+    for(int k=0;k<p.width*p.height;k++){
+        byte value = p.data[k];
+        res.data[3*k] = value;
+        res.data[3*k+1] = value;
+        res.data[3*k+2] = value; 
+    }
+    return res;
+}
+
+/* 
+    Convertir une image en couleur vers une image en niveaux de gris : picture convert_to_gray_picture(picture p);
+        [in] p l’image à convertir en niveaux de gris
+        [out] l’image convertie en niveaux de gris
+            Si p était un image en couleur on a convertie les couleurs en niveau de gris en utilisant la règle suivante : G=(0.299×R)+(0.587×V)+(0.114×B).
+            Si p était déjà une image en niveau de gris on se contentera d’en faire une copie
+
+*/
+picture convert_to_gray_picture(picture p){
+    assert(!is_empty_picture(p));
+
+    if(p.chan_num == BW_PIXEL_SIZE){
+        return copy_picture(p);
+    }
+    assert(p.chan_num == RGB_PIXEL_SIZE);
+    picture res = create_picture(p.width,p.height,BW_PIXEL_SIZE,MAX_BYTE);
+
+    for(int k=0;k<p.width*p.height;k++){
+        res.data[k] = 299*p.data[3*k]+587*p.data[3*k+1]+114*p.data[3*k+2];
+        res.data[k] /= 1000;
+    }
+    return res;
+}
+/*
+Séparation ou mélange des composantes d’une image
+
+    Séparer les composantes d’une image couleur en 3 images en niveau de gris contenant les valeurs pour le rouge, le vert et le bleu respectivement : 
+    picture * split_picture(picture p);
+        [in] p l’image couleur dont on veut séparer les composantes
+        [out] un tableau de 3 images en niveau de gris contenant les valeurs des canaux R, V et B.
+            Si p ne peut pas être décomposée on se contentera de renvoyer NULL.
+            Si p est une image en niveaux de gris on renverra un tableau ne contenant qu’un seul élément.
+
+*/
+picture *split_picture(picture p){
+    if(is_empty_picture(p)){
+        return NULL;
+    }
+    picture *arr = malloc(sizeof(picture)*p.chan_num);
+    for(int n=0;n<(int)p.chan_num;n++){
+        arr[n] = create_picture(p.width,p.height,BW_PIXEL_SIZE,MAX_BYTE);
+       
+        for(int i= 0;i<p.height;i++){
+            for(int j=0;j<p.width;j++){
+                byte component = (p.chan_num==BW_PIXEL_SIZE?read_component_bw(p,i,j):read_component_rgb(p,i,j,n));
+                write_pixel_bw(arr[n],i,j,component); //ici il n'y a pas de disjonction, on écrit toujours dans une image en niveau de gris.
+            }
+        }
+
+    }
+    return arr;
+}
+
+/*
+    Mélanger les composantes à partir de 3 images en niveau de gris pour composer une image couleurs : 
+    picture merge_picture(picture red, picture green, picture blue);
+        [in] red l’image en niveau de gris à utiliser pour fabriquer la composante rouge de l’image résultat.
+        [in] green l’image en niveau de gris à utiliser pour fabriquer la composante verte de l’image résultat.
+        [in] blue l’image en niveau de gris à utiliser pour fabriquer la composante bleue de l’image résultat.
+        [out] l’image composée
+            Si l’image résultat ne peut pas être créée (si par exemple les trois images red, green et blue ne sont pas de même taille ou type) on se contentera de renvoyer une image vide.
+
+*/
+picture merge_picture(picture red, picture green, picture blue){
+    int width = red.width * (red.width==green.width&&green.width == blue.width);
+    int height = red.height *(red.height==green.height&&green.height==blue.height);
+    enum channel_number chan_num = red.chan_num*(red.chan_num==green.chan_num&&green.chan_num==blue.chan_num);
+
+    picture res = create_picture(width,height,chan_num,MAX_BYTE);
+    for(int i=0;i<height;i++){
+        for(int j=0;j<width;j++){
+            byte r = read_component_bw(red,i,j);
+            byte g = read_component_bw(green,i,j);
+            byte b = read_component_bw(blue,i,j);
+            write_pixel_rgb(res,i,j,r,g,b);
+        }
+    }
+    return res;
 }

@@ -35,8 +35,22 @@ Vous pourrez ainsi extraire le nom du fichier image traité par votre programme
         return EXIT_FAILURE;
     }
     test_path = argv[2];
+
     test = read_picture(argv[1]);
+
+    if(is_empty_picture(test)){
+        printf("Empty picture.\n");
+    }else{
+        printf("Non-empty picture.\n");
+    }
+    printf("%d\n",is_gray_picture(test));
+    printf("%d\n",is_color_picture(test));
+
+    info_picture(test);
+
     write_picture(test,test_path);
 
+    int* wtf = malloc(sizeof(int));
+    *wtf = 5;
     return EXIT_SUCCESS;
 }

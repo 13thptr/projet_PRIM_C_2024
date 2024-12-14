@@ -1,5 +1,5 @@
 #CFLAGS += -std=c99
-CFLAGS+= -Wpedantic -pedantic-errors
+CFLAGS += -Wpedantic -pedantic-errors
 CFLAGS += -Werror
 CFLAGS += -Wall
 CFLAGS += -Wextra
@@ -42,7 +42,8 @@ prog: main.o pictures.o safe_malloc.o pixels.o
 	$(CC) $(CFLAGS) $^ -o $@
 
 pictures.o : pictures.c
-	$(CC) -c $(CFLAGS) $^ -o $@
+	gcc -c -Wall -Wextra -Wpedantic -fsanitize=address pictures.c -o pictures.o
+#$(CC) -c $(CFLAGS) $^ -o $@
 
 pixels.o : pixels.c
 	$(CC) -c $(CFLAGS) $^ -o $@
@@ -56,3 +57,6 @@ safe_malloc.o : safe_malloc.c
 
 main.o : main.c
 	$(CC) -c $(CFLAGS) $^ -o $@
+
+clean:
+	rm -rf *.o
