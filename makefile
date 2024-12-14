@@ -38,7 +38,7 @@ CC = gcc
 #main: main.c
 #	$(CC) -c $(CFLAGS) $^ -o $@ 
 
-prog: main.o pictures.o safe_malloc.o pixels.o
+prog: main.o pictures.o safe_malloc.o pixels.o filename.o
 	$(CC) $(CFLAGS) $^ -o $@
 
 pictures.o : pictures.c
@@ -48,15 +48,15 @@ pictures.o : pictures.c
 pixels.o : pixels.c
 	$(CC) -c $(CFLAGS) $^ -o $@
 
-filename.o : filename.c
-	$(CC) -c $(CFLAGS) $^ -o $@
-
 safe_malloc.o : safe_malloc.c
 	$(CC) -c $(CFLAGS) $^ -o $@
 
+filename.o : filename.c
+	$(CC) -c $(CFLAGS) $^ -o $@
 
 main.o : main.c
 	$(CC) -c $(CFLAGS) $^ -o $@
+
 
 clean:
 	rm -rf *.o

@@ -15,7 +15,10 @@
 #else
     #define PATH_SEP '/'
 #endif
-
+#include <stddef.h>
+/*Note: prototypes ajouté par moi-même (Mehdi SAHTALI) à cause de l'option -Werror=missing-prototypes.*/
+char * substr(char * string, size_t start, size_t end);
+int last_index_of(char * s, char c);
 /**
  * Extraction du chemin avant le nom depuis le path d'un fichier
  * @param [in] path le chemin complet du fichier

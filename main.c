@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "pictures.h"
+#include "filename.h"
+#include <string.h>
 /*
     Un code abondamment commenté ; 
     la première partie des commentaires comportera systématiquement les lignes :
@@ -30,6 +32,10 @@ Vous pourrez ainsi extraire le nom du fichier image traité par votre programme
  et le customiser avec les noms des opérations que vous appliquerez dessus avant*/
     picture test;
     char* test_path;
+
+    char ppm_ext[4] = "ppm";
+    char pgm_ext[4] = "pgm";
+    
     if(argc!=3){
         fprintf(stderr,"Usage:./prog <filename.[pgm|ppm]> <path_to_new_file.[pgm|ppm]\n");
         return EXIT_FAILURE;
@@ -38,6 +44,7 @@ Vous pourrez ainsi extraire le nom du fichier image traité par votre programme
 
     test = read_picture(argv[1]);
 
+    /*Test des fonctions d'interrogation*/
     if(is_empty_picture(test)){
         printf("Empty picture.\n");
     }else{
@@ -45,12 +52,70 @@ Vous pourrez ainsi extraire le nom du fichier image traité par votre programme
     }
     printf("%d\n",is_gray_picture(test));
     printf("%d\n",is_color_picture(test));
-
     info_picture(test);
 
     write_picture(test,test_path);
 
-    int* wtf = malloc(sizeof(int));
-    *wtf = 5;
+    picture copy = copy_picture(test);
+    info_picture(copy);
+    char *dir = dir_from_path(argv[1]);
+    char *name = name_from_path(argv[1]);
+    char copy_op[5] = "copy"; //Cette syntaxe est nécessaire, on ne peut utiliser char* pour faire les choses proprement.
+    char *ext = ext_from_path(argv[1]);
+    char *copy_concat = concat_parts(dir,name,copy_op,ext);
+    write_picture(copy,copy_concat);
+    free(copy_concat);
+
+    /*Test: conversion.*/
+    /*BW->RGB*/
+    picture conv2col = convert_to_color_picture(test);
+    char conv2col_op[9]="conv2col";
+    
+    char *conv2col_concat = concat_parts(dir,name,conv2col_op,ppm_ext);
+    write_picture(conv2col,conv2col_concat);
+    clean_picture(&conv2col);
+    free(conv2col_concat);
+    
+    /*RGB->BW*/
+    picture conv2bw = convert_to_gray_picture(test);
+    char conv2bw_op[9]= "conv2bw";
+    
+    char *conv2bw_concat = concat_parts(dir,name,conv2bw_op,pgm_ext);
+    write_picture(conv2bw,conv2bw_concat);
+    clean_picture(&conv2bw);
+    free(conv2bw_concat);
+
+    /*Split*/
+    picture *split_test = split_picture(test);
+
+    char split_shared_str[7] = "split_";
+    for(char k=0;k<(char)test.chan_num;k++){
+        printf("k:%d\n",(int)k);
+        char *split_individualized_channel = malloc(sizeof(char)*8);
+
+        size_t max_length = 8;
+        strncpy(split_individualized_channel,split_shared_str,max_length);
+        split_individualized_channel[6] = 48+k;
+        split_individualized_channel[7] = '\0';
+        char *split_channel_concat = concat_parts(dir,name,split_individualized_channel,pgm_ext);
+
+        write_picture(split_test[(int)k],split_channel_concat);
+
+        free(split_individualized_channel);
+        free(split_channel_concat);
+        clean_picture(&split_test[(int)k]);
+    }
+    free(split_test);
+    
+    /*Merge*/
+
+
+    free(dir);
+    free(name);
+    free(ext);
+    
+    
+    clean_picture(&copy);
+    clean_picture(&test);
     return EXIT_SUCCESS;
 }

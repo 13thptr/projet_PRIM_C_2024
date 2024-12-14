@@ -151,10 +151,10 @@ picture copy_picture(picture p){
     assert(p.chan_num == BW_PIXEL_SIZE || p.chan_num == RGB_PIXEL_SIZE);
 
     picture res = create_picture(p.width,p.height,p.chan_num,MAX_BYTE);
-
-    for(int k = 0; k<p.width*p.height;k++){
+    for(int k = 0; k<p.width*p.height*(int)p.chan_num;k++){
         res.data[k] = p.data[k];
     }
+   
     return res;
 }/*
 Obtention d’informations sur une image
@@ -193,11 +193,19 @@ picture convert_to_color_picture(picture p){
     assert(p.chan_num == BW_PIXEL_SIZE);
     picture res = create_picture(p.width,p.height,RGB_PIXEL_SIZE,MAX_BYTE);
 
-    for(int k=0;k<p.width*p.height;k++){
+    /*Version alternative, sans utiliser les fonctions déjà écrites.
+    for(int k=0;k<p.width*p.height*(int)p.chan_num;k++){
         byte value = p.data[k];
         res.data[3*k] = value;
         res.data[3*k+1] = value;
         res.data[3*k+2] = value; 
+    }*/
+    
+    for(int i=0;i<res.height;i++){
+        for(int j=0;j<res.width;j++){
+            byte value = read_component_bw(p,i,j);
+            write_pixel_rgb(p,i,j,value,value,value);
+        }
     }
     return res;
 }
@@ -219,9 +227,19 @@ picture convert_to_gray_picture(picture p){
     assert(p.chan_num == RGB_PIXEL_SIZE);
     picture res = create_picture(p.width,p.height,BW_PIXEL_SIZE,MAX_BYTE);
 
-    for(int k=0;k<p.width*p.height;k++){
+    /*for(int k=0;k<p.width*p.height;k++){
         res.data[k] = 299*p.data[3*k]+587*p.data[3*k+1]+114*p.data[3*k+2];
         res.data[k] /= 1000;
+    }
+    */
+    for(int i=0;i<res.height;i++){
+        for(int j=0;j<res.width;j++){
+            byte red = 0.299*(double)read_component_rgb(p,i,j,RED);
+            byte green = 0.587*(double)read_component_rgb(p,i,j,GREEN);
+            byte blue = 0.114*(double)read_component_rgb(p,i,j,BLUE);
+            byte value = red+green+blue;
+            write_pixel_bw(res,i,j,value);
+        }
     }
     return res;
 }
