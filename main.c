@@ -147,6 +147,7 @@ Vous pourrez ainsi extraire le nom du fichier image traité par votre programme
 
 
     /*LUT test*/
+    /*1) Inversion*/
     picture inverted = inverse_picture(test);
     char inverted_op[9] = "inverted";
     char *inverted_path = concat_parts(dir,name,inverted_op,ext);
@@ -154,6 +155,15 @@ Vous pourrez ainsi extraire le nom du fichier image traité par votre programme
     write_picture(inverted,inverted_path);
     clean_picture(&inverted);
     free(inverted_path);
+
+    /*2)Normalisation */
+    picture normalized = normalize_dynamic_picture(test);
+    char normalized_op[11] = "normalized";
+    char *normalized_path = concat_parts(dir,name,normalized_op,ext);
+
+    write_picture(normalized,normalized_path);
+    clean_picture(&normalized);
+    free(normalized_path);
 
     /*On libère les chemins*/
     free(dir);

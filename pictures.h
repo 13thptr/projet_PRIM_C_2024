@@ -61,4 +61,7 @@ picture inverse_picture(picture p);
 /*Normalisation*/
 picture normalize_dynamic_picture(picture p);
 
+/*Réduction*/
+picture set_levels_picture(picture p, byte nb_levels);
+
 #endif /*PICTURES_H*/
