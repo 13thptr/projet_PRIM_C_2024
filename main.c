@@ -145,6 +145,16 @@ Vous pourrez ainsi extraire le nom du fichier image traité par votre programme
     clean_picture(&melted);
     free(melted_path);
 
+
+    /*LUT test*/
+    picture inverted = inverse_picture(test);
+    char inverted_op[9] = "inverted";
+    char *inverted_path = concat_parts(dir,name,inverted_op,ext);
+
+    write_picture(inverted,inverted_path);
+    clean_picture(&inverted);
+    free(inverted_path);
+
     /*On libère les chemins*/
     free(dir);
     free(name);

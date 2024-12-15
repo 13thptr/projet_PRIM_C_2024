@@ -5,9 +5,11 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <assert.h>
+
 #include "safe_malloc.h"
 #include "pictures.h"
 #include "pixels.h"
+#include "lut.h"
 /*#include "pixels.h"*/
 /*
 La troisième ligne contient la valeur maximale des pixels à lire dans ce qui suit ...: Ici 255.
@@ -368,3 +370,38 @@ picture melt_picture(picture p, int number){
 }
 //2ème version, plus maligne: on convertit en image niveau de gris puis on effectue un appel récursif.
 //Il faut cependant une fonction auxiliaire pour savoir quel pointeur libérer, sinon on crée une fuite mémoire.
+/*A faire...*/
+
+
+/*Look-up tables:*/
+
+/*
+    QUESTION/TODO:
+    Pourrait-on mettre cette définition/précision de structure
+    dans lut.c sans avoir une erreur de type "incomplete type" ? Et si oui, comment ? Poser la question à M. Burel ?
+    + faire une comparaison avec la situation du TP9 que j'ai fini par faire marcher.
+*/
+struct lut_s{
+    int n;
+    byte *array;
+};
+typedef struct lut_s* lut;
+
+picture inverse_picture(picture p){
+    picture res = copy_picture(p);
+    if(is_empty_picture(p)){
+        return res;
+    }
+    /*On crée la LUT d'inversion*/
+    lut invert_lut = create_lut(MAX_BYTE+1);
+
+    for(int c=0;c<MAX_BYTE;c++){
+        (invert_lut)->array[c] = 255-c;
+    }
+    apply_lut(res,&invert_lut);
+    clean_lut(&invert_lut);
+    return res;
+ }
+picture normalize_dynamic_picture(picture p){
+    
+}

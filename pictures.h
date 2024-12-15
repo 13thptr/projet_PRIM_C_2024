@@ -55,4 +55,10 @@ picture brighten_picture(picture p, double factor);
 /*Fonte*/
 picture melt_picture(picture p, int number);
 
+/*Inversion*/
+picture inverse_picture(picture p);
+
+/*Normalisation*/
+picture normalize_dynamic_picture(picture p);
+
 #endif /*PICTURES_H*/
