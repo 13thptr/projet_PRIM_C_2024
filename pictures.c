@@ -398,7 +398,7 @@ picture inverse_picture(picture p){
     for(int c=0;c<MAX_BYTE;c++){
         invert_lut->array[c] = 255-c;
     }
-    apply_lut(res,&invert_lut);
+    apply_lut(res,invert_lut);
     clean_lut(&invert_lut);
     return res;
 }
@@ -434,7 +434,7 @@ picture normalize_dynamic_picture(picture p){
         val = val<255.0?val:255.0;
         normalize_lut->array[c] = (byte)val;
     }
-    apply_lut(res,&normalize_lut);
+    apply_lut(res,normalize_lut);
     clean_lut(&normalize_lut);
     return res;
 }
@@ -445,12 +445,12 @@ picture set_levels_picture(picture p, byte nb_levels){
         return res;
     }
     /*On crée la LUT de réduction*/
-    lut set_lut = create_lut(8);
+    lut set_lut = create_lut(nb_levels);
 
-    for(int c=0;c<8;c++){
+    for(int c=0;c<nb_levels;c++){
         set_lut->array[c] = c; //Identité.
     }
-    apply_lut(res,&set_lut);
+    apply_lut(res,set_lut);
     clean_lut(&set_lut);
     return res;
 }

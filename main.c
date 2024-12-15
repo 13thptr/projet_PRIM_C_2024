@@ -31,6 +31,8 @@ Séparer un chemin vers un fichier image <dirname>/<name>.<ext> en ses composant
 Composer un chemin vers un fichier image à partir de ces composantes.
 Vous pourrez ainsi extraire le nom du fichier image traité par votre programme
  et le customiser avec les noms des opérations que vous appliquerez dessus avant*/
+
+    /*TODO: factoriser les tests qui se ressemblent à l'aide d'une fonction supplémentaire, déclarée avant le main.*/
     picture test;
     char* test_path;
 
@@ -165,6 +167,14 @@ Vous pourrez ainsi extraire le nom du fichier image traité par votre programme
     clean_picture(&normalized);
     free(normalized_path);
 
+    /* 'Discrétisation' en blocs plus grossiers*/
+    picture discretized = set_levels_picture(test,8);
+    char discretized_op[12] = "discretized";
+    char *discretized_path = concat_parts(dir,name,discretized_op,ext);
+
+    write_picture(discretized,discretized_path);
+    clean_picture(&discretized);
+    free(discretized_path);
     /*On libère les chemins*/
     free(dir);
     free(name);

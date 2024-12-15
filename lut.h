@@ -12,7 +12,7 @@ void clean_lut(lut *table);
 Vu la formulation de l'énoncé, on modifiera les images par effet avec les LUT. On pourra 
 cependant créer une version qui renvoie une nouvelle image.
 */
-void apply_lut(picture p, lut *table);
+void apply_lut(picture p, lut table);
 
 
 #endif /*LUT_H*/
