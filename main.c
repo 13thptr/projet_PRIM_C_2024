@@ -3,6 +3,7 @@
 #include "pictures.h"
 #include "filename.h"
 #include <string.h>
+#include <assert.h>
 /*
     Un code abondamment commenté ; 
     la première partie des commentaires comportera systématiquement les lignes :
@@ -67,7 +68,7 @@ Vous pourrez ainsi extraire le nom du fichier image traité par votre programme
     free(copy_concat);
 
     /*Test: conversion.*/
-    /*BW->RGB*/
+    /*GRAY>RGB*/
     picture conv2col = convert_to_color_picture(test);
     char conv2col_op[9]="conv2col";
     
@@ -76,16 +77,26 @@ Vous pourrez ainsi extraire le nom du fichier image traité par votre programme
     clean_picture(&conv2col);
     free(conv2col_concat);
     
-    /*RGB->BW*/
+    /*RGB->GRAY*/
     picture conv2bw = convert_to_gray_picture(test);
     char conv2bw_op[9]= "conv2bw";
     
     char *conv2bw_concat = concat_parts(dir,name,conv2bw_op,pgm_ext);
     write_picture(conv2bw,conv2bw_concat);
+
+    /*Eclaircissement: on utilise l'image convertie en noir et blanc. RGB->BW, que l'on libérera plus bas*/
+    char brighten_op[9]="brighten";
+    char *brighten_concat = concat_parts(dir,name,brighten_op,ext); 
+    picture brightened = brighten_picture(conv2bw,1.5);
+
+    write_picture(brightened,brighten_concat);
+    clean_picture(&brightened);
+    free(brighten_concat);
+
     clean_picture(&conv2bw);
     free(conv2bw_concat);
 
-    /*Split*/
+    /*Split & merge*/
     picture *split_test = split_picture(test);
 
     char split_shared_str[7] = "split_";
@@ -103,13 +114,38 @@ Vous pourrez ainsi extraire le nom du fichier image traité par votre programme
 
         free(split_individualized_channel);
         free(split_channel_concat);
+        
+    }
+    
+    char merge_op[6] = "merge";
+    char *merge_concat = concat_parts(dir,name,merge_op,ppm_ext);
+    picture merged;
+    if(test.chan_num == RGB_PIXEL_SIZE){
+        merged = merge_picture(split_test[0],split_test[1],split_test[2]);
+    }else{
+        assert(test.chan_num == BW_PIXEL_SIZE);
+        merged = merge_picture(split_test[0],split_test[0],split_test[0]);
+    }
+    
+
+    write_picture(merged,merge_concat);
+    clean_picture(&merged);
+    free(merge_concat);
+    for(char k=0;k<(char)test.chan_num;k++){
         clean_picture(&split_test[(int)k]);
     }
     free(split_test);
+
     
-    /*Merge*/
+    picture melted = melt_picture(test,test.width*test.height*test.chan_num*5);
+    char melted_op[7]="melted";
+    char *melted_path = concat_parts(dir,name,melted_op,ext);
 
+    write_picture(melted,melted_path);
+    clean_picture(&melted);
+    free(melted_path);
 
+    /*On libère les chemins*/
     free(dir);
     free(name);
     free(ext);

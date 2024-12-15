@@ -204,7 +204,7 @@ picture convert_to_color_picture(picture p){
     for(int i=0;i<res.height;i++){
         for(int j=0;j<res.width;j++){
             byte value = read_component_bw(p,i,j);
-            write_pixel_rgb(p,i,j,value,value,value);
+            write_pixel_rgb(res,i,j,value,value,value);
         }
     }
     return res;
@@ -285,8 +285,10 @@ picture *split_picture(picture p){
 */
 picture merge_picture(picture red, picture green, picture blue){
     int width = red.width * (red.width==green.width&&green.width == blue.width);
+    //printf("width:%d\n",width);
     int height = red.height *(red.height==green.height&&green.height==blue.height);
-    enum channel_number chan_num = red.chan_num*(red.chan_num==green.chan_num&&green.chan_num==blue.chan_num);
+    //printf("height:%d\n",height);
+    enum channel_number chan_num = 3;
 
     picture res = create_picture(width,height,chan_num,MAX_BYTE);
     for(int i=0;i<height;i++){
@@ -299,3 +301,70 @@ picture merge_picture(picture red, picture green, picture blue){
     }
     return res;
 }
+
+picture brighten_picture(picture p, double factor){
+    picture res = copy_picture(p);
+    for(unsigned int k=0;k<res.width*res.height*res.chan_num;k++){
+        double value = (double)res.data[k]*factor;
+        /*J'ai passé quelques minutes à comprendre pourquoi cette fonction ne marchait pas initialement, 
+        je faisais le calcul de 'value' directement avec des types "byte", ce qui causait un dépassement d'entier ou plutôt de char
+        il faut donc faire le calcul avec des doubles, puis caster.
+        */
+        value = (value <(double)MAX_BYTE)?value:(double)MAX_BYTE; 
+        res.data[k] = (byte)value;
+    }
+    return res;
+}
+
+picture melt_picture(picture p, int number){
+    /*On choisit N pixels au hasard dans l’image. Pour chacun de ces pixels,
+    si le pixel situé juste au dessus est plus sombre que le pixel choisi alors le pixel courant prends la valeur du pixel du dessus.
+    [in] p l’image à faire fondre
+    [in] number le nombre de pixels à choisir aléatoirement
+    [out] l’image contenant les pixels qui ont fondu vers le bas*/
+
+    /*Il faut distinguer deux cas: image en niveaux de gris ou couleur.*/
+
+    picture melted = copy_picture(p);
+
+    if(p.chan_num == BW_PIXEL_SIZE){
+        for(int pix = 0;pix<number;pix++){
+            //On sélectionne abcisse et ordonnée au hasard.
+            int i = rand()%(p.height);
+            int j = rand()%(p.width);
+            //Le pixel du dessus existe-t-il ?i>0
+            byte valeur_courante = read_component_bw(melted,i,j);//(on n'écrira pas valeur_actuelle)
+            if(i>0&&read_component_bw(melted,i-1,j)<valeur_courante){
+                write_pixel_bw(melted,i,j,read_component_bw(melted,i-1,j));
+            }
+        }
+    }else if(p.chan_num == RGB_PIXEL_SIZE){
+        for(int pix = 0;pix<number;pix++){
+            //On sélectionne abcisse et ordonnée au hasard.
+            int i = rand()%(p.height);
+            int j = rand()%(p.width);
+            //Le pixel du dessus existe-t-il ?i>0
+            byte curr_red = 0.299*(double)read_component_rgb(melted,i,j,RED);
+            byte curr_green = 0.587*(double)read_component_rgb(melted,i,j,GREEN);
+            byte curr_blue = 0.114*(double)read_component_rgb(melted,i,j,BLUE);
+            byte curr_value = curr_red+curr_green+curr_blue;
+            //Pour comparer les luminosités respectives, on utilise la formule de conversion RGB->BW donnée par l'énoncé:
+            if(i>0){
+                byte above_red = read_component_rgb(melted,i-1,j,RED);
+                byte above_green = read_component_rgb(melted,i-1,j,GREEN);
+                byte above_blue = read_component_rgb(melted,i-1,j,BLUE);
+                byte above_value = 0.299*(double)above_red+0.587*(double)above_green+0.144*(double)above_blue;
+
+                if(above_value<curr_value){
+                    //write_component_rgb(melted,i,j,RED,above_red);
+                    //write_component_rgb(melted,i,j,GREEN,above_green);
+                    //write_component_rgb(melted,i,j,BLUE,above_blue);
+                    write_pixel_rgb(melted,i,j,above_red,above_green,above_blue);
+                }
+            }
+        }
+    }
+    return melted;
+}
+//2ème version, plus maligne: on convertit en image niveau de gris puis on effectue un appel récursif.
+//Il faut cependant une fonction auxiliaire pour savoir quel pointeur libérer, sinon on crée une fuite mémoire.

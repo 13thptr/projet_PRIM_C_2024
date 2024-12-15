@@ -49,4 +49,10 @@ picture * split_picture(picture p);
 /*Mélange*/
 picture merge_picture(picture red, picture green, picture blue);
 
+/*Eclaircissement*/
+picture brighten_picture(picture p, double factor);
+
+/*Fonte*/
+picture melt_picture(picture p, int number);
+
 #endif /*PICTURES_H*/
