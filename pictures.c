@@ -119,7 +119,6 @@ int write_picture(picture p, char * filename){
  * @param [in] width la largeur de l'image à créer
  * @param [in] height la hauteur de l'image à créer
  * @param [in] channels le nombre de canaux
- * @param [in] max ????
 
  * @assigns value  zones de mémoires modifiéres
  * 
@@ -128,10 +127,10 @@ int write_picture(picture p, char * filename){
  *   
  * @return rien
  */
-picture create_picture(unsigned int width, unsigned int height, unsigned int channels, byte max){
+picture create_picture(unsigned int width, unsigned int height, unsigned int channels){
     //assert(width>0&&height>0);
     assert(channels == RGB_PIXEL_SIZE||channels == BW_PIXEL_SIZE);
-    printf("max:%d\n",max);//éviter "unused parameter". à enlever.
+    //printf("max:%d\n",max);//éviter "unused parameter". à enlever.
     picture res;
     res.width = width;
     res.height = height;
@@ -153,7 +152,7 @@ picture copy_picture(picture p){
     assert(p.data!=NULL);
     assert(p.chan_num == BW_PIXEL_SIZE || p.chan_num == RGB_PIXEL_SIZE);
 
-    picture res = create_picture(p.width,p.height,p.chan_num,MAX_BYTE);
+    picture res = create_picture(p.width,p.height,p.chan_num);
     for(int k = 0; k<p.width*p.height*(int)p.chan_num;k++){
         res.data[k] = p.data[k];
     }
@@ -197,7 +196,7 @@ picture convert_to_color_picture(picture p){
         return copy_picture(p);
     }
     assert(p.chan_num == BW_PIXEL_SIZE);
-    picture res = create_picture(p.width,p.height,RGB_PIXEL_SIZE,MAX_BYTE);
+    picture res = create_picture(p.width,p.height,RGB_PIXEL_SIZE);
 
     /*Version alternative, sans utiliser les fonctions déjà écrites.
     for(int k=0;k<p.width*p.height*(int)p.chan_num;k++){
@@ -231,7 +230,7 @@ picture convert_to_gray_picture(picture p){
         return copy_picture(p);
     }
     assert(p.chan_num == RGB_PIXEL_SIZE);
-    picture res = create_picture(p.width,p.height,BW_PIXEL_SIZE,MAX_BYTE);
+    picture res = create_picture(p.width,p.height,BW_PIXEL_SIZE);
 
     /*for(int k=0;k<p.width*p.height;k++){
         res.data[k] = 299*p.data[3*k]+587*p.data[3*k+1]+114*p.data[3*k+2];
@@ -240,9 +239,9 @@ picture convert_to_gray_picture(picture p){
     */
     for(int i=0;i<res.height;i++){
         for(int j=0;j<res.width;j++){
-            byte red = 0.299*(double)read_component_rgb(p,i,j,RED);
-            byte green = 0.587*(double)read_component_rgb(p,i,j,GREEN);
-            byte blue = 0.114*(double)read_component_rgb(p,i,j,BLUE);
+            byte red = (byte)0.299*read_component_rgb(p,i,j,RED);
+            byte green = (byte)0.587*read_component_rgb(p,i,j,GREEN);
+            byte blue = (byte)0.114*read_component_rgb(p,i,j,BLUE);
             byte value = red+green+blue;
             write_pixel_bw(res,i,j,value);
         }
@@ -266,7 +265,7 @@ picture *split_picture(picture p){
     }
     picture *arr = malloc(sizeof(picture)*p.chan_num);
     for(int n=0;n<(int)p.chan_num;n++){
-        arr[n] = create_picture(p.width,p.height,BW_PIXEL_SIZE,MAX_BYTE);
+        arr[n] = create_picture(p.width,p.height,BW_PIXEL_SIZE);
        
         for(int i= 0;i<p.height;i++){
             for(int j=0;j<p.width;j++){
@@ -296,7 +295,7 @@ picture merge_picture(picture red, picture green, picture blue){
     //printf("height:%d\n",height);
     enum channel_number chan_num = 3;
 
-    picture res = create_picture(width,height,chan_num,MAX_BYTE);
+    picture res = create_picture(width,height,chan_num);
     for(int i=0;i<height;i++){
         for(int j=0;j<width;j++){
             byte r = read_component_bw(red,i,j);
@@ -350,9 +349,9 @@ picture melt_picture(picture p, int number){
             int i = rand()%(p.height);
             int j = rand()%(p.width);
             //Le pixel du dessus existe-t-il ?i>0
-            byte curr_red = 0.299*(double)read_component_rgb(melted,i,j,RED);
-            byte curr_green = 0.587*(double)read_component_rgb(melted,i,j,GREEN);
-            byte curr_blue = 0.114*(double)read_component_rgb(melted,i,j,BLUE);
+            byte curr_red = 0.299*read_component_rgb(melted,i,j,RED);
+            byte curr_green = 0.587*read_component_rgb(melted,i,j,GREEN);
+            byte curr_blue = 0.114*read_component_rgb(melted,i,j,BLUE);
             byte curr_value = curr_red+curr_green+curr_blue;
             //Pour comparer les luminosités respectives, on utilise la formule de conversion RGB->BW donnée par l'énoncé:
             if(i>0){
@@ -467,7 +466,7 @@ picture distance_picture(picture p1, picture p2){
     assert(p1.width==p2.width);
     assert(p1.height==p2.height);
     assert(p1.chan_num==p2.chan_num);
-    picture res = create_picture(p1.width,p2.height,p1.chan_num,MAX_BYTE);
+    picture res = create_picture(p1.width,p2.height,p1.chan_num);
     for(int k=0;k<(int)res.chan_num*res.width*res.height;k++){
         signed int diff = p1.data[k]-p2.data[k]; //même problème que d'habitude avec le type (byte)
         diff = diff>0 ?diff:-diff; //même effet que diff = abs(diff) sans la fonction abs.
@@ -484,7 +483,7 @@ picture mult_picture(picture p1, picture p2){
     assert(p1.width==p2.width);
     assert(p1.height==p2.height);
     assert(p1.chan_num==p2.chan_num);
-    picture res = create_picture(p1.width,p2.height,p1.chan_num,MAX_BYTE);
+    picture res = create_picture(p1.width,p2.height,p1.chan_num);
     for(int k=0;k<(int)res.chan_num*res.width*res.height;k++){
         
         double value =  p1.data[k]*p2.data[k];
@@ -500,7 +499,7 @@ picture mix_picture(picture p1, picture p2, picture p3){
         return p1;
     }
     assert(same_dimensions(p1,p2)&&same_dimensions(p2,p3));
-    picture res = create_picture(p1.width,p1.height,p1.chan_num,MAX_BYTE);
+    picture res = create_picture(p1.width,p1.height,p1.chan_num);
 
     for(int k=0;k<(int)res.chan_num*res.width*res.height;k++){
         double alpha = p3.data[k]/255.0;

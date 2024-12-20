@@ -42,8 +42,8 @@ prog: main.o pictures.o safe_malloc.o pixels.o filename.o lut.o
 	$(CC) $(CFLAGS) $^ -o $@
 
 pictures.o : pictures.c
-	gcc -c -Wall -Wextra -Wpedantic -fsanitize=address pictures.c -o pictures.o
-#$(CC) -c $(CFLAGS) $^ -o $@
+#gcc -c -Wall -Wextra -Wpedantic -fsanitize=address pictures.c -o pictures.o
+	$(CC) -c $(CFLAGS) $^ -o $@
 
 pixels.o : pixels.c
 	$(CC) -c $(CFLAGS) $^ -o $@
