@@ -70,7 +70,8 @@ picture read_picture(char *filename){
         res.chan_num = BW_PIXEL_SIZE;
     }
     else{
-        perror("Not binary ppm nor pgm file.Aborting...\n");
+        printf("%s:",filename);fflush(stdout);
+        perror("Not a binary ppm nor a pgm file.Aborting...\n");
         exit(1);
     }
     fgets( buffer ,BUFFER_SIZE , to_be_read );
@@ -177,6 +178,9 @@ bool is_color_picture(picture p){
 }
 void info_picture(picture p){
     printf("%d x% d x %d\n",p.width,p.height,p.chan_num);
+}
+bool same_dimensions(picture p1, picture p2){
+    return p1.chan_num==p2.chan_num&&p1.width==p2.width&&p1.height==p2.height;
 }
 /*
 Convertir une image en niveau de gris vers une image en couleur : picture convert_to_color_picture(picture p);
@@ -452,5 +456,55 @@ picture set_levels_picture(picture p, byte nb_levels){
     }
     apply_lut(res,set_lut);
     clean_lut(&set_lut);
+    return res;
+}
+/*Différence absolue*/
+picture distance_picture(picture p1, picture p2){
+    if(is_empty_picture(p1)&&is_empty_picture(p2)){
+        return p1;
+    }
+    /*On vérifie que les tailles et les types (couleur ou niveaux de gris) sont les mêmes*/
+    assert(p1.width==p2.width);
+    assert(p1.height==p2.height);
+    assert(p1.chan_num==p2.chan_num);
+    picture res = create_picture(p1.width,p2.height,p1.chan_num,MAX_BYTE);
+    for(int k=0;k<(int)res.chan_num*res.width*res.height;k++){
+        signed int diff = p1.data[k]-p2.data[k]; //même problème que d'habitude avec le type (byte)
+        diff = diff>0 ?diff:-diff; //même effet que diff = abs(diff) sans la fonction abs.
+        res.data[k] = (byte)diff;
+    }
+    return res;
+}
+/*Produit*/
+picture mult_picture(picture p1, picture p2){
+    if(is_empty_picture(p1)&&is_empty_picture(p2)){
+        return p1;
+    }
+    /*On vérifie que les tailles et les types (couleur ou niveaux de gris) sont les mêmes*/
+    assert(p1.width==p2.width);
+    assert(p1.height==p2.height);
+    assert(p1.chan_num==p2.chan_num);
+    picture res = create_picture(p1.width,p2.height,p1.chan_num,MAX_BYTE);
+    for(int k=0;k<(int)res.chan_num*res.width*res.height;k++){
+        
+        double value =  p1.data[k]*p2.data[k];
+        //value = value<MAX_BYTE?value:MAX_BYTE;
+        res.data[k] = (byte)value;
+    }
+    return res;
+}
+
+/*Mélange*/
+picture mix_picture(picture p1, picture p2, picture p3){
+    if(is_empty_picture(p1)&&is_empty_picture(p2)&&is_empty_picture(p3)){
+        return p1;
+    }
+    assert(same_dimensions(p1,p2)&&same_dimensions(p2,p3));
+    picture res = create_picture(p1.width,p1.height,p1.chan_num,MAX_BYTE);
+
+    for(int k=0;k<(int)res.chan_num*res.width*res.height;k++){
+        double alpha = p3.data[k]/255.0;
+        res.data[k] = (1.0-alpha)*(double)p1.data[k]+alpha*(double)p2.data[k];
+    }
     return res;
 }

@@ -37,6 +37,7 @@ picture copy_picture(picture p);
 bool is_empty_picture(picture p);
 bool is_gray_picture(picture p);
 bool is_color_picture(picture p);
+bool same_dimensions(picture p1, picture p2);
 void info_picture(picture p);
 
 /*Conversion*/
@@ -64,4 +65,11 @@ picture normalize_dynamic_picture(picture p);
 /*Réduction*/
 picture set_levels_picture(picture p, byte nb_levels);
 
+/*Différence absolue*/
+picture distance_picture(picture p1, picture p2);
+/*Produit*/
+picture mult_picture(picture p1, picture p2);
+
+/*Mélange*/
+picture mix_picture(picture p1, picture p2, picture p3);
 #endif /*PICTURES_H*/

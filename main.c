@@ -24,6 +24,8 @@
     si des techniques particulières méritent d’être mentionnées.
 
 */
+
+
 int main(int argc, char* argv[]){
 /* 
 On vous fournit un module filename.[h/c] qui vous permettra de
@@ -47,6 +49,11 @@ Vous pourrez ainsi extraire le nom du fichier image traité par votre programme
 
     test = read_picture(argv[1]);
 
+    char *dir = dir_from_path(argv[1]);
+    char *name = name_from_path(argv[1]);
+    char *ext = ext_from_path(argv[1]);
+
+
     /*Test des fonctions d'interrogation*/
     if(is_empty_picture(test)){
         printf("Empty picture.\n");
@@ -61,10 +68,9 @@ Vous pourrez ainsi extraire le nom du fichier image traité par votre programme
 
     picture copy = copy_picture(test);
     info_picture(copy);
-    char *dir = dir_from_path(argv[1]);
-    char *name = name_from_path(argv[1]);
+  
+
     char copy_op[5] = "copy"; //Cette syntaxe est nécessaire, on ne peut utiliser char* pour faire les choses proprement.
-    char *ext = ext_from_path(argv[1]);
     char *copy_concat = concat_parts(dir,name,copy_op,ext);
     write_picture(copy,copy_concat);
     free(copy_concat);
@@ -175,6 +181,54 @@ Vous pourrez ainsi extraire le nom du fichier image traité par votre programme
     write_picture(discretized,discretized_path);
     clean_picture(&discretized);
     free(discretized_path);
+    /* Distance (valeur absolue de la différence composante par composante)*/
+
+    char path1[27] = "Lenna_input/Lenna_gray.pgm"; 
+    char path2[25] = "Lenna_input/Lenna_BW.pgm";
+
+    picture p1 = read_picture(path1);
+    picture p2 = read_picture(path2);
+    picture dist = distance_picture(p1,p2);
+   
+    char dist_op[9] = "distance";
+    char *dist_path = concat_parts(dir,name,dist_op,pgm_ext);
+
+    write_picture(dist,dist_path);
+    clean_picture(&dist);
+    free(dist_path);
+
+    /*Produit composante par composante*/
+    picture prod = mult_picture(p1,p2);
+    char prod_op[5]="prod";
+    char *prod_path = concat_parts(dir,name,prod_op,pgm_ext);
+
+    write_picture(prod,prod_path);
+    clean_picture(&prod);
+    free(prod_path);
+
+    clean_picture(&p1);
+    clean_picture(&p2);
+
+    char path_a[28]="Lenna_input/Lenna_color.ppm";//37] //= "Lenna_input/Lenna_color_inverted.ppm";
+    char path_b[28]="Lenna_input/Lenna_color.ppm";
+    char path_c[25] = "Lenna_input/Lenna_BW.pgm";
+
+    char mix_op[4]="mix";
+    char *mix_path = concat_parts(dir,name,mix_op,ppm_ext);
+
+    picture p_a = read_picture(path_a);
+    picture p_b = read_picture(path_b);
+    picture p_c = read_picture(path_c);
+
+    picture mixed = mix_picture(p_a,p_b,p_c);
+    write_picture(mixed,mix_path);
+
+    clean_picture(&mixed);
+    free(mix_path);
+    
+    clean_picture(&p_a);
+    clean_picture(&p_b);
+    clean_picture(&p_c);
     /*On libère les chemins*/
     free(dir);
     free(name);
