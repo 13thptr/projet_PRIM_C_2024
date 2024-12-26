@@ -1,0 +1,27 @@
+Reste à faire sur le projet C:
+
+
+- 1 Formater le main comme demandé. Factoriser au maximum pour la lisibilité. 
+
+- 2 Terminer les fonctions voulues.
+
+- 3 Ajouter les @assigns, @requires, @ensures et en profiter pour relire mon code, attentivement.
+
+- 4 Ajouter les "assert" qui vont bien, où il faut.
+
+
+- Remettre les options maximales de compilation, y compris ISO C / W old style / Werror
+
+- Tester avec Valgrind.
+
+- Modifier le makefile pour utiliser une cible "all" tel que prescrit dans le cours.
+
+- Tester et re-tester
+
+- Ecrire le rapport en LaTeX
+
+- Faire lire le tout à MS
+
+- Faire une archive tar sans fichier git ni ce fichier TODO.
+
+- 

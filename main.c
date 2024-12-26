@@ -209,6 +209,7 @@ Vous pourrez ainsi extraire le nom du fichier image traité par votre programme
     clean_picture(&p1);
     clean_picture(&p2);
 
+    /*
     char path_a[28]="Lenna_input/Lenna_color.ppm";//37] //= "Lenna_input/Lenna_color_inverted.ppm";
     char path_b[28]="Lenna_input/Lenna_color.ppm";
     char path_c[25] = "Lenna_input/Lenna_BW.pgm";
@@ -229,6 +230,7 @@ Vous pourrez ainsi extraire le nom du fichier image traité par votre programme
     clean_picture(&p_a);
     clean_picture(&p_b);
     clean_picture(&p_c);
+    */
     /*On libère les chemins*/
     free(dir);
     free(name);
