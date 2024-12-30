@@ -92,16 +92,12 @@ OR           2) merge the two functions into a single one.
 */
 //@requires is_color_picture p
 void normalize_color_picture_wrapper(picture p, const char *res_dir, const char *name_p, char *res_ext){
-    
-
     picture *split = split_picture(p);
     for(int k = 0; k<(int)p.chan_num;++k){
         picture tmp = normalize_dynamic_picture(split[k]);
         clean_picture(&split[k]);
         split[k] = tmp;
     }
-
-    
     picture merged_result = merge_picture(split[0],split[1],split[2]);
 
     char dynamic_op[8] = "dynamic";
@@ -121,12 +117,11 @@ void normalize_color_picture_wrapper(picture p, const char *res_dir, const char 
 /**/
 void set_levels_wrapper(picture p, char *res_dir, char *name_p, char *res_ext){
 
-    /* 'Discrétisation' en blocs plus grossiers*/
-    picture discretized = set_levels_picture(p,8);
-    char discretized_op[12] = "discretized";
-    char *discretized_path = concat_parts(res_dir,name_p,discretized_op,res_ext);
+    picture levels = set_levels_picture(p,8);
+    char levels_op[7] = "levels";
+    char *levels_path = concat_parts(res_dir,name_p,levels_op,res_ext);
 
-    write_picture(discretized,discretized_path);
-    clean_picture(&discretized);
-    free(discretized_path);
+    write_picture(levels,levels_path);
+    clean_picture(&levels);
+    free(levels_path);
 }

@@ -119,13 +119,14 @@ int main(int argc, char* argv[]){
             split_picture_wrapper(current_pic,output_dir,name,pgm_ext);
             normalize_color_picture_wrapper(current_pic,output_dir,name,ext);
         }
-        /*Opérations ne dépendant pas du type d'image: brighten, melt,inverse...*/
+        /*Opérations ne dépendant pas du type d'image: brighten, melt,inverse, set_levels...*/
         brighten_picture_wrapper(current_pic,output_dir,name,ext);
 
         melt_picture_wrapper(current_pic,output_dir,name,ext);
 
         inverse_picture_wrapper(current_pic,output_dir,name,ext);
 
+        set_levels_wrapper(current_pic,output_dir,name,ext);
         
         /*Free and reset memory*/
         clean_picture(&current_pic);//Check the prototype clean_picture should have.
