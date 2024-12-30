@@ -28,3 +28,5 @@ void set_levels_wrapper(picture p, char *res_dir, char *name_p, char *res_ext);
 
 /*Resample: nearest neighbour policy*/
 void resample_nearest_wrapper(picture p, char *res_dir, char *name_p, char *res_ext, const double RESIZE_FACTOR);
+/*Resample: bilinear policy*/
+void resample_bilinear_wrapper(picture p, char *res_dir, char *name_p, char *res_ext, const double RESIZE_FACTOR);

@@ -460,6 +460,7 @@ picture mix_picture(picture p1, picture p2, picture p3){
     return res;
 }
 /*Rééchantillonnage avec la politique du plus proche voisin.*/
+/*Todo: transformer les 2 boucles en une sans mettre un if à l'intérieur (même s'il sera sûrement optimisé par le compilateur)*/
 picture resample_picture_nearest(picture image, unsigned int width, unsigned int height){
     const double epsilon = 1e-3;
     assert(width>0);
@@ -473,37 +474,31 @@ picture resample_picture_nearest(picture image, unsigned int width, unsigned int
     assert(ratio_x>epsilon);
     assert(ratio_y>epsilon);
 
-    //printf("ratio_x:%lf,ratio_y:%lf\n",ratio_x,ratio_y);
+
 
     double diff = ratio_x - ratio_y; diff = diff>0 ? diff:-diff;
 
     if(diff>epsilon){
         printf("Warning: the desired aspect ratio differs from that of the original image.\n");
     }
-    if(image.chan_num==BW_PIXEL_SIZE){
-        for(unsigned int i=0;i<height;++i){
-            for(unsigned int j=0;j<width;++j){
+  
+    for(unsigned int i=0;i<height;++i){
+        for(unsigned int j=0;j<width;++j){
 
-                unsigned int old_i = (int)((double)i/ratio_y);
-                unsigned int old_j = (int)((double)j/ratio_x);
-                
-                byte value = read_component_bw(image,old_i,old_j);
-                write_pixel_bw(res,i,j,value);
-            }
-        }
-    }else{
-        for(unsigned int i=0;i<height;++i){
-            for(unsigned int j=0;j<width;++j){
+            unsigned int old_i = (int)((double)i/ratio_y);
+            unsigned int old_j = (int)((double)j/ratio_x);
 
-                unsigned int old_i = (int)((double)i/ratio_y);
-                unsigned int old_j = (int)((double)j/ratio_x);
-                
+            if(image.chan_num==RGB_PIXEL_SIZE){
                 byte red = read_component_rgb(image,old_i,old_j,RED);
                 byte green = read_component_rgb(image,old_i,old_j,GREEN);
                 byte blue = read_component_rgb(image,old_i,old_j,BLUE);
-
                 write_pixel_rgb(res,i,j,red,green,blue);
             }
+            else{
+                byte value = read_component_bw(image,old_i,old_j);
+                write_pixel_bw(res,i,j,value);
+            }
+            
         }
     }
     return res;
