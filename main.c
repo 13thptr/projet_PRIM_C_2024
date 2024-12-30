@@ -25,6 +25,19 @@
 
 */
 
+//conv2col_wrapper (better code readability)
+//@ requires p is a grayscale (pgm) picture ?
+
+void conv2col_wrapper(picture p, char *dir_p,char *name_p, char *ext_p);
+
+void conv2col_wrapper(picture p, char *dir_p,char *name_p, char *ext_p){
+    picture conv2col = convert_to_color_picture(p);
+    char conv2col_op[9] = "conv2col"; //Check wanted filename
+    char *conv2col_concat = concat_parts(dir_p,name_p,conv2col_op,ext_p);
+    write_picture(conv2col,conv2col_concat);
+    clean_picture(&conv2col);
+    free(conv2col_concat);
+}
 
 int main(int argc, char* argv[]){
     /*Votre programme principal devra consister en la lecture d’une ou plusieurs images source depuis des fichiers (PGM ou PPM)
@@ -68,9 +81,13 @@ int main(int argc, char* argv[]){
 
     /*------------------------------------Récupération des différents éléments constituant le chemin------------------------------------*/
 
-    char **dir = malloc((argc-1)*sizeof(char*)); 
-    char **name = malloc((argc-1)*sizeof(char*));
-    char **ext = malloc((argc-1)*sizeof(char*)); 
+    const int NB_FILES = argc-1;
+
+
+    //Now why would we store everything into an array ? No reason. Just keep the current file info...
+    char *dir;
+    char *name; 
+    char *ext; 
 
     //printf("dir:%s,name:%s,ext:%s\n",dir,name,ext);
 
@@ -82,37 +99,42 @@ int main(int argc, char* argv[]){
 
     */
 
-    for(int i = 1;i<=argc;i++){
-        dir[]
-    }
+    /*----------------------------------------------Boucle principale-------------------------------------------------------------------*/
 
-    /*----------------------------------------------Test des fonctions d'interrogation-------------------------------------------------*/
-    if(is_empty_picture(pic)){
-        printf("Empty picture. Aborting...\n");
-        return EXIT_FAILURE;
-    }else{
-        printf("Non-empty picture. Proceeding...\n");
-    }
-    /*--------------------------------------------------------Tests principaux---------------------------------------------------------*/
+    for(int i = 1;i <= NB_FILES;++i){
+        dir = dir_from_path(argv[i]);
+        name = name_from_path(argv[i]);
+        ext = ext_from_path(argv[i]);
 
-    /*Conversion : GRAY->RGB*/
-    picture conv2col = convert_to_color_picture(pic1);/*TODO: instead of hardcoded first-argument conversion, convert every grayscale image.*/
-    char conv2col_op[9]="conv2col";
+        /*Read the i-th picture.*/
+        current_pic = read_picture(argv[i]);
+        /* Get and print pic info */
+        
+        info_picture(current_pic);
     
-    char *conv2col_concat = concat_parts(dir,name,conv2col_op,ppm_ext);
-    write_picture(conv2col,conv2col_concat);
-    clean_picture(&conv2col);
-    free(conv2col_concat);
+
+        /*Free and reset memory*/
+        clean_picture(&current_pic);//Check the prototype clean_picture should have.
+
+
+
+        free(dir);
+        free(name);
+        free(ext);
+        dir = NULL;
+        name = NULL;
+        ext = NULL;
+    }
 
 
 
     /*-------------------------------------------------Libération de la mémoire---------------------------------------------------------*/
-    free(dir);
-    free(name);
-    free(ext);
+    //free(dir);
+    //free(name);
+    //free(ext);
     
     
     /*clean_picture(&copy);*/
-    clean_picture(&pic);
+    
     return EXIT_SUCCESS;
 }

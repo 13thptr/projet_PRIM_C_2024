@@ -26,6 +26,8 @@ OBJECTIF / DATE LIMITE : TOUT FINIR AVANT LE MARDI 31 DEC.
 
         Je choisis la 2ème option. Pour ce faire, j'utilise des tableaux de chaînes de caractères.
 
+        -> Réalisation: des tableaux ?pour quoi faire ? Je n'ai pas besoin des précédents: je reviens sur de simples variables
+        dir,name,ext que je vais mettre à jour à chaque tour de boucle.
 
 
 
@@ -51,8 +53,11 @@ OBJECTIF / DATE LIMITE : TOUT FINIR AVANT LE MARDI 31 DEC.
 
 - 6: supprimer les fonctions et constantes inutilisées (je pense à la manipulation de pixels, à MAX_BYTE...) mentionner dans le rapport. + commit.
 
+- 7: vérifier que tous les prototypes de fonctions correspondent bien à ce qui était demandé.
 
 - Remettre les options maximales de compilation, y compris ISO C / W old style / Werror
+
+- Remplacer tous les "malloc" et "calloc" par "myalloc" (vérifier partout avec une recherche textuelle)
 
 - Tester avec Valgrind. (désactiver fsanitize=address pour ce faire)
 

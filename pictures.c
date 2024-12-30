@@ -44,6 +44,8 @@ TODO :
     @requires filename chemin valide vers un fichier .pgm ou .ppm valide
     @assigns rien
     @return une structure de type "picture"
+
+    TODO: replace strcmp with strncmp ? + Increase general safety 
 */
 picture read_picture(char *filename){
     FILE *to_be_read = NULL;
@@ -103,9 +105,9 @@ int write_picture(picture p, char * filename){
         return 1; //cf. man fopen.
     }
     if(p.chan_num == RGB_PIXEL_SIZE){
-        fprintf(f, "P6 \n%d %d\n255\n", p.width, p.height);
+        fprintf(f, "P6\n%d %d\n255\n", p.width, p.height);
     }else if(p.chan_num == BW_PIXEL_SIZE){
-        fprintf(f, "P5 \n%d %d\n255\n", p.width, p.height);
+        fprintf(f, "P5\n%d %d\n255\n", p.width, p.height);
     }else{
         fprintf(stderr,"Erreur de canal dans la fonction write_picture.\n");
         return 1;
