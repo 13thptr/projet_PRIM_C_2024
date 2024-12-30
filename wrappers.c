@@ -30,7 +30,7 @@ void split_picture_wrapper(picture p, char *res_dir, char *name_p, char *res_ext
     rgb_filename[0] = "red";
     rgb_filename[1] = "green";
     rgb_filename[2] = "blue";
-    for(int k=0;k<(int)p.chan_num;k++){
+    for(int k=0;k<(int)p.chan_num;++k){
         /*Faire dépendre la boucle de chan_num permet de gérer les cas d'image ppm ou pgm sans disjonction explicite.*/
         char *split_channel_concat = concat_parts(res_dir,name_p,rgb_filename[k],res_ext);
         write_picture(split_array[k],split_channel_concat);
@@ -86,6 +86,39 @@ void normalize_picture_wrapper(picture p, const char *res_dir, const char *name_
     clean_picture(&normalized);
     free(normalized_path);
 }
+/*normalize color picture using split & merge.
+TODO: either 1) change above function name to normalize_gray_picture_wrapper 
+OR           2) merge the two functions into a single one.
+*/
+//@requires is_color_picture p
+void normalize_color_picture_wrapper(picture p, const char *res_dir, const char *name_p, char *res_ext){
+    
+
+    picture *split = split_picture(p);
+    for(int k = 0; k<(int)p.chan_num;++k){
+        picture tmp = normalize_dynamic_picture(split[k]);
+        clean_picture(&split[k]);
+        split[k] = tmp;
+    }
+
+    
+    picture merged_result = merge_picture(split[0],split[1],split[2]);
+
+    char dynamic_op[8] = "dynamic";
+    char *normalized_path = concat_parts(res_dir,name_p,dynamic_op,res_ext);
+
+    write_picture(merged_result,normalized_path);
+
+    clean_picture(&split[0]);
+    clean_picture(&split[1]);
+    clean_picture(&split[2]);
+    clean_picture(&merged_result);
+
+    free(normalized_path);
+    free(split);
+}
+
+/**/
 void set_levels_wrapper(picture p, char *res_dir, char *name_p, char *res_ext){
 
     /* 'Discrétisation' en blocs plus grossiers*/

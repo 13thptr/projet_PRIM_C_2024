@@ -117,14 +117,16 @@ int main(int argc, char* argv[]){
         if(is_color_picture(current_pic)){
             convert_gray_wrapper(current_pic,output_dir,name,pgm_ext);
             split_picture_wrapper(current_pic,output_dir,name,pgm_ext);
+            normalize_color_picture_wrapper(current_pic,output_dir,name,ext);
         }
-        /*Opérations ne dépendant pas du type d'image: brighten, melt,...*/
+        /*Opérations ne dépendant pas du type d'image: brighten, melt,inverse...*/
         brighten_picture_wrapper(current_pic,output_dir,name,ext);
 
         melt_picture_wrapper(current_pic,output_dir,name,ext);
 
         inverse_picture_wrapper(current_pic,output_dir,name,ext);
 
+        
         /*Free and reset memory*/
         clean_picture(&current_pic);//Check the prototype clean_picture should have.
 
@@ -140,6 +142,8 @@ int main(int argc, char* argv[]){
     current_pic = read_picture("Lenna_input/Lenna_gray.pgm");
     normalize_picture_wrapper(current_pic,"Lenna_output","Lenna_gray",pgm_ext);
     clean_picture(&current_pic);
+
+ 
 
     /*-------------------------------------------------Libération de la mémoire---------------------------------------------------------*/
     //free(dir);
