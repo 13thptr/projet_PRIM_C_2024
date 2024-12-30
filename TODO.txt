@@ -43,6 +43,8 @@ OBJECTIF / DATE LIMITE : TOUT FINIR AVANT LE MARDI 31 DEC.
 
 - 3: Reprendre toutes les fonctions qui prennent une entrée utilisateur (en particulier read_picture)
     pour garantir la validité des images traitées. Tester sur les images incorrectes fournies + commit.
+    Rendre read_picture plus robuste ou plus stricte ? Cf. espace P5 \n vs P5\n. La fonction doit-elle accepter la 1ère entrée ?
+    
 
 - 3bis: (optionnel) Encapsuler les checks réalisés à l'étape 3 dans des fonctions pour les réutiliser 
     afin de vérifier la validité des images produites. + commit

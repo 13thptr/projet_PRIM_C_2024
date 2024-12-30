@@ -228,23 +228,20 @@ picture convert_to_color_picture(picture p){
 picture convert_to_gray_picture(picture p){
     assert(!is_empty_picture(p));
 
-    if(p.chan_num == BW_PIXEL_SIZE){
-        return copy_picture(p);
+    if(is_gray_picture(p)){
+        return copy_picture(p); //Enoncé: on se contentera d'en faire une copie
     }
-    assert(p.chan_num == RGB_PIXEL_SIZE);
+    assert(is_color_picture(p));
+
     picture res = create_picture(p.width,p.height,BW_PIXEL_SIZE);
 
-    /*for(int k=0;k<p.width*p.height;k++){
-        res.data[k] = 299*p.data[3*k]+587*p.data[3*k+1]+114*p.data[3*k+2];
-        res.data[k] /= 1000;
-    }
-    */
+    printf("Breakpoint.\n");
     for(int i=0;i<res.height;i++){
         for(int j=0;j<res.width;j++){
-            byte red = (byte)0.299*read_component_rgb(p,i,j,RED);
-            byte green = (byte)0.587*read_component_rgb(p,i,j,GREEN);
-            byte blue = (byte)0.114*read_component_rgb(p,i,j,BLUE);
-            byte value = red+green+blue;
+            double red = (double)0.299*read_component_rgb(p,i,j,RED);
+            double green = (double)0.587*read_component_rgb(p,i,j,GREEN);
+            double blue = (double)0.114*read_component_rgb(p,i,j,BLUE);
+            byte value = (byte)(red+green+blue);
             write_pixel_bw(res,i,j,value);
         }
     }

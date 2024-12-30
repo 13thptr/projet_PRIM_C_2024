@@ -28,17 +28,29 @@
 //conv2col_wrapper (better code readability)
 //@ requires p is a grayscale (pgm) picture ?
 
-void conv2col_wrapper(picture p, char *dir_p,char *name_p, char *ext_p);
+void convert_color_wrapper(picture p, char *dir_p,char *name_p, char *ext_p);
 
-void conv2col_wrapper(picture p, char *dir_p,char *name_p, char *ext_p){
+void convert_color_wrapper(picture p, char *dir_p,char *name_p, char *ext_p){
     picture conv2col = convert_to_color_picture(p);
-    char conv2col_op[9] = "conv2col"; //Check wanted filename
+    char conv2col_op[30] = "convert_color"; //Check wanted filename OK
     char *conv2col_concat = concat_parts(dir_p,name_p,conv2col_op,ext_p);
     write_picture(conv2col,conv2col_concat);
     clean_picture(&conv2col);
     free(conv2col_concat);
 }
 
+/*RGB->gray*/
+/*@requires picture is valid ppm file*/
+void convert_gray_wrapper(picture p, char *dir_p, char *name_p, char *ext_p);
+
+void convert_gray_wrapper(picture p, char *dir_p, char *name_p, char *ext_p){ 
+    picture conv2gray = convert_to_gray_picture(p);
+    char conv2gray_op[30]= "convert_gray";
+    char *conv2gray_concat = concat_parts(dir_p,name_p,conv2gray_op,ext_p);
+    write_picture(conv2gray,conv2gray_concat);
+    clean_picture(&conv2gray);
+    free(conv2gray_concat);
+}
 int main(int argc, char* argv[]){
     /*Votre programme principal devra consister en la lecture d’une ou plusieurs images source depuis des fichiers (PGM ou PPM)
     fournis en arguments du programme. Exemple :
@@ -65,7 +77,7 @@ int main(int argc, char* argv[]){
     les traitements au fur et à mesure, argument par argument, fonction par fonction en libérant la mémoire utilisée dès que possible/nécessaire.
     */
 
-    char output_path[13] = "Lenna_output"; /*Chemin pour produire les images afin de ne pas mélanger les entrées et les sorties*/
+    char output_dir[13] = "Lenna_output"; /*Chemin pour produire les images afin de ne pas mélanger les entrées et les sorties*/
 
   
 
@@ -111,11 +123,23 @@ int main(int argc, char* argv[]){
         /* Get and print pic info */
         
         info_picture(current_pic);
-    
+
+        /*conv2col:*/
+
+        /*Question: Que doit-il se passer si l'image courante est déjà une image couleur ?
+        Faut-il la traiter quand même ? On suppose que non dans un premier temps.
+        */
+        if(is_gray_picture(current_pic)){
+            convert_color_wrapper(current_pic,output_dir,name,ppm_ext);
+        }
+        if(is_color_picture(current_pic)){
+            convert_gray_wrapper(current_pic,output_dir,name,pgm_ext);
+        }
+
+
 
         /*Free and reset memory*/
         clean_picture(&current_pic);//Check the prototype clean_picture should have.
-
 
 
         free(dir);
