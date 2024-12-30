@@ -64,3 +64,4 @@ main.o : main.c
 
 clean:
 	rm -rf *.o
+	rm -rf Lenna_output/*

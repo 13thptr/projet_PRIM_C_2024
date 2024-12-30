@@ -27,217 +27,92 @@
 
 
 int main(int argc, char* argv[]){
-/* 
-On vous fournit un module filename.[h/c] qui vous permettra de
-Séparer un chemin vers un fichier image <dirname>/<name>.<ext> en ses composantes <dirname>, <name> et <ext>
-Composer un chemin vers un fichier image à partir de ces composantes.
-Vous pourrez ainsi extraire le nom du fichier image traité par votre programme
- et le customiser avec les noms des opérations que vous appliquerez dessus avant*/
+    /*Votre programme principal devra consister en la lecture d’une ou plusieurs images source depuis des fichiers (PGM ou PPM)
+    fournis en arguments du programme. Exemple :
+
+    ./projet Lenna_gray.pgm Lenna_color.ppm
+
+    REMARQUE: j'avais donc mal interprété la consigne au début. Le deuxième argument n'est pas la destination mais un autre fichier à traiter.
+
+    Il va falloir effectuer une boucle sur les arguments, mais dans un premier temps on peut supposer qu'il y en a exactement 2.
+
+    -> En fait non, pour éviter d'avoir à revenir sur cette partie du code, je vais directement gérer n entrées à l'aide d'une boucle.
+
+    */
 
     /*TODO: factoriser les tests qui se ressemblent à l'aide d'une fonction supplémentaire, déclarée avant le main.*/
-    picture test;
-    char* test_path;
+
+
+
+    /*-------------------------Déclaration des variables en amont (conforme à la norme ISO C)-------------------------------*/
+
+    picture current_pic; /*Variable qui sera mise à jour au fur et à mesure dans une boucle sur les arguments.*/
+
+    /*On évite de créer un tableau de "pictures" pour des raisons d'économie de mémoire. On effectue plutôt 
+    les traitements au fur et à mesure, argument par argument, fonction par fonction en libérant la mémoire utilisée dès que possible/nécessaire.
+    */
+
+    char output_path[13] = "Lenna_output"; /*Chemin pour produire les images afin de ne pas mélanger les entrées et les sorties*/
+
+  
 
     char ppm_ext[4] = "ppm";
     char pgm_ext[4] = "pgm";
     
-    if(argc!=3){
-        fprintf(stderr,"Usage:./prog <filename.[pgm|ppm]> <path_to_new_file.[pgm|ppm]\n");
+    /*Vérifications d'usage sur la bonne utilisation du programme. Proposer plus loin une aide pour les différentes options.*/
+    if(argc<2){
+        fprintf(stderr,"Usage:./prog <f1.[pgm|ppm]>...<fn.[pgm|ppm]>\n");
         return EXIT_FAILURE;
     }
-    test_path = argv[2];
-
-    test = read_picture(argv[1]);
-
-    char *dir = dir_from_path(argv[1]);
-    char *name = name_from_path(argv[1]);
-    char *ext = ext_from_path(argv[1]);
 
 
-    /*Test des fonctions d'interrogation*/
-    if(is_empty_picture(test)){
-        printf("Empty picture.\n");
-    }else{
-        printf("Non-empty picture.\n");
+    /*------------------------------------Récupération des différents éléments constituant le chemin------------------------------------*/
+
+    char **dir = malloc((argc-1)*sizeof(char*)); 
+    char **name = malloc((argc-1)*sizeof(char*));
+    char **ext = malloc((argc-1)*sizeof(char*)); 
+
+    //printf("dir:%s,name:%s,ext:%s\n",dir,name,ext);
+
+    /*
+        TODO: loop through a picture array.
+        
+        Be smart: do not load every picture into memory before processing them.  SO NOT A PICTURE ARRAY, JUST A FILENAME ARRAY.
+        Process the current picture (picture current_pic), free the memory and then go to the next one.argc
+
+    */
+
+    for(int i = 1;i<=argc;i++){
+        dir[]
     }
-    printf("%d\n",is_gray_picture(test));
-    printf("%d\n",is_color_picture(test));
-    info_picture(test);
 
-    write_picture(test,test_path);
+    /*----------------------------------------------Test des fonctions d'interrogation-------------------------------------------------*/
+    if(is_empty_picture(pic)){
+        printf("Empty picture. Aborting...\n");
+        return EXIT_FAILURE;
+    }else{
+        printf("Non-empty picture. Proceeding...\n");
+    }
+    /*--------------------------------------------------------Tests principaux---------------------------------------------------------*/
 
-    picture copy = copy_picture(test);
-    info_picture(copy);
-  
-
-    char copy_op[5] = "copy"; //Cette syntaxe est nécessaire, on ne peut utiliser char* pour faire les choses proprement.
-    char *copy_concat = concat_parts(dir,name,copy_op,ext);
-    write_picture(copy,copy_concat);
-    free(copy_concat);
-
-    /*Test: conversion.*/
-    /*GRAY>RGB*/
-    picture conv2col = convert_to_color_picture(test);
+    /*Conversion : GRAY->RGB*/
+    picture conv2col = convert_to_color_picture(pic1);/*TODO: instead of hardcoded first-argument conversion, convert every grayscale image.*/
     char conv2col_op[9]="conv2col";
     
     char *conv2col_concat = concat_parts(dir,name,conv2col_op,ppm_ext);
     write_picture(conv2col,conv2col_concat);
     clean_picture(&conv2col);
     free(conv2col_concat);
-    
-    /*RGB->GRAY*/
-    picture conv2bw = convert_to_gray_picture(test);
-    char conv2bw_op[9]= "conv2bw";
-    
-    char *conv2bw_concat = concat_parts(dir,name,conv2bw_op,pgm_ext);
-    write_picture(conv2bw,conv2bw_concat);
-
-    /*Eclaircissement: on utilise l'image convertie en noir et blanc. RGB->BW, que l'on libérera plus bas*/
-    char brighten_op[9]="brighten";
-    char *brighten_concat = concat_parts(dir,name,brighten_op,ext); 
-    picture brightened = brighten_picture(conv2bw,1.5);
-
-    write_picture(brightened,brighten_concat);
-    clean_picture(&brightened);
-    free(brighten_concat);
-
-    clean_picture(&conv2bw);
-    free(conv2bw_concat);
-
-    /*Split & merge*/
-    picture *split_test = split_picture(test);
-
-    char split_shared_str[7] = "split_";
-    for(char k=0;k<(char)test.chan_num;k++){
-        printf("k:%d\n",(int)k);
-        char *split_individualized_channel = malloc(sizeof(char)*8);
-
-        size_t max_length = 8;
-        strncpy(split_individualized_channel,split_shared_str,max_length);
-        split_individualized_channel[6] = 48+k;
-        split_individualized_channel[7] = '\0';
-        char *split_channel_concat = concat_parts(dir,name,split_individualized_channel,pgm_ext);
-
-        write_picture(split_test[(int)k],split_channel_concat);
-
-        free(split_individualized_channel);
-        free(split_channel_concat);
-        
-    }
-    
-    char merge_op[6] = "merge";
-    char *merge_concat = concat_parts(dir,name,merge_op,ppm_ext);
-    picture merged;
-    if(test.chan_num == RGB_PIXEL_SIZE){
-        merged = merge_picture(split_test[0],split_test[1],split_test[2]);
-    }else{
-        assert(test.chan_num == BW_PIXEL_SIZE);
-        merged = merge_picture(split_test[0],split_test[0],split_test[0]);
-    }
-    
-
-    write_picture(merged,merge_concat);
-    clean_picture(&merged);
-    free(merge_concat);
-    for(char k=0;k<(char)test.chan_num;k++){
-        clean_picture(&split_test[(int)k]);
-    }
-    free(split_test);
-
-    
-    picture melted = melt_picture(test,test.width*test.height*test.chan_num*5);
-    char melted_op[7]="melted";
-    char *melted_path = concat_parts(dir,name,melted_op,ext);
-
-    write_picture(melted,melted_path);
-    clean_picture(&melted);
-    free(melted_path);
 
 
-    /*LUT test*/
-    /*1) Inversion*/
-    picture inverted = inverse_picture(test);
-    char inverted_op[9] = "inverted";
-    char *inverted_path = concat_parts(dir,name,inverted_op,ext);
 
-    write_picture(inverted,inverted_path);
-    clean_picture(&inverted);
-    free(inverted_path);
-
-    /*2)Normalisation */
-    picture normalized = normalize_dynamic_picture(test);
-    char normalized_op[11] = "normalized";
-    char *normalized_path = concat_parts(dir,name,normalized_op,ext);
-
-    write_picture(normalized,normalized_path);
-    clean_picture(&normalized);
-    free(normalized_path);
-
-    /* 'Discrétisation' en blocs plus grossiers*/
-    picture discretized = set_levels_picture(test,8);
-    char discretized_op[12] = "discretized";
-    char *discretized_path = concat_parts(dir,name,discretized_op,ext);
-
-    write_picture(discretized,discretized_path);
-    clean_picture(&discretized);
-    free(discretized_path);
-    /* Distance (valeur absolue de la différence composante par composante)*/
-
-    char path1[27] = "Lenna_input/Lenna_gray.pgm"; 
-    char path2[25] = "Lenna_input/Lenna_BW.pgm";
-
-    picture p1 = read_picture(path1);
-    picture p2 = read_picture(path2);
-    picture dist = distance_picture(p1,p2);
-   
-    char dist_op[9] = "distance";
-    char *dist_path = concat_parts(dir,name,dist_op,pgm_ext);
-
-    write_picture(dist,dist_path);
-    clean_picture(&dist);
-    free(dist_path);
-
-    /*Produit composante par composante*/
-    picture prod = mult_picture(p1,p2);
-    char prod_op[5]="prod";
-    char *prod_path = concat_parts(dir,name,prod_op,pgm_ext);
-
-    write_picture(prod,prod_path);
-    clean_picture(&prod);
-    free(prod_path);
-
-    clean_picture(&p1);
-    clean_picture(&p2);
-
-    /*
-    char path_a[28]="Lenna_input/Lenna_color.ppm";//37] //= "Lenna_input/Lenna_color_inverted.ppm";
-    char path_b[28]="Lenna_input/Lenna_color.ppm";
-    char path_c[25] = "Lenna_input/Lenna_BW.pgm";
-
-    char mix_op[4]="mix";
-    char *mix_path = concat_parts(dir,name,mix_op,ppm_ext);
-
-    picture p_a = read_picture(path_a);
-    picture p_b = read_picture(path_b);
-    picture p_c = read_picture(path_c);
-
-    picture mixed = mix_picture(p_a,p_b,p_c);
-    write_picture(mixed,mix_path);
-
-    clean_picture(&mixed);
-    free(mix_path);
-    
-    clean_picture(&p_a);
-    clean_picture(&p_b);
-    clean_picture(&p_c);
-    */
-    /*On libère les chemins*/
+    /*-------------------------------------------------Libération de la mémoire---------------------------------------------------------*/
     free(dir);
     free(name);
     free(ext);
     
     
-    clean_picture(&copy);
-    clean_picture(&test);
+    /*clean_picture(&copy);*/
+    clean_picture(&pic);
     return EXIT_SUCCESS;
 }
