@@ -67,7 +67,9 @@ int main(int argc, char* argv[]){
         /*Rééchantillonnages:*/
         resample_nearest_wrapper(current_pic,output_dir,name,ext,1.0/LARGER_FACTOR);/*Plus petit d'un facteur 1.36*/
         resample_nearest_wrapper(current_pic,output_dir,name,ext,LARGER_FACTOR);/*Plus grand d'un facteur 1.36*/
-
+        
+        resample_bilinear_wrapper(current_pic,output_dir,name,ext,1.0/LARGER_FACTOR);
+        resample_bilinear_wrapper(current_pic,output_dir,name,ext,LARGER_FACTOR);
 
         /*Free and reset memory*/
         clean_picture(&current_pic);//Check the prototype clean_picture should have.

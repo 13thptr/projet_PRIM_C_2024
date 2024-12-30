@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
@@ -12,13 +11,16 @@
 #include "lut.h"
 
 
+
 /*
 TODO :
 - implémenter: ignorer les commentaires
 - sanitize input...
 - prendre en compte la valeur maximale de la troisième ligne (en "bonus").
 */
-#define BUFFER_SIZE 32
+#define BUFFER_SIZE (32)
+
+#define EPSILON (1e-3)
 /*
     Fonction read_picture
     @param filename chemin vers un fichier
@@ -454,31 +456,32 @@ picture mix_picture(picture p1, picture p2, picture p3){
     picture res = create_picture(p1.width,p1.height,p1.chan_num);
 
     for(int k=0;k<(int)res.chan_num*res.width*res.height;k++){
-        double alpha = p3.data[k]/255.0;
+        double alpha = (double)p3.data[k]/255.0;
         res.data[k] = (1.0-alpha)*(double)p1.data[k]+alpha*(double)p2.data[k];
     }
     return res;
 }
-/*Rééchantillonnage avec la politique du plus proche voisin.*/
-/*Todo: transformer les 2 boucles en une sans mettre un if à l'intérieur (même s'il sera sûrement optimisé par le compilateur)*/
+
+
 
 void check_resamplable(picture image, unsigned int width, unsigned int height,double *rx,double *ry){
-    const double epsilon = 1e-3;
+    //const double EPSILON = 1e-3;
     assert(width>0);
     assert(height>0);
     assert(!is_empty_picture(image));
 
     *rx = (double)width/(double)image.width;
     *ry = (double)height/(double)image.height;
-    assert(*rx>epsilon);
-    assert(*ry>epsilon);
+    assert(*rx>EPSILON);
+    assert(*ry>EPSILON);
 
     double diff = *rx - *ry; diff = diff>0?diff:-diff;
 
-    if(diff>epsilon){
+    if(diff>EPSILON){
         printf("Warning: the desired aspect ratio differs from that of the original image.\n");
     }
 }
+/*Rééchantillonnage avec la politique du plus proche voisin.*/
 picture resample_picture_nearest(picture image, unsigned int width, unsigned int height){
     
     picture res = create_picture(width,height,image.chan_num);
@@ -514,5 +517,82 @@ picture resample_picture_nearest(picture image, unsigned int width, unsigned int
     }
     return res;
 }
+double min_double(double d1, double d2){
+    return d1<d2?d1:d2;
+}
+int min_int(int a, int b){
+    return a<b?a:b;
+}
+picture resample_picture_bilinear(picture image, unsigned int width, unsigned int height){
+       
+    picture res; 
 
-//picture resample_picture_bilinear()
+    double ratio_x;
+    double ratio_y;
+
+    check_resamplable(image,width,height,&ratio_x,&ratio_y);
+
+    if(image.chan_num==RGB_PIXEL_SIZE){
+        picture *split = split_picture(image);
+        for(int k=0;k<3;++k){
+            picture tmp = resample_picture_bilinear(split[k],width,height);
+            clean_picture(&split[k]);
+            split[k] = tmp;
+        }
+        
+        res = merge_picture(split[0],split[1],split[2]);
+        clean_picture(&split[0]);
+        clean_picture(&split[1]);
+        clean_picture(&split[2]);
+        free(split);
+        return res;
+    }
+    res = create_picture(width,height,image.chan_num);
+    for(unsigned int i=0;i<height;++i){
+        for(unsigned int j=0;j<width;++j){
+
+            double y = (double)i/ratio_y;
+            double x = (double)j/ratio_x;
+            unsigned int old_i = (int)y;
+            unsigned int old_j = (int)x;
+
+            int x1 = old_j;
+            int x2 = min_int(old_j+1,image.width-1);
+
+            int y1 = min_int(old_i+1,image.height-1);
+            int y2 = old_i;
+            
+            
+            byte top_left = read_component_bw(image,y2,x1);
+            byte top_right = read_component_bw(image,y2,x2);
+            byte bottom_right = read_component_bw(image,y1,x2);
+            byte bottom_left = read_component_bw(image,y1,x1);
+
+            double alpha = 1.0;
+            if(abs(x2-x1)>0){
+                alpha = (x2-x)/(x2-x1);
+            }
+            
+            double beta = 1.0;
+            if(abs(y2-y1)>0){
+                beta = (y2-y)/(y2-y1);
+            }
+
+
+            double val_1 = alpha*(double)bottom_left+(1.0-alpha)*(double)bottom_right;
+            double val_2 = alpha*(double)top_left+(1.0-alpha)*(double)top_right;
+
+            byte val = (byte)min_double(beta*val_1+(1.0-beta)*val_2,255.0);
+            write_pixel_bw(res,i,j,val);
+        }
+            
+        
+    }
+    return res;
+}
+/*
+Définir une fonction d'ordre supérieur qui applique une fonction prenant des images en noir et blanc 
+aux composantes RGB d'une image couleur passée en argument, puis renvoie la fusion des trois résultats.
+
+Utiliser cette fonction pour améliorer / factoriser resample et melt_picture ?
+*/
