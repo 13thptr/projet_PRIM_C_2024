@@ -469,28 +469,28 @@ picture resample_picture_nearest(picture image, unsigned int width, unsigned int
 
     double ratio_x = (double)width / (double)image.width;
     double ratio_y = (double)height/ (double)image.height;
-    printf("ratio_x:%lf,ratio_y:%lf\n",ratio_x,ratio_y);
+
+    assert(ratio_x>epsilon);
+    assert(ratio_y>epsilon);
+
+    //printf("ratio_x:%lf,ratio_y:%lf\n",ratio_x,ratio_y);
+
     double diff = ratio_x - ratio_y; diff = diff>0 ? diff:-diff;
+
     if(diff>epsilon){
         printf("Warning: the desired aspect ratio differs from that of the original image.\n");
     }
 
-        for(unsigned int i=0;i<height;++i){
-            for(unsigned int j=0;j<width;++j){
-                int old_i = (int)((double)i/ratio_y);
-                int old_j = (int)((double)j/ratio_x);
-                assert((int)old_i<image.height);
-                assert((int)old_j<image.width);
-                if(old_i<0){
-                    printf("%d: %lf %d\n",old_i,ratio_y,i);
-                }
-                assert(0<=old_i);
-                assert(0<=old_j&&old_j<image.width);
-                byte value = image.data[i*image.width+j];
-                //read_component_bw(image,old_i,old_j);
-                write_pixel_bw(res,i,j,value);
-            }
+    for(unsigned int i=0;i<height;++i){
+        for(unsigned int j=0;j<width;++j){
+
+            unsigned int old_i = (int)((double)i/ratio_y);
+            unsigned int old_j = (int)((double)j/ratio_x);
+            
+            byte value = read_component_bw(image,old_i,old_j);
+            write_pixel_bw(res,i,j,value);
         }
-   
+    }
+    
     return res;
 }
