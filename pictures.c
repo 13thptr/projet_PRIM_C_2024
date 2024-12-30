@@ -241,7 +241,8 @@ picture convert_to_gray_picture(picture p){
             double red = (double)0.299*read_component_rgb(p,i,j,RED);
             double green = (double)0.587*read_component_rgb(p,i,j,GREEN);
             double blue = (double)0.114*read_component_rgb(p,i,j,BLUE);
-            byte value = (byte)(red+green+blue);
+            double sum = red+green+blue;
+            byte value = (byte)(sum<255?sum:255);
             write_pixel_bw(res,i,j,value);
         }
     }
