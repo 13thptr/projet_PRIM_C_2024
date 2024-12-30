@@ -32,6 +32,7 @@ OBJECTIF / DATE LIMITE : TOUT FINIR AVANT LE MARDI 31 DEC.
 
 
 - 1: Formater le main comme demandé. Factoriser au maximum pour la lisibilité. + commit
+- 1 bis: Mettre le merge_picture en option (pas demandé, d'où "en option".)
 
 - 2: Terminer les fonctions voulues. + commit
 

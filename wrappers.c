@@ -52,3 +52,14 @@ void brighten_picture_wrapper(picture p, char *res_dir, char *name_p, char *res_
     clean_picture(&brightened);
     free(brighten_concat);
 }
+
+void melt_picture_wrapper(picture p, char *res_dir, char *name_p, char *res_ext){
+    
+    picture melted = melt_picture(p,p.width*p.height*p.chan_num*5);
+    char melted_op[7]="melted";
+    char *melted_path = concat_parts(res_dir,name_p,melted_op,res_ext);
+
+    write_picture(melted,melted_path);
+    clean_picture(&melted);
+    free(melted_path);
+}

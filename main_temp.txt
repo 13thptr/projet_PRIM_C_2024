@@ -1,20 +1,4 @@
 
-    
-
-    /*Eclaircissement: on utilise l'image convertie en noir et blanc. RGB->BW, que l'on libérera plus bas*/
-    char brighten_op[9]="brighten";
-    char *brighten_concat = concat_parts(dir,name,brighten_op,ext); 
-    picture brightened = brighten_picture(conv2bw,1.5);
-
-    write_picture(brightened,brighten_concat);
-    clean_picture(&brightened);
-    free(brighten_concat);
-
-    clean_picture(&conv2bw);
-    free(conv2bw_concat);
-
-    
-    
     char merge_op[6] = "merge";
     char *merge_concat = concat_parts(dir,name,merge_op,ppm_ext);
     picture merged;

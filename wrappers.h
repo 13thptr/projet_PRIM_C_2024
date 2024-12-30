@@ -13,3 +13,6 @@ void split_picture_wrapper(picture p, char *res_dir, char *name_p, char *res_ext
 
 /*Brighten*/
 void brighten_picture_wrapper(picture p, char *res_dir, char *name_p, char *res_ext);
+
+/*Melt*/
+void melt_picture_wrapper(picture p, char *res_dir, char *name_p, char *res_ext);

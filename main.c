@@ -110,11 +110,7 @@ int main(int argc, char* argv[]){
         
         info_picture(current_pic);
 
-        /*conv2col:*/
-
-        /*Question: Que doit-il se passer si l'image courante est déjà une image couleur ?
-        Faut-il la traiter quand même ? On suppose que non dans un premier temps.
-        */
+     
         if(is_gray_picture(current_pic)){
             convert_color_wrapper(current_pic,output_dir,name,ppm_ext);
         }
@@ -122,9 +118,11 @@ int main(int argc, char* argv[]){
             convert_gray_wrapper(current_pic,output_dir,name,pgm_ext);
             split_picture_wrapper(current_pic,output_dir,name,pgm_ext);
         }
-        /*Que l'image soit en niveau de gris (pgm), en noir et blanc (pgm) ou en couleur, on l'éclaircit:*/
-        /*(remarque: effet nul sur une image strictement en noir et blanc ?)*/
+        /*Opérations ne dépendant pas du type d'image: brighten, melt,...*/
         brighten_picture_wrapper(current_pic,output_dir,name,ext);
+
+        melt_picture_wrapper(current_pic,output_dir,name,ext);
+
 
         /*Free and reset memory*/
         clean_picture(&current_pic);//Check the prototype clean_picture should have.
