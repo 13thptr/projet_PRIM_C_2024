@@ -233,7 +233,7 @@ picture convert_to_gray_picture(picture p){
     }
     assert(is_color_picture(p));
     picture res = create_picture(p.width,p.height,BW_PIXEL_SIZE);
-    
+
     for(int i=0;i<res.height;i++){
         for(int j=0;j<res.width;j++){
             double red = (double)0.299*read_component_rgb(p,i,j,RED);
@@ -309,10 +309,6 @@ picture brighten_picture(picture p, double factor){
     picture res = copy_picture(p);
     for(unsigned int k=0;k<res.width*res.height*res.chan_num;k++){
         double value = (double)res.data[k]*factor;
-        /*J'ai passé quelques minutes à comprendre pourquoi cette fonction ne marchait pas initialement, 
-        je faisais le calcul de 'value' directement avec des types "byte", ce qui causait un dépassement d'entier ou plutôt de char
-        il faut donc faire le calcul avec des doubles, puis caster.
-        */
         value = (value <(double)MAX_BYTE)?value:(double)MAX_BYTE; 
         res.data[k] = (byte)value;
     }

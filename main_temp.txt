@@ -13,26 +13,7 @@
     clean_picture(&conv2bw);
     free(conv2bw_concat);
 
-    /*Split & merge*/
-    picture *split_test = split_picture(test);
-
-    char split_shared_str[7] = "split_";
-    for(char k=0;k<(char)test.chan_num;k++){
-        printf("k:%d\n",(int)k);
-        char *split_individualized_channel = malloc(sizeof(char)*8);
-
-        size_t max_length = 8;
-        strncpy(split_individualized_channel,split_shared_str,max_length);
-        split_individualized_channel[6] = 48+k;
-        split_individualized_channel[7] = '\0';
-        char *split_channel_concat = concat_parts(dir,name,split_individualized_channel,pgm_ext);
-
-        write_picture(split_test[(int)k],split_channel_concat);
-
-        free(split_individualized_channel);
-        free(split_channel_concat);
-        
-    }
+    
     
     char merge_op[6] = "merge";
     char *merge_concat = concat_parts(dir,name,merge_op,ppm_ext);

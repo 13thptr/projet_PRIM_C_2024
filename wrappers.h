@@ -10,3 +10,6 @@ void convert_gray_wrapper(picture p, char *dir_p, char *name_p, char *ext_p);
 
 /*RGB->red component,green component, blue component*/
 void split_picture_wrapper(picture p, char *res_dir, char *name_p, char *res_ext);
+
+/*Brighten*/
+void brighten_picture_wrapper(picture p, char *res_dir, char *name_p, char *res_ext);

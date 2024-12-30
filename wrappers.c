@@ -42,3 +42,13 @@ void split_picture_wrapper(picture p, char *res_dir, char *name_p, char *res_ext
     /*On libère le tableau d'images.*/
     free(split_array);
 }
+/*Brighten (doit marcher sur RGB & BW alike)*/
+void brighten_picture_wrapper(picture p, char *res_dir, char *name_p, char *res_ext){
+    char brighten_op[9]="brighten";
+    char *brighten_concat = concat_parts(res_dir,name_p,brighten_op,res_ext); 
+    picture brightened = brighten_picture(p,1.5);
+
+    write_picture(brightened,brighten_concat);
+    clean_picture(&brightened);
+    free(brighten_concat);
+}
