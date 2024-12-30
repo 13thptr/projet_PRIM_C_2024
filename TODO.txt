@@ -44,7 +44,7 @@ OBJECTIF / DATE LIMITE : TOUT FINIR AVANT LE MARDI 31 DEC.
 - 3: Reprendre toutes les fonctions qui prennent une entrée utilisateur (en particulier read_picture)
     pour garantir la validité des images traitées. Tester sur les images incorrectes fournies + commit.
     Rendre read_picture plus robuste ou plus stricte ? Cf. espace P5 \n vs P5\n. La fonction doit-elle accepter la 1ère entrée ?
-    
+
 
 - 3bis: (optionnel) Encapsuler les checks réalisés à l'étape 3 dans des fonctions pour les réutiliser 
     afin de vérifier la validité des images produites. + commit
@@ -56,6 +56,8 @@ OBJECTIF / DATE LIMITE : TOUT FINIR AVANT LE MARDI 31 DEC.
 - 6: supprimer les fonctions et constantes inutilisées (je pense à la manipulation de pixels, à MAX_BYTE...) mentionner dans le rapport. + commit.
 
 - 7: vérifier que tous les prototypes de fonctions correspondent bien à ce qui était demandé.
+
+- 8: fusionner wrappers.h|c et safe_malloc.h|c ?
 
 - Remettre les options maximales de compilation, y compris ISO C / W old style / Werror
 
@@ -78,6 +80,8 @@ OBJECTIF / DATE LIMITE : TOUT FINIR AVANT LE MARDI 31 DEC.
 
     + Mentionner le paramètre inutile, sa suppression et le traitement de la constante rendue inutile (?) MAX_BYTE.
 
+    + Mentionner l'ajout dans filename.h et filename.c du mot clef "const" à cause de l'erreur -Wdiscarded-qualifiers.
+    + Mentionner l'autre modification apportée à filename.h - > Demander à momo ?
 
     + Parler de l'évolution des fonctions dans le temps: ajout de checks à la fin, difficultés éventuelles ou même absence de difficultés.
     

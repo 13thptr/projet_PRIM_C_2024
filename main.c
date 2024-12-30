@@ -120,6 +120,7 @@ int main(int argc, char* argv[]){
         }
         if(is_color_picture(current_pic)){
             convert_gray_wrapper(current_pic,output_dir,name,pgm_ext);
+            split_picture_wrapper(current_pic,output_dir,name,pgm_ext);
         }
 
 
