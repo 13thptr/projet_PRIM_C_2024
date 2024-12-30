@@ -84,6 +84,11 @@ OBJECTIF / DATE LIMITE : TOUT FINIR AVANT LE MARDI 31 DEC.
     + Mentionner le paramètre inutile, sa suppression et le traitement de la constante rendue inutile (?) MAX_BYTE.
 
     + Mentionner l'ajout dans filename.h et filename.c du mot clef "const" à cause de l'erreur -Wdiscarded-qualifiers.
+    
+    + Mentionner les histoires de if dans une double boucle (cf. pictures.c) et mon choix de factoriser (boucle d'abord, if ensuite)
+      + le choix de l'optimisation à la compilation -O2 pour "compenser" ce genre de choses.
+      
+
     + Mentionner l'autre modification apportée à filename.h - > Demander à momo ?
 
     + Parler de l'évolution des fonctions dans le temps: ajout de checks à la fin, difficultés éventuelles ou même absence de difficultés.

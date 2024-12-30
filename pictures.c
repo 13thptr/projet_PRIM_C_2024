@@ -461,27 +461,38 @@ picture mix_picture(picture p1, picture p2, picture p3){
 }
 /*Rééchantillonnage avec la politique du plus proche voisin.*/
 /*Todo: transformer les 2 boucles en une sans mettre un if à l'intérieur (même s'il sera sûrement optimisé par le compilateur)*/
-picture resample_picture_nearest(picture image, unsigned int width, unsigned int height){
+
+void check_resamplable(picture image, unsigned int width, unsigned int height,double *rx,double *ry){
     const double epsilon = 1e-3;
     assert(width>0);
     assert(height>0);
     assert(!is_empty_picture(image));
-    picture res = create_picture(width,height,image.chan_num);
 
-    double ratio_x = (double)width / (double)image.width;
-    double ratio_y = (double)height/ (double)image.height;
+    *rx = (double)width/(double)image.width;
+    *ry = (double)height/(double)image.height;
+    assert(*rx>epsilon);
+    assert(*ry>epsilon);
 
-    assert(ratio_x>epsilon);
-    assert(ratio_y>epsilon);
-
-
-
-    double diff = ratio_x - ratio_y; diff = diff>0 ? diff:-diff;
+    double diff = *rx - *ry; diff = diff>0?diff:-diff;
 
     if(diff>epsilon){
         printf("Warning: the desired aspect ratio differs from that of the original image.\n");
     }
-  
+}
+picture resample_picture_nearest(picture image, unsigned int width, unsigned int height){
+    
+    picture res = create_picture(width,height,image.chan_num);
+
+    double ratio_x;
+    double ratio_y;
+
+    check_resamplable(image,width,height,&ratio_x,&ratio_y);
+
+    /*
+    Remarque: la condition dans le "if" est indépendante de i et de j. On pourrait donc la sortir de la double boucle,
+    ce que j'ai fait dans une version précédente (cf git log) (mentionner dans le rapport)
+
+    */
     for(unsigned int i=0;i<height;++i){
         for(unsigned int j=0;j<width;++j){
 
@@ -503,3 +514,5 @@ picture resample_picture_nearest(picture image, unsigned int width, unsigned int
     }
     return res;
 }
+
+//picture resample_picture_bilinear()
