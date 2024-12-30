@@ -47,8 +47,10 @@ OBJECTIF / DATE LIMITE : TOUT FINIR AVANT LE MARDI 31 DEC.
     Rendre read_picture plus robuste ou plus stricte ? Cf. espace P5 \n vs P5\n. La fonction doit-elle accepter la 1ère entrée ?
 
 
-- 3bis: (optionnel) Encapsuler les checks réalisés à l'étape 3 dans des fonctions pour les réutiliser 
+- 3 bis: (optionnel) Encapsuler les checks réalisés à l'étape 3 dans des fonctions pour les réutiliser 
     afin de vérifier la validité des images produites. + commit
+
+- 3 ter: faire en sorte de prendre en compte la valeur maximale des pixels (cf. énoncé)
 
 - 4: Ajouter les @assigns, @requires, @ensures et en profiter pour relire mon code, attentivement.+commit
 

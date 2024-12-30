@@ -10,26 +10,7 @@
 #include "pictures.h"
 #include "pixels.h"
 #include "lut.h"
-/*#include "pixels.h"*/
-/*
-La troisième ligne contient la valeur maximale des pixels à lire dans ce qui suit ...: Ici 255.
 
-    Cette valeur maximale peut varier entre 1 et 255.
-    Si cette valeur était 64 cela voudrait dire qu’un pixel composé des valeurs (r=64,v=64,b=64)
-     correspondrait à la couleur blanche, alors que si le maximum est de 255 un pixel (r=64,v=64,b=64) correspond à du gris foncé.
-    Pour simplifier les choses nous ne prendrons pas en compte cette valeur maximale dans nos structures de données
-     (ce qui revient implicitement à considérer une valeur maximale de 255 dans nos images).
-
-      Néanmoins, dans ce cas il faudra la prendre en compte lors de la lecture des fichiers
-       et corriger les valeurs des composantes des pixels (par 255max) pour qu’elles soient comprises dans l’intervalle [0⋯255]
-        au lieu de la valeur maximale indiquée dans la 3ème ligne du fichier.
-
-Après la première ligne et avant la quatrième ligne il peut y avoir un nombre indéterminé de 
-lignes commençant par le caractère # que l’on doit considérer comme des lignes de commentaires et donc ignorer.
-La quatrième ligne ... ou tout ce qui suit correspond aux données binaires des pixels.
- Dans le cas présenté ci-dessus il y a donc 512×512×3=786432 octets à lire avant la fin du fichier.
-
-*/
 
 /*
 TODO :
@@ -199,14 +180,6 @@ picture convert_to_color_picture(picture p){
     }
     assert(p.chan_num == BW_PIXEL_SIZE);
     picture res = create_picture(p.width,p.height,RGB_PIXEL_SIZE);
-
-    /*Version alternative, sans utiliser les fonctions déjà écrites.
-    for(int k=0;k<p.width*p.height*(int)p.chan_num;k++){
-        byte value = p.data[k];
-        res.data[3*k] = value;
-        res.data[3*k+1] = value;
-        res.data[3*k+2] = value; 
-    }*/
     
     for(int i=0;i<res.height;i++){
         for(int j=0;j<res.width;j++){
@@ -316,12 +289,6 @@ picture brighten_picture(picture p, double factor){
 }
 
 picture melt_picture(picture p, int number){
-    /*On choisit N pixels au hasard dans l’image. Pour chacun de ces pixels,
-    si le pixel situé juste au dessus est plus sombre que le pixel choisi alors le pixel courant prends la valeur du pixel du dessus.
-    [in] p l’image à faire fondre
-    [in] number le nombre de pixels à choisir aléatoirement
-    [out] l’image contenant les pixels qui ont fondu vers le bas*/
-
     /*Il faut distinguer deux cas: image en niveaux de gris ou couleur.*/
 
     picture melted = copy_picture(p);
@@ -355,9 +322,6 @@ picture melt_picture(picture p, int number){
                 byte above_value = 0.299*(double)above_red+0.587*(double)above_green+0.144*(double)above_blue;
 
                 if(above_value<curr_value){
-                    //write_component_rgb(melted,i,j,RED,above_red);
-                    //write_component_rgb(melted,i,j,GREEN,above_green);
-                    //write_component_rgb(melted,i,j,BLUE,above_blue);
                     write_pixel_rgb(melted,i,j,above_red,above_green,above_blue);
                 }
             }
@@ -365,12 +329,6 @@ picture melt_picture(picture p, int number){
     }
     return melted;
 }
-//2ème version, plus maligne: on convertit en image niveau de gris puis on effectue un appel récursif.
-//Il faut cependant une fonction auxiliaire pour savoir quel pointeur libérer, sinon on crée une fuite mémoire.
-/*A faire...*/
-
-
-/*Look-up tables:*/
 
 /*
     QUESTION/TODO:
@@ -420,11 +378,11 @@ picture normalize_dynamic_picture(picture p){
     lut normalize_lut = create_lut(MAX_BYTE+1);
 
     for(int c=min;c<=max;c++){
-
         double val = 0;
         if(max!=min){
+            /*On évite les divisions par 0.*/
             double range = (double)max-(double)min;
-            val=255.0*(((double)c- (double)min)/range);
+            val = 255.0*(((double)c- (double)min)/range);
         }
         else
             val = 0.0;
@@ -499,5 +457,40 @@ picture mix_picture(picture p1, picture p2, picture p3){
         double alpha = p3.data[k]/255.0;
         res.data[k] = (1.0-alpha)*(double)p1.data[k]+alpha*(double)p2.data[k];
     }
+    return res;
+}
+/*Rééchantillonnage avec la politique du plus proche voisin.*/
+picture resample_picture_nearest(picture image, unsigned int width, unsigned int height){
+    const double epsilon = 1e-3;
+    assert(width>0);
+    assert(height>0);
+    assert(!is_empty_picture(image));
+    picture res = create_picture(width,height,image.chan_num);
+
+    double ratio_x = (double)width / (double)image.width;
+    double ratio_y = (double)height/ (double)image.height;
+    printf("ratio_x:%lf,ratio_y:%lf\n",ratio_x,ratio_y);
+    double diff = ratio_x - ratio_y; diff = diff>0 ? diff:-diff;
+    if(diff>epsilon){
+        printf("Warning: the desired aspect ratio differs from that of the original image.\n");
+    }
+
+        for(unsigned int i=0;i<height;++i){
+            for(unsigned int j=0;j<width;++j){
+                int old_i = (int)((double)i/ratio_y);
+                int old_j = (int)((double)j/ratio_x);
+                assert((int)old_i<image.height);
+                assert((int)old_j<image.width);
+                if(old_i<0){
+                    printf("%d: %lf %d\n",old_i,ratio_y,i);
+                }
+                assert(0<=old_i);
+                assert(0<=old_j&&old_j<image.width);
+                byte value = image.data[i*image.width+j];
+                //read_component_bw(image,old_i,old_j);
+                write_pixel_bw(res,i,j,value);
+            }
+        }
+   
     return res;
 }

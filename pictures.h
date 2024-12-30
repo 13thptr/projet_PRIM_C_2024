@@ -63,7 +63,7 @@ picture inverse_picture(picture p);
 /*Normalisation*/
 picture normalize_dynamic_picture(picture p);
 
-/*Réduction*/
+/*Réduction du nombre de couleurs utilisées*/
 picture set_levels_picture(picture p, byte nb_levels);
 
 /*Différence absolue*/
@@ -73,4 +73,11 @@ picture mult_picture(picture p1, picture p2);
 
 /*Mélange*/
 picture mix_picture(picture p1, picture p2, picture p3);
+
+/*Rééchantillonnage - politique du plus proche voisin*/
+picture resample_picture_nearest(picture image, unsigned int width, unsigned int height);
+
+/*Rééchantillonnage - politique d'interpolation bilinéaire*/
+picture resample_picture_bilinear(picture image, unsigned int width, unsigned int height);
+
 #endif /*PICTURES_H*/

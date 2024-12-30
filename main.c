@@ -19,8 +19,6 @@ int main(int argc, char* argv[]){
 
     char output_dir[13] = "Lenna_output"; /*Chemin pour produire les images afin de ne pas mélanger les entrées et les sorties*/
 
-  
-
     char ppm_ext[4] = "ppm";
     char pgm_ext[4] = "pgm";
     
@@ -63,6 +61,7 @@ int main(int argc, char* argv[]){
         melt_picture_wrapper(current_pic,output_dir,name,ext);
         inverse_picture_wrapper(current_pic,output_dir,name,ext);
         set_levels_wrapper(current_pic,output_dir,name,ext);
+        resample_nearest_wrapper(current_pic,output_dir,name,ext);
         
         /*Free and reset memory*/
         clean_picture(&current_pic);//Check the prototype clean_picture should have.
