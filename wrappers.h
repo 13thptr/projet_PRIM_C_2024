@@ -27,4 +27,4 @@ void normalize_color_picture_wrapper(picture p, const char *res_dir, const char 
 void set_levels_wrapper(picture p, char *res_dir, char *name_p, char *res_ext);
 
 /*Resample: nearest neighbour policy*/
-void resample_nearest_wrapper(picture p, char *res_dir, char *name_p, char *res_ext);
+void resample_nearest_wrapper(picture p, char *res_dir, char *name_p, char *res_ext, const double RESIZE_FACTOR);

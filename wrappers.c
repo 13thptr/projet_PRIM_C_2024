@@ -126,15 +126,15 @@ void set_levels_wrapper(picture p, char *res_dir, char *name_p, char *res_ext){
     free(levels_path);
 }
 
-void resample_nearest_wrapper(picture p, char *res_dir, char *name_p, char *res_ext){
-    const double RESIZE_FACTOR = 1/1.36;
+void resample_nearest_wrapper(picture p, char *res_dir, char *name_p, char *res_ext, const double RESIZE_FACTOR){
     int new_width = (int)p.width * RESIZE_FACTOR;
     int new_height = (int)p.height * RESIZE_FACTOR;
 
     picture resampled = resample_picture_nearest(p,new_width,new_height);
 
-    char nearest_op[30] = "smaller_nearest";
-    char *nearest_path = concat_parts(res_dir,name_p,nearest_op,res_ext);
+    char smaller_op[30] = "smaller_nearest";
+    char larger_op[30] = "larger_nearest";
+    char *nearest_path = concat_parts(res_dir,name_p,RESIZE_FACTOR>1?larger_op:smaller_op,res_ext);
 
     write_picture(resampled,nearest_path);
 
