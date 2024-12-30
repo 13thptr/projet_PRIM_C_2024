@@ -27,8 +27,9 @@ typedef struct{
 }picture;
 
 /*Création,nettoyage et copie*/
-picture read_picture(char * filename);
-int write_picture(picture p, char * filename);
+picture read_picture(const char *filename);
+int write_picture(picture p, char *filename);
+
 picture create_picture(unsigned int width, unsigned int height, unsigned int channels);
 void clean_picture(picture *p);
 picture copy_picture(picture p);

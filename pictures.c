@@ -47,7 +47,7 @@ TODO :
 
     TODO: replace strcmp with strncmp ? + Increase general safety 
 */
-picture read_picture(char *filename){
+picture read_picture(const char *filename){
     FILE *to_be_read = NULL;
 
     picture res;

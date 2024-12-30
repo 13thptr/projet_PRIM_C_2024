@@ -123,6 +123,7 @@ int main(int argc, char* argv[]){
 
         melt_picture_wrapper(current_pic,output_dir,name,ext);
 
+        inverse_picture_wrapper(current_pic,output_dir,name,ext);
 
         /*Free and reset memory*/
         clean_picture(&current_pic);//Check the prototype clean_picture should have.
@@ -136,7 +137,9 @@ int main(int argc, char* argv[]){
         ext = NULL;
     }
 
-
+    current_pic = read_picture("Lenna_input/Lenna_gray.pgm");
+    normalize_picture_wrapper(current_pic,"Lenna_output","Lenna_gray",pgm_ext);
+    clean_picture(&current_pic);
 
     /*-------------------------------------------------Libération de la mémoire---------------------------------------------------------*/
     //free(dir);

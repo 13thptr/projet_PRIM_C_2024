@@ -51,6 +51,6 @@ char * ext_from_path(char * path);
  * @return une nouvelle chaîne dynamiquement allouée contenant le chemin
  * composé des différentes parties
  */
-char * concat_parts(char * dir, char * name, const char * op, char * ext);
+char * concat_parts(const char * dir, const char * name, const char * op, char * ext);
 
 #endif  // __FILENAME__

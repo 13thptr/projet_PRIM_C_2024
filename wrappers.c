@@ -54,7 +54,7 @@ void brighten_picture_wrapper(picture p, char *res_dir, char *name_p, char *res_
 }
 
 void melt_picture_wrapper(picture p, char *res_dir, char *name_p, char *res_ext){
-    
+
     picture melted = melt_picture(p,p.width*p.height*p.chan_num*5);
     char melted_op[7]="melted";
     char *melted_path = concat_parts(res_dir,name_p,melted_op,res_ext);
@@ -62,4 +62,38 @@ void melt_picture_wrapper(picture p, char *res_dir, char *name_p, char *res_ext)
     write_picture(melted,melted_path);
     clean_picture(&melted);
     free(melted_path);
+}
+
+/*LUT p*/
+void inverse_picture_wrapper(picture p, char *res_dir, char *name_p, char *res_ext){
+    /*1) Inversion*/
+    picture inverted = inverse_picture(p);
+    char inverted_op[9] = "inverse";
+    char *inverted_path = concat_parts(res_dir,name_p,inverted_op,res_ext);
+
+    write_picture(inverted,inverted_path);
+    clean_picture(&inverted);
+    free(inverted_path);
+}
+/*2)Normalisation i.e. optimisation de la dynamique. */
+void normalize_picture_wrapper(picture p, const char *res_dir, const char *name_p, char *res_ext){
+
+    picture normalized = normalize_dynamic_picture(p);
+    char dynamic_op[8] = "dynamic";
+    char *normalized_path = concat_parts(res_dir,name_p,dynamic_op,res_ext);
+
+    write_picture(normalized,normalized_path);
+    clean_picture(&normalized);
+    free(normalized_path);
+}
+void set_levels_wrapper(picture p, char *res_dir, char *name_p, char *res_ext){
+
+    /* 'Discrétisation' en blocs plus grossiers*/
+    picture discretized = set_levels_picture(p,8);
+    char discretized_op[12] = "discretized";
+    char *discretized_path = concat_parts(res_dir,name_p,discretized_op,res_ext);
+
+    write_picture(discretized,discretized_path);
+    clean_picture(&discretized);
+    free(discretized_path);
 }

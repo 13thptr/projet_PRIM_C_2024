@@ -19,13 +19,7 @@
     free(split_test);
 
     
-    picture melted = melt_picture(test,test.width*test.height*test.chan_num*5);
-    char melted_op[7]="melted";
-    char *melted_path = concat_parts(dir,name,melted_op,ext);
-
-    write_picture(melted,melted_path);
-    clean_picture(&melted);
-    free(melted_path);
+   
 
 
     /*LUT test*/

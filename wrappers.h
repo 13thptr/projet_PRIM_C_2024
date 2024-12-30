@@ -16,3 +16,10 @@ void brighten_picture_wrapper(picture p, char *res_dir, char *name_p, char *res_
 
 /*Melt*/
 void melt_picture_wrapper(picture p, char *res_dir, char *name_p, char *res_ext);
+
+/*Invert*/
+void inverse_picture_wrapper(picture p, char *res_dir, char *name_p, char *res_ext);
+/*Normalize*/
+void normalize_picture_wrapper(picture p, const char *res_dir, const char *name_p, char *res_ext);
+/*Set_levels*/
+void set_levels_wrapper(picture p, char *res_dir, char *name_p, char *res_ext);
