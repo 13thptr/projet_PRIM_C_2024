@@ -38,7 +38,7 @@ CC = gcc
 #main: main.c
 #	$(CC) -c $(CFLAGS) $^ -o $@ 
 
-prog: main.o pictures.o safe_malloc.o pixels.o filename.o lut.o
+prog: main.o pictures.o safe_malloc.o pixels.o filename.o lut.o wrappers.o
 	$(CC) $(CFLAGS) $^ -o $@
 
 pictures.o : pictures.c
@@ -57,9 +57,11 @@ filename.o : filename.c
 lut.o : lut.c
 	$(CC) -c $(CFLAGS) $^ -o $@
 
-main.o : main.c
+wrappers.o : wrappers.c
 	$(CC) -c $(CFLAGS) $^ -o $@
 
+main.o : main.c
+	$(CC) -c $(CFLAGS) $^ -o $@
 
 
 clean:

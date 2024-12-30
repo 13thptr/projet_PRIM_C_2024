@@ -232,10 +232,8 @@ picture convert_to_gray_picture(picture p){
         return copy_picture(p); //Enoncé: on se contentera d'en faire une copie
     }
     assert(is_color_picture(p));
-
     picture res = create_picture(p.width,p.height,BW_PIXEL_SIZE);
-
-    printf("Breakpoint.\n");
+    
     for(int i=0;i<res.height;i++){
         for(int j=0;j<res.width;j++){
             double red = (double)0.299*read_component_rgb(p,i,j,RED);

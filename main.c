@@ -1,9 +1,17 @@
+
+/*TODO: examiner à la main l'arbre des includes et enlever ceux qui ne sont pas nécessaires.*/
 #include <stdio.h>
 #include <stdlib.h>
-#include "pictures.h"
-#include "filename.h"
+
 #include <string.h>
 #include <assert.h>
+
+#include "pictures.h"
+#include "filename.h"
+
+#include "wrappers.h"
+
+
 /*
     Un code abondamment commenté ; 
     la première partie des commentaires comportera systématiquement les lignes :
@@ -25,32 +33,10 @@
 
 */
 
-//conv2col_wrapper (better code readability)
-//@ requires p is a grayscale (pgm) picture ?
 
-void convert_color_wrapper(picture p, char *dir_p,char *name_p, char *ext_p);
 
-void convert_color_wrapper(picture p, char *dir_p,char *name_p, char *ext_p){
-    picture conv2col = convert_to_color_picture(p);
-    char conv2col_op[30] = "convert_color"; //Check wanted filename OK
-    char *conv2col_concat = concat_parts(dir_p,name_p,conv2col_op,ext_p);
-    write_picture(conv2col,conv2col_concat);
-    clean_picture(&conv2col);
-    free(conv2col_concat);
-}
 
-/*RGB->gray*/
-/*@requires picture is valid ppm file*/
-void convert_gray_wrapper(picture p, char *dir_p, char *name_p, char *ext_p);
 
-void convert_gray_wrapper(picture p, char *dir_p, char *name_p, char *ext_p){ 
-    picture conv2gray = convert_to_gray_picture(p);
-    char conv2gray_op[30]= "convert_gray";
-    char *conv2gray_concat = concat_parts(dir_p,name_p,conv2gray_op,ext_p);
-    write_picture(conv2gray,conv2gray_concat);
-    clean_picture(&conv2gray);
-    free(conv2gray_concat);
-}
 int main(int argc, char* argv[]){
     /*Votre programme principal devra consister en la lecture d’une ou plusieurs images source depuis des fichiers (PGM ou PPM)
     fournis en arguments du programme. Exemple :
