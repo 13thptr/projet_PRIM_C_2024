@@ -40,7 +40,7 @@ CC = gcc
 #	$(CC) -c $(CFLAGS) $^ -o $@ 
 
 prog: main.o pictures.o safe_malloc.o pixels.o filename.o lut.o wrappers.o
-	$(CC) $(CFLAGS) -O2 $^ -o $@
+	$(CC) $(CFLAGS) -O2 -lm $^ -o $@
 
 pictures.o : pictures.c
 #gcc -c -Wall -Wextra -Wpedantic -fsanitize=address pictures.c -o pictures.o

@@ -22,6 +22,18 @@ TODO :
 #define BUFFER_SIZE (32)
 
 #define EPSILON (1e-3)
+
+double min_double(double d1, double d2){
+    return d1<d2?d1:d2;
+}
+int min_int(int a, int b){
+    return a<b?a:b;
+}
+double abs_double(double x){
+    return x>0?x:-x;
+}
+
+
 /*
     Fonction read_picture
     @param filename chemin vers un fichier
@@ -283,7 +295,7 @@ picture merge_picture(picture red, picture green, picture blue){
 
 picture brighten_picture(picture p, double factor){
     picture res = copy_picture(p);
-    for(unsigned int k=0;k<res.width*res.height*res.chan_num;k++){
+    for(int k=0;k<res.width*res.height*res.chan_num;k++){
         double value = (double)res.data[k]*factor;
         value = (value <(double)MAX_BYTE)?value:(double)MAX_BYTE; 
         res.data[k] = (byte)value;
@@ -438,7 +450,7 @@ picture mult_picture(picture p1, picture p2){
     if(is_empty_picture(p1)&&is_empty_picture(p2)){
         return p1;
     }
-    /*On vérifie que les tailles et les types (couleur ou niveaux de gris) sont les mêmes*/
+   
     if(p1.chan_num==BW_PIXEL_SIZE&&p2.chan_num==RGB_PIXEL_SIZE){
         return mult_picture(p2,p1);
     }
@@ -496,21 +508,65 @@ picture mult_picture(picture p1, picture p2){
 
 /*Mélange*/
 picture mix_picture(picture p1, picture p2, picture p3){
-    if(is_empty_picture(p1)&&is_empty_picture(p2)&&is_empty_picture(p3)){
+    if(is_empty_picture(p1)&&is_empty_picture(p2)){
         return p1;
     }
-    assert(same_dimensions(p1,p2)&&same_dimensions(p2,p3));
-    picture res = create_picture(p1.width,p1.height,p1.chan_num);
+    assert(p1.width == p2.width);
+    assert(p1.height == p2.height);
+    /*
+        rapport: Dans le cas où la troisième image p3 est en couleur, je choisis de la convertir en niveaux de gris
+        avant d'effectuer le mélange. Cela permet d'éliminer la moitié des configurations de couleur / triplets de valeur {RGB,BW}
+        parmi les 2³ = 8 théoriquement possibles. Mais surtout, je ne vois pas comment faire autrement pour utiliser une image
+        RGB comme masque de pondération...
 
-    for(int k=0;k<(int)res.chan_num*res.width*res.height;k++){
-        double alpha = (double)p3.data[k]/255.0;
-        res.data[k] = (1.0-alpha)*(double)p1.data[k]+alpha*(double)p2.data[k];
+        Non, en fait, je change d'avis. Je ne traite que le cas (RGB, RGB, RGB) quitte à effectuer des conversions dans un sens puis dans l'autre.
+
+    */
+    if(p1.chan_num == RGB_PIXEL_SIZE){
+        picture tmp = convert_to_color_picture(p1);
+        clean_picture(&p1);
+        return mix_picture(tmp,p2,p3);
+    }
+    if(p2.chan_num == RGB_PIXEL_SIZE){
+        picture tmp = convert_to_gray_picture(p2);
+        clean_picture(&p2);
+        return mix_picture(p1,tmp,p3);
+    }
+    if(p3.chan_num == RGB_PIXEL_SIZE){
+        picture tmp = convert_to_gray_picture(p3);
+        clean_picture(&p3);
+        return mix_picture(p1,p2,tmp);
+    }
+    assert(p1.chan_num == p2.chan_num && p2.chan_num == p3.chan_num && p3.chan_num == RGB_PIXEL_SIZE); 
+   
+    if(p1.width!=p3.width||p1.height!=p3.height){
+        /*Cf énoncé: on pourra redimensionner...*/
+        picture tmp = resample_picture_bilinear(p2,p1.width,p1.height);
+        clean_picture(&p2);
+        p2 = tmp; 
+    }
+    picture res = create_picture(p1.width,p1.height,RGB_PIXEL_SIZE);
+
+    //On ne gère ici que le cas (RGB,RGB,RGB).
+    for(int i=0;i<p1.height;++i){
+        for(int j=0;j<p1.width;++j){
+            for(int k=0;k<2;++k){
+                double alpha = d_from_b(read_component_rgb(p3,i,j,k))/255.0;
+                double bary = (1.0-alpha)*d_from_b(read_component_rgb(p1,i,j,k));
+                bary += alpha*d_from_b(read_component_rgb(p2,i,j,k));
+                bary = round(min_double(bary,255.0));
+                byte val = (byte)bary;
+                write_component_rgb(res,i,j,k,val);
+            }
+            
+        }
     }
     return res;
 }
-
-
-
+/*Fonction d'aide: utilisée deux fois
+Modifie par référence les ratios de redimensionnement horizontal et vertical
+Affiche un avertissement lorsque l'on déforme l'image.
+*/
 void check_resamplable(picture image, unsigned int width, unsigned int height,double *rx,double *ry){
     assert(width>0);
     assert(height>0);
@@ -521,7 +577,7 @@ void check_resamplable(picture image, unsigned int width, unsigned int height,do
     assert(*rx>EPSILON);
     assert(*ry>EPSILON);
 
-    double diff = *rx - *ry; diff = diff>0?diff:-diff;
+    double diff = abs_double(*rx-*ry);
 
     if(diff>EPSILON){
         printf("Warning: the desired aspect ratio differs from that of the original image.\n");
@@ -542,11 +598,11 @@ picture resample_picture_nearest(picture image, unsigned int width, unsigned int
     ce que j'ai fait dans une version précédente (cf git log) (mentionner dans le rapport)
 
     */
-    for(unsigned int i=0;i<height;++i){
-        for(unsigned int j=0;j<width;++j){
+    for(int i=0;i<height;++i){
+        for(int j=0;j<width;++j){
 
-            unsigned int old_i = (int)((double)i/ratio_y);
-            unsigned int old_j = (int)((double)j/ratio_x);
+            int old_i = (int)((double)i/ratio_y);
+            int old_j = (int)((double)j/ratio_x);
 
             if(image.chan_num==RGB_PIXEL_SIZE){
                 byte red = read_component_rgb(image,old_i,old_j,RED);
@@ -562,12 +618,6 @@ picture resample_picture_nearest(picture image, unsigned int width, unsigned int
         }
     }
     return res;
-}
-double min_double(double d1, double d2){
-    return d1<d2?d1:d2;
-}
-int min_int(int a, int b){
-    return a<b?a:b;
 }
 /*On gère d'abord le cas des images en niveaux de gris. En cas d'image couleur, on la sépare en composantes avec split_picture
 et on interpole les composantes séparément, puis on renvoie la fusion des résultats.
@@ -597,13 +647,13 @@ picture resample_picture_bilinear(picture image, unsigned int width, unsigned in
         return res;
     }
     res = create_picture(width,height,image.chan_num);
-    for(unsigned int i=0;i<height;++i){
-        for(unsigned int j=0;j<width;++j){
+    for(int i=0;i<height;++i){
+        for(int j=0;j<width;++j){
 
             double y = (double)i/ratio_y;
             double x = (double)j/ratio_x;
-            unsigned int old_i = (int)y;
-            unsigned int old_j = (int)x;
+            int old_i = (int)y;
+            int old_j = (int)x;
 
             int x1 = old_j;
             int x2 = min_int(old_j+1,image.width-1);

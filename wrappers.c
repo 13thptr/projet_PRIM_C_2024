@@ -191,7 +191,6 @@ void mult_picture_wrapper(picture p1, picture p2, char *res_dir, char *name_p, c
 
     picture product = mult_picture(p1,p2);
     
-    
     char product_op[30] = "product";
     char *product_path = concat_parts(res_dir,name_p,product_op,res_ext);
 
