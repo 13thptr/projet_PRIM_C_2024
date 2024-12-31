@@ -103,8 +103,10 @@ int main(int argc, char* argv[]){
 
         /*Free and reset memory*/
         
-        clean_picture(&current_pic);//Check the prototype clean_picture should have.
-        clean_picture(&save);
+        clean_picture(&current_pic);
+        if(THIRD_IMAGE_FLAG){
+            clean_picture(&save);
+        }
         free(dir);
         free(name);
         free(ext);
@@ -117,18 +119,10 @@ int main(int argc, char* argv[]){
     normalize_picture_wrapper(current_pic,"Lenna_output","Lenna_gray",pgm_ext);
 
     clean_picture(&current_pic);
-    /*
-        On évite le double free qui pourrait se produire à cause de la manipulation de la fonction 
-        mix_picture où l'on libère la mémoire d'un argument qui n'a pas le bon type de couleur.
-    */
- 
-    //clean_picture(&save);
+
 
     if(THIRD_IMAGE_FLAG){
         clean_picture(&mask);
     }
-    //free(current_pic);
-    //free(mask);
-    //free(save);
     return EXIT_SUCCESS;
 }
