@@ -13,6 +13,7 @@
 #include "safe_malloc.h"
 
 #define LARGER_FACTOR (1.36)
+#define BRIGHTENING_FACTOR (1.5)
 
 
 int main(int argc, char* argv[]){
@@ -73,7 +74,7 @@ int main(int argc, char* argv[]){
         }
 
         /*Opérations ne dépendant pas du type d'image: brighten, melt,inverse, set_levels...*/
-        brighten_picture_wrapper(current_pic,output_dir,name,ext);
+        brighten_picture_wrapper(current_pic,output_dir,name,ext,BRIGHTENING_FACTOR);
         melt_picture_wrapper(current_pic,output_dir,name,ext);
 
 
@@ -94,6 +95,8 @@ int main(int argc, char* argv[]){
         /*Différence normalisée*/
         /*NB: on refait dans cette fonction ce qui a été fait plus haut / tôt, mais bon...*/
         normalized_difference_wrapper(current_pic,output_dir,name,ext,LARGER_FACTOR);
+
+        brighten_lut_wrapper(current_pic,output_dir,name,ext,BRIGHTENING_FACTOR);
 
         if(THIRD_IMAGE_FLAG){
             /*On s'occupe du mixage selon le masque ici.*/

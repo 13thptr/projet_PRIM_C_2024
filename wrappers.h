@@ -12,7 +12,7 @@ void convert_gray_wrapper(picture p, char *dir_p, char *name_p, char *ext_p);
 void split_picture_wrapper(picture p, char *res_dir, char *name_p, char *res_ext);
 
 /*Brighten*/
-void brighten_picture_wrapper(picture p, char *res_dir, char *name_p, char *res_ext);
+void brighten_picture_wrapper(picture p, char *res_dir, char *name_p, char *res_ext, const double BRIGHTENING_FACTOR);
 
 /*Melt*/
 void melt_picture_wrapper(picture p, char *res_dir, char *name_p, char *res_ext);
@@ -39,3 +39,5 @@ void mult_picture_wrapper(picture p1, picture p2, char *res_dir, char *name_p, c
 
 /*Mélange/Mixture*/
 void mix_picture_wrapper(picture p1,picture p2, picture p3, char *res_dir, char *name_p, char *res_ext);
+
+void brighten_lut_wrapper(picture p, char *res_dir, char *name_p, char *res_ext, const double BRIGHTENING_FACTOR);

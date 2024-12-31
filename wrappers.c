@@ -43,10 +43,10 @@ void split_picture_wrapper(picture p, char *res_dir, char *name_p, char *res_ext
     free(split_array);
 }
 /*Brighten (doit marcher sur RGB & BW alike)*/
-void brighten_picture_wrapper(picture p, char *res_dir, char *name_p, char *res_ext){
+void brighten_picture_wrapper(picture p, char *res_dir, char *name_p, char *res_ext, const double BRIGHTENING_FACTOR){
     char brighten_op[9]="brighten";
     char *brighten_concat = concat_parts(res_dir,name_p,brighten_op,res_ext); 
-    picture brightened = brighten_picture(p,1.5);
+    picture brightened = brighten_picture(p,BRIGHTENING_FACTOR);
 
     write_picture(brightened,brighten_concat);
     clean_picture(&brightened);
@@ -212,4 +212,12 @@ void mix_picture_wrapper(picture p1,picture p2, picture p3, char *res_dir, char 
     write_picture(mixture,mixture_path);
     clean_picture(&mixture);
     free(mixture_path);
+}
+void brighten_lut_wrapper(picture p, char *res_dir, char *name_p, char *res_ext, const double BRIGHTENING_FACTOR){
+    picture brightened_lut = brighten_picture_lut(p,BRIGHTENING_FACTOR);
+    char brighten_lut_op[30] = "brighten_lut";
+    char *brighten_lut_path = concat_parts(res_dir,name_p,brighten_lut_op,res_ext);
+    write_picture(brightened_lut,brighten_lut_path);
+    clean_picture(&brightened_lut);
+    free(brighten_lut_path);
 }

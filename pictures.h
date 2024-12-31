@@ -2,6 +2,11 @@
 #define PICTURES_H
 
 #define MAX_BYTE 255
+
+#define BUFFER_SIZE (32)
+
+#define EPSILON (1e-3)
+
 #include <stdbool.h>
 
 int min_int(int a, int b);
@@ -81,5 +86,8 @@ picture resample_picture_nearest(picture image, unsigned int width, unsigned int
 
 /*Rééchantillonnage - politique d'interpolation bilinéaire*/
 picture resample_picture_bilinear(picture image, unsigned int width, unsigned int height);
+
+/*Brighten - LUT version*/
+picture brighten_picture_lut(picture p, double factor);
 
 #endif /*PICTURES_H*/

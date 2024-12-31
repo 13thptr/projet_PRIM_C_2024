@@ -19,9 +19,6 @@ TODO :
 - sanitize input...
 - prendre en compte la valeur maximale de la troisième ligne (en "bonus").
 */
-#define BUFFER_SIZE (32)
-
-#define EPSILON (1e-3)
 
 double min_double(double d1, double d2){
     return d1<d2?d1:d2;
@@ -688,6 +685,19 @@ picture resample_picture_bilinear(picture image, unsigned int width, unsigned in
         }
              
     }
+    return res;
+}
+
+picture brighten_picture_lut(picture p, double factor){
+    lut brighten_lut = create_lut(MAX_BYTE+1);
+    picture res = copy_picture(p);
+    for(int c=0;c<MAX_BYTE;++c){
+        double val = min_double((double)c*factor,255.0);
+        brighten_lut->array[c] = (byte)val;
+    }
+    /*Modification par effet*/
+    apply_lut(res,brighten_lut);
+    clean_lut(&brighten_lut);
     return res;
 }
 /*

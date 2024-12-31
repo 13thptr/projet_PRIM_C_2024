@@ -4,9 +4,10 @@
 
 #include "lut.h"
 #include "pixels.h"
+#include "safe_malloc.h"
+#include "pictures.h"
 
 /*NB: la consigne spécifie la création d'un type ABSTRAIT. On le précisera donc dans lut.c*/
-
 /*
 NB: J'ai été obligé de copier la définition / précision du type lut_s dans pictures.c pour éviter une erreur de type incomplet,
 peut-on éviter cela ?
@@ -21,22 +22,18 @@ typedef struct lut_s* lut;
 lut create_lut(unsigned int n){
     assert(n>0);
     lut res = malloc(sizeof(struct lut_s));
-    //*res = malloc(sizeof(lut));
+
     res->n = n;
+    res->array = myalloc(n*sizeof(byte));//sizeof(byte)==1 mais on évite l'utilisation de constantes non nommées.
 
-    //res->array = NULL;
 
-    res->array = calloc(n,sizeof(byte));//sizeof(byte)==1 mais on évite l'utilisation de constantes non nommées.
-
-    //todo: utiliser myalloc (et vérifier partout.)
     return res;
 }
 void clean_lut(lut *table){
     assert(table!=NULL);
     (*table)->n=0;
     free((*table)->array);
-    free(*table); //pas sûr de ça.
-    //free(table);
+    free(*table); 
 }
 
 void apply_lut(picture p, lut table){
@@ -44,7 +41,7 @@ void apply_lut(picture p, lut table){
         return;
     }
     double factor = (double)(table->n-1)/255.0;/*Ajouté pour les petites LUTs*/
-    //assert(factor!=0.0);
+    assert(abs_double(factor)>EPSILON);
     if(p.chan_num == RGB_PIXEL_SIZE){
         for(int i=0;i<p.height;i++){
             for(int j=0;j<p.width;j++){
