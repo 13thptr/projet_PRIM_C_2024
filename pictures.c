@@ -509,29 +509,22 @@ picture mult_picture(picture p1, picture p2){
 
 /*Mélange*/
 
-void mix_reformat(picture p1,picture p2,picture p3, picture *q1, picture *q2, picture *q3){
-    
+void mix_reformat(picture p1,picture *q1){
+    if(p1.chan_num == BW_PIXEL_SIZE){
+        *q1 = convert_to_color_picture(p1);
+    }else{
+        *q1 = copy_picture(p1);
+    }
 }
 picture mix_picture(picture p1, picture p2, picture p3){
 
     picture q1;
     picture q2;
     picture q3;
-    if(p1.chan_num == BW_PIXEL_SIZE){
-        q1 = convert_to_color_picture(p1);
-    }else{
-        q1 = copy_picture(p1);
-    }
-    if(p2.chan_num == BW_PIXEL_SIZE){
-        q2 = convert_to_color_picture(p2);
-    }else{
-        q2 = copy_picture(p2);
-    }
-    if(p3.chan_num == BW_PIXEL_SIZE){
-        q3 = convert_to_color_picture(p3);
-    }else{
-        q3 = copy_picture(p3);
-    }
+    mix_reformat(p1,&q1);
+    mix_reformat(p2,&q2);
+    mix_reformat(p3,&q3);
+   
     assert(q1.chan_num == q2.chan_num && q2.chan_num == q3.chan_num && q3.chan_num == RGB_PIXEL_SIZE); 
    
     if(q1.width!=q3.width || q1.height!=q3.height){

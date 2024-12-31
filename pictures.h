@@ -69,7 +69,7 @@ picture distance_picture(picture p1, picture p2);
 picture mult_picture(picture p1, picture p2);
 
 /*Mélange*/
-picture mix_picture_aux(picture p1,picture p2, picture p3, bool *freed_p1, bool *freed_p2, bool *freed_p3);
+void mix_reformat(picture p1,picture *q1);
 picture mix_picture(picture p1, picture p2, picture p3);
 
 /*Helper functions*/
