@@ -14,14 +14,17 @@
 
 #define LARGER_FACTOR (1.36)
 
+
 int main(int argc, char* argv[]){
  
+
+
     /*-------------------------Déclaration des variables en amont (conforme à la norme ISO C)-------------------------------*/
 
     picture current_pic; /*Variable qui sera mise à jour au fur et à mesure dans une boucle sur les arguments.*/
-    picture mask; /*Le 3ème argument éventuel*/
-    picture *save = myalloc(sizeof(picture)); /*Sauvegarder l'image inversée pour la réutiliser comme l'énoncé semble le demander.*/
-    
+    picture mask;  /*Le 3ème argument éventuel*/
+    picture save; /*Sauvegarder l'image inversée pour la réutiliser comme l'énoncé semble le demander.*/
+ 
     char output_dir[13] = "Lenna_output"; /*Chemin pour produire les images afin de ne pas mélanger les entrées et les sorties*/
 
     char ppm_ext[4] = "ppm";
@@ -72,7 +75,7 @@ int main(int argc, char* argv[]){
         /*Opérations ne dépendant pas du type d'image: brighten, melt,inverse, set_levels...*/
         brighten_picture_wrapper(current_pic,output_dir,name,ext);
         melt_picture_wrapper(current_pic,output_dir,name,ext);
-        inverse_picture_wrapper(current_pic,output_dir,name,ext,THIRD_IMAGE_FLAG,save);
+        inverse_picture_wrapper(current_pic,output_dir,name,ext,THIRD_IMAGE_FLAG,&save);
         set_levels_wrapper(current_pic,output_dir,name,ext);
 
         /*Rééchantillonnages:*/
@@ -89,11 +92,13 @@ int main(int argc, char* argv[]){
         if(THIRD_IMAGE_FLAG){
             /*On s'occupe du mixage selon le masque ici.*/
             mult_picture_wrapper(current_pic,mask,output_dir,name,ext);
-            mix_picture_wrapper(*save,current_pic,mask,output_dir,name,ext);
+            mix_picture_wrapper(save,current_pic,mask,output_dir,name,ext);
         }
 
         /*Free and reset memory*/
+        
         clean_picture(&current_pic);//Check the prototype clean_picture should have.
+        clean_picture(&save);
         free(dir);
         free(name);
         free(ext);
@@ -110,12 +115,14 @@ int main(int argc, char* argv[]){
         On évite le double free qui pourrait se produire à cause de la manipulation de la fonction 
         mix_picture où l'on libère la mémoire d'un argument qui n'a pas le bon type de couleur.
     */
-    if(save->data!=NULL){
-        clean_picture(save);
-    }
+ 
+    //clean_picture(&save);
+
     if(THIRD_IMAGE_FLAG){
         clean_picture(&mask);
     }
-    free(save);
+    //free(current_pic);
+    //free(mask);
+    //free(save);
     return EXIT_SUCCESS;
 }

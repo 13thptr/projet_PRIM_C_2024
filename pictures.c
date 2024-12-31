@@ -508,36 +508,27 @@ picture mult_picture(picture p1, picture p2){
 }
 
 /*Mélange*/
+
+void mix_reformat(picture *p1,picture *p2,picture *p3){
+    if(p1->chan_num == BW_PIXEL_SIZE){
+        picture tmp = *p1;
+        *p1 = convert_to_color_picture(*p1);
+        //clean_picture(&tmp);
+    }
+    if(p2->chan_num == BW_PIXEL_SIZE){
+        picture tmp = *p2;
+        *p2 = convert_to_color_picture(*p1);
+        //clean_picture(&tmp);
+    }
+    if(p3->chan_num == BW_PIXEL_SIZE){
+        picture tmp = *p3;
+        *p3 = convert_to_color_picture(*p3);
+        //clean_picture(&tmp);
+    }
+}
 picture mix_picture(picture p1, picture p2, picture p3){
-    if(is_empty_picture(p1)&&is_empty_picture(p2)){
-        return p1;
-    }
-    assert(p1.width == p2.width);
-    assert(p1.height == p2.height);
-    /*
-        rapport: Dans le cas où la troisième image p3 est en couleur, je choisis de la convertir en niveaux de gris
-        avant d'effectuer le mélange. Cela permet d'éliminer la moitié des configurations de couleur / triplets de valeur {RGB,BW}
-        parmi les 2³ = 8 théoriquement possibles. Mais surtout, je ne vois pas comment faire autrement pour utiliser une image
-        RGB comme masque de pondération...
 
-        Non, en fait, je change d'avis. Je ne traite que le cas (RGB, RGB, RGB) quitte à effectuer des conversions dans un sens puis dans l'autre.
-
-    */
-    if(p1.chan_num == BW_PIXEL_SIZE){
-        picture tmp = convert_to_color_picture(p1);
-        //clean_picture(&p1);
-        return mix_picture(tmp,p2,p3);
-    }
-    if(p2.chan_num == BW_PIXEL_SIZE){
-        picture tmp = convert_to_color_picture(p2);
-        //clean_picture(&p2);
-        return mix_picture(p1,tmp,p3);
-    }
-    if(p3.chan_num == BW_PIXEL_SIZE){
-        picture tmp = convert_to_color_picture(p3);
-        //clean_picture(&p3);
-        return mix_picture(p1,p2,tmp);
-    }
+    mix_reformat(&p1,&p2,&p3);
     assert(p1.chan_num == p2.chan_num && p2.chan_num == p3.chan_num && p3.chan_num == RGB_PIXEL_SIZE); 
    
     if(p1.width!=p3.width||p1.height!=p3.height){
