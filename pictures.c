@@ -521,6 +521,10 @@ picture mix_picture(picture p1, picture p2, picture p3){
     picture q1;
     picture q2;
     picture q3;
+    /*
+        On fait en sorte que q1,q2,q3 soient des images RGB représentant les mêmes données que p1,p2,p3 qui peuvent
+        être en niveaux de gris.
+    */
     mix_reformat(p1,&q1);
     mix_reformat(p2,&q2);
     mix_reformat(p3,&q3);
@@ -538,12 +542,15 @@ picture mix_picture(picture p1, picture p2, picture p3){
     //On ne gère ici que le cas (RGB,RGB,RGB).
     for(int i=0;i<p1.height;++i){
         for(int j=0;j<p1.width;++j){
-            for(int c=RED;c<BLUE;++c){
+            for(int c=RED;c<=BLUE;++c){
 
                 double alpha = d_from_b(read_component_rgb(q3,i,j,c))/255.0;
+                assert(0<=alpha&&alpha<=255);
                 double bary = (1.0-alpha)*d_from_b(read_component_rgb(q1,i,j,c));
 
                 bary += alpha*d_from_b(read_component_rgb(q2,i,j,c));
+                
+
                 /*Un peu inutile: un barycentre entre 2 valeurs comprises entre 0 et 255 l'est aussi.*/
                 //bary = min_double(bary,255.0);
 

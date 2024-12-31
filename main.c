@@ -98,8 +98,6 @@ int main(int argc, char* argv[]){
         if(THIRD_IMAGE_FLAG){
             /*On s'occupe du mixage selon le masque ici.*/
             mult_picture_wrapper(current_pic,mask,output_dir,name,ext);
-
-
             mix_picture_wrapper(save,current_pic,mask,output_dir,name,ext);
         }
 
