@@ -127,8 +127,8 @@ void set_levels_wrapper(picture p, char *res_dir, char *name_p, char *res_ext){
 }
 
 void resample_nearest_wrapper(picture p, char *res_dir, char *name_p, char *res_ext, const double RESIZE_FACTOR){
-    int new_width = (int)p.width * RESIZE_FACTOR;
-    int new_height = (int)p.height * RESIZE_FACTOR;
+    int new_width = (int)p.width*RESIZE_FACTOR;
+    int new_height = (int)p.height*RESIZE_FACTOR;
 
     picture resampled = resample_picture_nearest(p,new_width,new_height);
 
@@ -143,18 +143,61 @@ void resample_nearest_wrapper(picture p, char *res_dir, char *name_p, char *res_
 }
 
 void resample_bilinear_wrapper(picture p, char *res_dir, char *name_p, char *res_ext, const double RESIZE_FACTOR){
-    int new_width = (int)p.width * RESIZE_FACTOR;
-    int new_height = (int)p.height * RESIZE_FACTOR;
+    int new_width = (int)p.width*RESIZE_FACTOR;
+    int new_height = (int)p.height*RESIZE_FACTOR;
 
     picture resampled = resample_picture_bilinear(p,new_width,new_height);
 
     char smaller_op[30] = "smaller_bilinear";
     char larger_op[30] = "larger_bilinear";
-    char *nearest_path = concat_parts(res_dir,name_p,RESIZE_FACTOR>1?larger_op:smaller_op,res_ext);
+    char *bilinear_path = concat_parts(res_dir,name_p,RESIZE_FACTOR>1?larger_op:smaller_op,res_ext);
 
-    write_picture(resampled,nearest_path);
+    write_picture(resampled,bilinear_path);
 
     clean_picture(&resampled);
-    free(nearest_path);
+    free(bilinear_path);
+}
+
+void normalized_difference_wrapper(picture p, char *res_dir, char *name_p, char *res_ext, const double RESIZE_FACTOR){
+  
+   
+    int new_width = (int)p.width * RESIZE_FACTOR;
+    int new_height = (int)p.height * RESIZE_FACTOR;
+
+    picture p1 =  resample_picture_nearest(p,new_width,new_height);
+    picture p2 = resample_picture_bilinear(p,new_width,new_height);
+
+    picture difference = distance_picture(p1,p2);
+
+    clean_picture(&p1);
+    clean_picture(&p2);
+
+    picture normalized_res = normalize_dynamic_picture(difference);
+    clean_picture(&difference);
+    
+    
+
+    char diff_op[30] = "difference";
+    char *difference_path = concat_parts(res_dir,name_p,diff_op,res_ext);
+
+    write_picture(normalized_res,difference_path);
+
+    clean_picture(&normalized_res);
+    free(difference_path);
+}
+
+/*Produit de deux images:*/
+void mult_picture_wrapper(picture p1, picture p2, char *res_dir, char *name_p, char *res_ext){
+
+    picture product = mult_picture(p1,p2);
+    
+    
+    char product_op[30] = "product";
+    char *product_path = concat_parts(res_dir,name_p,product_op,res_ext);
+
+    write_picture(product,product_path);
+
+    clean_picture(&product);
+    free(product_path);
 }
 

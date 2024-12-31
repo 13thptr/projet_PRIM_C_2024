@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <assert.h>
+#include <math.h>
 
 #include "safe_malloc.h"
 #include "pictures.h"
@@ -429,20 +430,66 @@ picture distance_picture(picture p1, picture p2){
     return res;
 }
 /*Produit*/
+
+double d_from_b(byte b){
+    return (double)b;
+}
 picture mult_picture(picture p1, picture p2){
     if(is_empty_picture(p1)&&is_empty_picture(p2)){
         return p1;
     }
     /*On vérifie que les tailles et les types (couleur ou niveaux de gris) sont les mêmes*/
-    assert(p1.width==p2.width);
-    assert(p1.height==p2.height);
-    assert(p1.chan_num==p2.chan_num);
-    picture res = create_picture(p1.width,p2.height,p1.chan_num);
-    for(int k=0;k<(int)res.chan_num*res.width*res.height;k++){
-        
-        double value =  p1.data[k]*p2.data[k];
-        //value = value<MAX_BYTE?value:MAX_BYTE;
-        res.data[k] = (byte)value;
+    if(p1.chan_num==BW_PIXEL_SIZE&&p2.chan_num==RGB_PIXEL_SIZE){
+        return mult_picture(p2,p1);
+    }
+    if(p1.width!=p2.width||p1.height!=p2.height){
+        /*Cf énoncé: on pourra redimensionner...*/
+        picture tmp = resample_picture_bilinear(p2,p1.width,p1.height);
+        clean_picture(&p2);
+        p2 = tmp; 
+    }
+    picture res = create_picture(p1.width,p1.height,p1.chan_num);
+
+    /*Justification de l'utilisation des doubles (à mettre dans le rapport):
+    on a besoin d'un type plus grand que "char/byte" pour saturer au lieu de cycler. Int ne suffit pas car on divise par 255.0
+    pour avoir un nombre entre 0 et 1. 
+    */
+   /*Rmq: encore un cas de disjonction de cas indépendante de i,j à commenter dans le rapport.*/
+    for(int i=0;i<p1.height;++i){
+        for(int j=0;j<p1.width;++j){
+            if(p1.chan_num == BW_PIXEL_SIZE && p2.chan_num == BW_PIXEL_SIZE){
+                double new = (d_from_b(read_component_bw(p1,i,j))/255.0)*d_from_b(read_component_bw(p2,i,j));
+                new = min_double(new,255.0);
+                byte value = (byte)new;
+                write_pixel_bw(res,i,j,value);
+            }
+            else if(p1.chan_num == RGB_PIXEL_SIZE &&p2.chan_num == BW_PIXEL_SIZE){
+                double bw_val = d_from_b(read_component_bw(p2,i,j))/255.0;
+
+                double new_red_d = d_from_b(read_component_rgb(p1,i,j,RED))*bw_val;
+                double new_green_d = d_from_b(read_component_rgb(p1,i,j,GREEN))*bw_val;
+                double new_blue_d = d_from_b(read_component_rgb(p1,i,j,BLUE))*bw_val;
+
+                new_red_d = min_double(new_red_d,255.0);
+                new_green_d = min_double(new_green_d,255.0);
+                new_blue_d = min_double(new_blue_d,255.0);
+
+                byte red_b = (byte)new_red_d;
+                byte green_b = (byte)new_green_d;
+                byte blue_b = (byte)new_blue_d;
+
+                write_pixel_rgb(res,i,j,red_b,green_b,blue_b);
+            }
+            else{
+                /*Cf début de la fonction pour l'élimination du cas symétrique.*/
+                assert(p1.chan_num==RGB_PIXEL_SIZE&&p2.chan_num==RGB_PIXEL_SIZE);
+                double new_red = d_from_b(read_component_rgb(p1,i,j,RED))*d_from_b(read_component_rgb(p2,i,j,RED));
+                double new_green = d_from_b(read_component_rgb(p1,i,j,GREEN))*d_from_b(read_component_rgb(p2,i,j,GREEN));
+                double new_blue = d_from_b(read_component_rgb(p1,i,j,BLUE))*d_from_b(read_component_rgb(p2,i,j,BLUE));
+
+                write_pixel_rgb(res,i,j,new_red,new_green,new_blue);
+            }
+        }
     }
     return res;
 }
@@ -465,7 +512,6 @@ picture mix_picture(picture p1, picture p2, picture p3){
 
 
 void check_resamplable(picture image, unsigned int width, unsigned int height,double *rx,double *ry){
-    //const double EPSILON = 1e-3;
     assert(width>0);
     assert(height>0);
     assert(!is_empty_picture(image));
@@ -523,6 +569,9 @@ double min_double(double d1, double d2){
 int min_int(int a, int b){
     return a<b?a:b;
 }
+/*On gère d'abord le cas des images en niveaux de gris. En cas d'image couleur, on la sépare en composantes avec split_picture
+et on interpole les composantes séparément, puis on renvoie la fusion des résultats.
+*/
 picture resample_picture_bilinear(picture image, unsigned int width, unsigned int height){
        
     picture res; 
@@ -578,15 +627,17 @@ picture resample_picture_bilinear(picture image, unsigned int width, unsigned in
                 beta = (y2-y)/(y2-y1);
             }
 
-
+            assert(-EPSILON<beta&&beta<1+EPSILON);
+            assert(-EPSILON<alpha&&alpha<1+EPSILON);
             double val_1 = alpha*(double)bottom_left+(1.0-alpha)*(double)bottom_right;
             double val_2 = alpha*(double)top_left+(1.0-alpha)*(double)top_right;
-
-            byte val = (byte)min_double(beta*val_1+(1.0-beta)*val_2,255.0);
-            write_pixel_bw(res,i,j,val);
-        }
             
-        
+            double val = min_double(beta*val_1+(1.0-beta)*val_2,255.0);
+            val = val>0?val:-val; //max_double pas implémenté.
+            byte value = (byte)val;
+            write_pixel_bw(res,i,j,value);
+        }
+             
     }
     return res;
 }

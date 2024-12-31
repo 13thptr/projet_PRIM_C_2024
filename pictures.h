@@ -9,7 +9,10 @@ double min_double(double d1, double d2);
 double abs_double(double x);
 
 
+
 typedef unsigned char byte; /* sizeof(char) == 1 */
+
+double d_from_b(byte b);
 
 enum channel_number{BW_PIXEL_SIZE = 1, RGB_PIXEL_SIZE = 3};
 

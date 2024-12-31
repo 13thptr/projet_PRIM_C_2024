@@ -18,6 +18,7 @@ int main(int argc, char* argv[]){
     /*-------------------------Déclaration des variables en amont (conforme à la norme ISO C)-------------------------------*/
 
     picture current_pic; /*Variable qui sera mise à jour au fur et à mesure dans une boucle sur les arguments.*/
+    picture mask; /*Le 3ème argument éventuel*/
 
     char output_dir[13] = "Lenna_output"; /*Chemin pour produire les images afin de ne pas mélanger les entrées et les sorties*/
 
@@ -35,9 +36,17 @@ int main(int argc, char* argv[]){
     char *name; 
     char *ext;
 
+    bool THIRD_IMAGE_FLAG = false;
+    /*Chargement de la troisième image (optionnel)*/
+
+    if(argc == 4){
+        mask = read_picture(argv[3]);
+        THIRD_IMAGE_FLAG = true;
+    }
+
     /*----------------------------------------------Boucle principale-------------------------------------------------------------------*/
 
-    for(int i = 1;i <= NB_FILES;++i){
+    for(int i = 1;i <= min_int(NB_FILES,2);++i){
         dir = dir_from_path(argv[i]);
         name = name_from_path(argv[i]);
         ext = ext_from_path(argv[i]);
@@ -71,6 +80,15 @@ int main(int argc, char* argv[]){
         resample_bilinear_wrapper(current_pic,output_dir,name,ext,1.0/LARGER_FACTOR);
         resample_bilinear_wrapper(current_pic,output_dir,name,ext,LARGER_FACTOR);
 
+        /*Différence normalisée*/
+        /*NB: on refait dans cette fonction ce qui a été fait plus haut / tôt, mais bon...*/
+        normalized_difference_wrapper(current_pic,output_dir,name,ext,LARGER_FACTOR);
+
+        if(THIRD_IMAGE_FLAG){
+            /*On s'occupe du mixage selon le masque ici.*/
+            mult_picture_wrapper(current_pic,mask,output_dir,name,ext);
+        }
+
         /*Free and reset memory*/
         clean_picture(&current_pic);//Check the prototype clean_picture should have.
         free(dir);
@@ -84,6 +102,9 @@ int main(int argc, char* argv[]){
     current_pic = read_picture("Lenna_input/Lenna_gray.pgm");
     normalize_picture_wrapper(current_pic,"Lenna_output","Lenna_gray",pgm_ext);
     clean_picture(&current_pic);
-    
+
+    if(THIRD_IMAGE_FLAG){
+        clean_picture(&mask);
+    }
     return EXIT_SUCCESS;
 }

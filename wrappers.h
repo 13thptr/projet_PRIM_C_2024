@@ -30,3 +30,11 @@ void set_levels_wrapper(picture p, char *res_dir, char *name_p, char *res_ext);
 void resample_nearest_wrapper(picture p, char *res_dir, char *name_p, char *res_ext, const double RESIZE_FACTOR);
 /*Resample: bilinear policy*/
 void resample_bilinear_wrapper(picture p, char *res_dir, char *name_p, char *res_ext, const double RESIZE_FACTOR);
+
+/*Différence normalisée*/
+void normalized_difference_wrapper(picture p, char *res_dir, char *name_p, char *res_ext,const double RESIZE_FACTOR);
+
+/*Produit*/
+void mult_picture_wrapper(picture p1, picture p2, char *res_dir, char *name_p, char *res_ext);
+
+/*Mélange/Mixture*/
