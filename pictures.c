@@ -509,49 +509,59 @@ picture mult_picture(picture p1, picture p2){
 
 /*Mélange*/
 
-void mix_reformat(picture *p1,picture *p2,picture *p3){
-    if(p1->chan_num == BW_PIXEL_SIZE){
-        picture tmp = *p1;
-        *p1 = convert_to_color_picture(*p1);
-        //clean_picture(&tmp);
-    }
-    if(p2->chan_num == BW_PIXEL_SIZE){
-        picture tmp = *p2;
-        *p2 = convert_to_color_picture(*p1);
-        //clean_picture(&tmp);
-    }
-    if(p3->chan_num == BW_PIXEL_SIZE){
-        picture tmp = *p3;
-        *p3 = convert_to_color_picture(*p3);
-        //clean_picture(&tmp);
-    }
+void mix_reformat(picture p1,picture p2,picture p3, picture *q1, picture *q2, picture *q3){
+    
 }
 picture mix_picture(picture p1, picture p2, picture p3){
 
-    mix_reformat(&p1,&p2,&p3);
-    assert(p1.chan_num == p2.chan_num && p2.chan_num == p3.chan_num && p3.chan_num == RGB_PIXEL_SIZE); 
-   
-    if(p1.width!=p3.width||p1.height!=p3.height){
-        /*Cf énoncé: on pourra redimensionner...*/
-        picture tmp = resample_picture_bilinear(p2,p1.width,p1.height);
-        clean_picture(&p2);
-        p2 = tmp; 
+    picture q1;
+    picture q2;
+    picture q3;
+    if(p1.chan_num == BW_PIXEL_SIZE){
+        q1 = convert_to_color_picture(p1);
+    }else{
+        q1 = copy_picture(p1);
     }
-    picture res = create_picture(p1.width,p1.height,RGB_PIXEL_SIZE);
+    if(p2.chan_num == BW_PIXEL_SIZE){
+        q2 = convert_to_color_picture(p2);
+    }else{
+        q2 = copy_picture(p2);
+    }
+    if(p3.chan_num == BW_PIXEL_SIZE){
+        q3 = convert_to_color_picture(p3);
+    }else{
+        q3 = copy_picture(p3);
+    }
+    assert(q1.chan_num == q2.chan_num && q2.chan_num == q3.chan_num && q3.chan_num == RGB_PIXEL_SIZE); 
+   
+    if(q1.width!=q3.width || q1.height!=q3.height){
+        /*Cf énoncé: on pourra redimensionner...*/
+        picture tmp = resample_picture_bilinear(q2,q1.width,q1.height);
+        clean_picture(&q2);
+        q2 = tmp; 
+    }
+    picture res = create_picture(q1.width,q1.height,RGB_PIXEL_SIZE);
 
     //On ne gère ici que le cas (RGB,RGB,RGB).
     for(int i=0;i<p1.height;++i){
         for(int j=0;j<p1.width;++j){
-            for(int k=0;k<2;++k){
-                double alpha = d_from_b(read_component_rgb(p3,i,j,k))/255.0;
-                double bary = (1.0-alpha)*d_from_b(read_component_rgb(p1,i,j,k));
-                bary += alpha*d_from_b(read_component_rgb(p2,i,j,k));
-                bary = round(min_double(bary,255.0));
+            for(int c=RED;c<BLUE;++c){
+
+                double alpha = d_from_b(read_component_rgb(q3,i,j,c))/255.0;
+                double bary = (1.0-alpha)*d_from_b(read_component_rgb(q1,i,j,c));
+
+                bary += alpha*d_from_b(read_component_rgb(q2,i,j,c));
+                /*Un peu inutile: un barycentre entre 2 valeurs comprises entre 0 et 255 l'est aussi.*/
+                //bary = min_double(bary,255.0);
+
                 byte val = (byte)bary;
-                write_component_rgb(res,i,j,k,val);
+                write_component_rgb(res,i,j,c,val);
             }        
         }
     }
+    clean_picture(&q1);
+    clean_picture(&q2);
+    clean_picture(&q3);
     return res;
 }
 /*Fonction d'aide: utilisée deux fois

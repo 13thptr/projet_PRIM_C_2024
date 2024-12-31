@@ -75,7 +75,13 @@ int main(int argc, char* argv[]){
         /*Opérations ne dépendant pas du type d'image: brighten, melt,inverse, set_levels...*/
         brighten_picture_wrapper(current_pic,output_dir,name,ext);
         melt_picture_wrapper(current_pic,output_dir,name,ext);
+
+
+        /*On sauvegarde l'image inversée si la troisième est présente, car alors on mixe et on en aura besoin plus tard.*/
         inverse_picture_wrapper(current_pic,output_dir,name,ext,THIRD_IMAGE_FLAG,&save);
+
+
+
         set_levels_wrapper(current_pic,output_dir,name,ext);
 
         /*Rééchantillonnages:*/
@@ -92,6 +98,8 @@ int main(int argc, char* argv[]){
         if(THIRD_IMAGE_FLAG){
             /*On s'occupe du mixage selon le masque ici.*/
             mult_picture_wrapper(current_pic,mask,output_dir,name,ext);
+
+
             mix_picture_wrapper(save,current_pic,mask,output_dir,name,ext);
         }
 
