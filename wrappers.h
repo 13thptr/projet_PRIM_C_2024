@@ -18,7 +18,7 @@ void brighten_picture_wrapper(picture p, char *res_dir, char *name_p, char *res_
 void melt_picture_wrapper(picture p, char *res_dir, char *name_p, char *res_ext);
 
 /*Invert*/
-void inverse_picture_wrapper(picture p, char *res_dir, char *name_p, char *res_ext);
+void inverse_picture_wrapper(picture p, char *res_dir, char *name_p, char *res_ext, bool should_save, picture *save);
 /*Normalize: gray*/
 void normalize_picture_wrapper(picture p, const char *res_dir, const char *name_p, char *res_ext);
 /*Normalize: color*/
@@ -38,3 +38,4 @@ void normalized_difference_wrapper(picture p, char *res_dir, char *name_p, char 
 void mult_picture_wrapper(picture p1, picture p2, char *res_dir, char *name_p, char *res_ext);
 
 /*Mélange/Mixture*/
+void mix_picture_wrapper(picture p1,picture p2, picture p3, char *res_dir, char *name_p, char *res_ext);

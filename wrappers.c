@@ -65,14 +65,18 @@ void melt_picture_wrapper(picture p, char *res_dir, char *name_p, char *res_ext)
 }
 
 /*LUT p*/
-void inverse_picture_wrapper(picture p, char *res_dir, char *name_p, char *res_ext){
+void inverse_picture_wrapper(picture p, char *res_dir, char *name_p, char *res_ext, bool should_save, picture *save){
     /*1) Inversion*/
     picture inverted = inverse_picture(p);
     char inverted_op[9] = "inverse";
     char *inverted_path = concat_parts(res_dir,name_p,inverted_op,res_ext);
 
     write_picture(inverted,inverted_path);
-    clean_picture(&inverted);
+    if(should_save){
+        *save = inverted;
+    }else{
+        clean_picture(&inverted);
+    }
     free(inverted_path);
 }
 /*2)Normalisation i.e. optimisation de la dynamique. */
@@ -200,3 +204,12 @@ void mult_picture_wrapper(picture p1, picture p2, char *res_dir, char *name_p, c
     free(product_path);
 }
 
+/*Mixture de deux images (barycentres) selon une troisième*/
+void mix_picture_wrapper(picture p1,picture p2, picture p3, char *res_dir, char *name_p, char *res_ext){
+    picture mixture = mix_picture(p1,p2,p3);
+    char mixture_op[30] = "mixture";
+    char *mixture_path = concat_parts(res_dir,name_p,mixture_op,res_ext);
+    write_picture(mixture,mixture_path);
+    clean_picture(&mixture);
+    free(mixture_path);
+}

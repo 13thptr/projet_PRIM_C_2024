@@ -144,6 +144,7 @@ void clean_picture(picture *p){
     if(p->data!=NULL){
         free(p->data);
     }
+    p->data = NULL;
 }
 picture copy_picture(picture p){
     assert(p.width>0&&p.height>0);
@@ -295,7 +296,7 @@ picture merge_picture(picture red, picture green, picture blue){
 
 picture brighten_picture(picture p, double factor){
     picture res = copy_picture(p);
-    for(int k=0;k<res.width*res.height*res.chan_num;k++){
+    for(int k=0;k<(int)res.width*(int)res.height*(int)res.chan_num;k++){
         double value = (double)res.data[k]*factor;
         value = (value <(double)MAX_BYTE)?value:(double)MAX_BYTE; 
         res.data[k] = (byte)value;
@@ -522,19 +523,19 @@ picture mix_picture(picture p1, picture p2, picture p3){
         Non, en fait, je change d'avis. Je ne traite que le cas (RGB, RGB, RGB) quitte à effectuer des conversions dans un sens puis dans l'autre.
 
     */
-    if(p1.chan_num == RGB_PIXEL_SIZE){
+    if(p1.chan_num == BW_PIXEL_SIZE){
         picture tmp = convert_to_color_picture(p1);
-        clean_picture(&p1);
+        //clean_picture(&p1);
         return mix_picture(tmp,p2,p3);
     }
-    if(p2.chan_num == RGB_PIXEL_SIZE){
-        picture tmp = convert_to_gray_picture(p2);
-        clean_picture(&p2);
+    if(p2.chan_num == BW_PIXEL_SIZE){
+        picture tmp = convert_to_color_picture(p2);
+        //clean_picture(&p2);
         return mix_picture(p1,tmp,p3);
     }
-    if(p3.chan_num == RGB_PIXEL_SIZE){
-        picture tmp = convert_to_gray_picture(p3);
-        clean_picture(&p3);
+    if(p3.chan_num == BW_PIXEL_SIZE){
+        picture tmp = convert_to_color_picture(p3);
+        //clean_picture(&p3);
         return mix_picture(p1,p2,tmp);
     }
     assert(p1.chan_num == p2.chan_num && p2.chan_num == p3.chan_num && p3.chan_num == RGB_PIXEL_SIZE); 
@@ -557,8 +558,7 @@ picture mix_picture(picture p1, picture p2, picture p3){
                 bary = round(min_double(bary,255.0));
                 byte val = (byte)bary;
                 write_component_rgb(res,i,j,k,val);
-            }
-            
+            }        
         }
     }
     return res;
@@ -598,8 +598,8 @@ picture resample_picture_nearest(picture image, unsigned int width, unsigned int
     ce que j'ai fait dans une version précédente (cf git log) (mentionner dans le rapport)
 
     */
-    for(int i=0;i<height;++i){
-        for(int j=0;j<width;++j){
+    for(int i=0;i<(int)height;++i){
+        for(int j=0;j<(int)width;++j){
 
             int old_i = (int)((double)i/ratio_y);
             int old_j = (int)((double)j/ratio_x);
@@ -614,7 +614,6 @@ picture resample_picture_nearest(picture image, unsigned int width, unsigned int
                 byte value = read_component_bw(image,old_i,old_j);
                 write_pixel_bw(res,i,j,value);
             }
-            
         }
     }
     return res;
@@ -623,7 +622,6 @@ picture resample_picture_nearest(picture image, unsigned int width, unsigned int
 et on interpole les composantes séparément, puis on renvoie la fusion des résultats.
 */
 picture resample_picture_bilinear(picture image, unsigned int width, unsigned int height){
-       
     picture res; 
 
     double ratio_x;
@@ -647,8 +645,8 @@ picture resample_picture_bilinear(picture image, unsigned int width, unsigned in
         return res;
     }
     res = create_picture(width,height,image.chan_num);
-    for(int i=0;i<height;++i){
-        for(int j=0;j<width;++j){
+    for(int i=0;i<(int)height;++i){
+        for(int j=0;j<(int)width;++j){
 
             double y = (double)i/ratio_y;
             double x = (double)j/ratio_x;
