@@ -11,8 +11,6 @@
 #include "pixels.h"
 #include "lut.h"
 
-
-
 /*
 TODO :
 - implémenter: ignorer les commentaires
@@ -44,15 +42,23 @@ picture read_picture(const char *filename){
     FILE *to_be_read = NULL;
 
     picture res;
+    res.width = 0;
+    res.height = 0;
+    res.chan_num = 0;
+
+
     to_be_read = fopen(filename,"r");
 
     if(to_be_read == NULL){
-        fprintf(stderr,"Problème de lecture dans la fonction read_picture.\n");
-        //TODO: utiliser errno
+        fprintf(stderr,"Problem reading ppm or pgm file.Aborting...\n");
+        /*Convention : en cas d'échec, on renvoie une structure "picture" vide.*/
+        exit(1);
         return res;
     }
     //On compare maintenant l'en-tête à celui attendu pour un fichier PGM ou PPM.
     char buffer[BUFFER_SIZE];
+
+    /*On va passer de fgets à getline pour plus de sécurité. */
     fgets (buffer,BUFFER_SIZE, to_be_read);
    
 
@@ -69,8 +75,10 @@ picture read_picture(const char *filename){
         perror("Not a binary ppm nor a pgm file.Aborting...\n");
         exit(1);
     }
-    fgets( buffer ,BUFFER_SIZE , to_be_read );
+    fgets(buffer ,BUFFER_SIZE , to_be_read );
     sscanf(buffer, " %d %d " , &res.width , &res.height);
+
+    assert(res.width>0&&res.height>0&&(res.chan_num==RGB_PIXEL_SIZE||res.chan_num==BW_PIXEL_SIZE));
 
     printf("Width read:%d\nHeight read:%d\n",res.width,res.height);
     fgets( buffer ,BUFFER_SIZE , to_be_read );
@@ -78,7 +86,10 @@ picture read_picture(const char *filename){
     int alloc_size = res.width*res.height*res.chan_num;
     res.data = myalloc (alloc_size);
     
-    fread (res.data , res.chan_num , alloc_size , to_be_read );
+    fread(res.data, res.chan_num, alloc_size, to_be_read);
+
+    /*Important: Ne pas oublier de fermer le fichier. */
+    fclose(to_be_read);
 
     return res;
 }
