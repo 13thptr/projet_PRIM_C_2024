@@ -6,11 +6,13 @@
 #include <string.h>
 #include <assert.h>
 
-#include "pictures.h"
 #include "filename.h"
+
+#include "picture_rw.h"
 
 #include "wrappers.h"
 #include "safe_malloc.h"
+
 
 #define LARGER_FACTOR (1.36)
 #define BRIGHTENING_FACTOR (1.5)

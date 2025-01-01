@@ -3,6 +3,7 @@
 
 #include "wrappers.h"
 #include "filename.h"
+#include "picture_rw.h"
 
 /*TODO: merge this file with safe_malloc.c ?*/
 

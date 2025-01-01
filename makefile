@@ -39,11 +39,13 @@ CC = gcc
 #main: main.c
 #	$(CC) -c $(CFLAGS) $^ -o $@ 
 
-prog: main.o pictures.o safe_malloc.o pixels.o filename.o lut.o wrappers.o
+prog: main.o pictures.o safe_malloc.o pixels.o filename.o lut.o wrappers.o picture_rw.o
 	$(CC) $(CFLAGS) -O2 -lm $^ -o $@
 
+picture_rw.o : picture_rw.c
+	$(CC) -c $(CFLAGS) $^ -o $@
+
 pictures.o : pictures.c
-#gcc -c -Wall -Wextra -Wpedantic -fsanitize=address pictures.c -o pictures.o
 	$(CC) -c $(CFLAGS) $^ -o $@
 
 pixels.o : pixels.c
