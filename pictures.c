@@ -518,6 +518,9 @@ picture mix_picture(picture p1, picture p2, picture p3){
     picture q1;
     picture q2;
     picture q3;
+
+    bool gray = (p1.chan_num == p2.chan_num && p2.chan_num == p3.chan_num && p3.chan_num == BW_PIXEL_SIZE);
+
     /*
         On fait en sorte que q1,q2,q3 soient des images RGB représentant les mêmes données que p1,p2,p3 qui peuvent
         être en niveaux de gris.
@@ -556,9 +559,18 @@ picture mix_picture(picture p1, picture p2, picture p3){
             }        
         }
     }
+    /*Si (et seulement si ?)les trois images d'entrée étaient en niveaux de gris, la conversion en RGB était artificielle 
+    et on aurait pu s'en passer (avec plus de code cependant). On reconvertit donc le résultat en image niveaux de gris.
+    */
     clean_picture(&q1);
     clean_picture(&q2);
     clean_picture(&q3);
+    if(gray){
+        picture res_gray = convert_to_gray_picture(res);
+        clean_picture(&res);
+        return res_gray;
+    }
+    
     return res;
 }
 /*Fonction d'aide: utilisée deux fois

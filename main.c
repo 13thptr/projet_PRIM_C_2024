@@ -80,9 +80,8 @@ int main(int argc, char* argv[]){
 
         /*On sauvegarde l'image inversée si la troisième est présente, car alors on mixe et on en aura besoin plus tard.*/
         inverse_picture_wrapper(current_pic,output_dir,name,ext,THIRD_IMAGE_FLAG,&save);
-
-
-
+        
+        /*Réduction du nombre de couleurs*/
         set_levels_wrapper(current_pic,output_dir,name,ext);
 
         /*Rééchantillonnages:*/
@@ -122,7 +121,6 @@ int main(int argc, char* argv[]){
     normalize_picture_wrapper(current_pic,"Lenna_output","Lenna_gray",pgm_ext);
 
     clean_picture(&current_pic);
-
 
     if(THIRD_IMAGE_FLAG){
         clean_picture(&mask);

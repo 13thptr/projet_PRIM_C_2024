@@ -1,13 +1,11 @@
 Reste à faire sur le projet C:
 
-OBJECTIF / DATE LIMITE : TOUT FINIR AVANT LE MARDI 31 DEC.
+OBJECTIF / DATE LIMITE : TOUT FINIR AVANT LE JEUDI 2 JAN AU SOIR.
 
-- Meta: Mettre le projet sur mon GitHub (dépôt privé, en tout cas pour le moment) et le pousser après chaque modification. OK
-
-
+- OK Meta: Mettre le projet sur mon GitHub (dépôt privé, en tout cas pour le moment) et le pousser après chaque modification. OK
 
 
-- 0: Faire en sorte que les fichiers images produits aillent dans Lenna_output au lieu de Lenna_input (jeu sur les chemins). + commit
+- OK 0: Faire en sorte que les fichiers images produits aillent dans Lenna_output au lieu de Lenna_input (jeu sur les chemins). + commit
 
     -> j'ai créé un fichier main_temp.txt pour travailler avec un main allégé et avoir l'esprit plus clair,
     sans perdre mon travail. Mentionner ce problème de précipitation dans le compte-rendu.
@@ -31,10 +29,10 @@ OBJECTIF / DATE LIMITE : TOUT FINIR AVANT LE MARDI 31 DEC.
 
 
 
-- 1: Formater le main comme demandé. Factoriser au maximum pour la lisibilité. + commit
-- 1 bis: Mettre le merge_picture en option (pas demandé, d'où "en option".)
+- OK 1: Formater le main comme demandé. Factoriser au maximum pour la lisibilité. + commit
 
-- 2: Terminer les fonctions voulues. + commit
+
+- OK 2: Terminer les fonctions voulues. + commit
 
 - 2 bis: Faire le bonus. + commit
 
@@ -61,6 +59,8 @@ OBJECTIF / DATE LIMITE : TOUT FINIR AVANT LE MARDI 31 DEC.
 - 7: vérifier que tous les prototypes de fonctions correspondent bien à ce qui était demandé.
 
 - 8: fusionner wrappers.h|c et safe_malloc.h|c ?
+
+- 9: uniformiser mes conventions de code, les espaces, etc. "Prettifier" dans CLion ou avec une extension ? Un logiciel ?
 
 - Remettre les options maximales de compilation, y compris ISO C / W old style / Werror
 
@@ -93,6 +93,13 @@ OBJECTIF / DATE LIMITE : TOUT FINIR AVANT LE MARDI 31 DEC.
 
     + Parler de l'évolution des fonctions dans le temps: ajout de checks à la fin, difficultés éventuelles ou même absence de difficultés.
     
+    + Faire une recherche du mot "rapport" dans tous les fichiers pour voir ce que j'aurais pu oublier
+     
+    + Section spécifique pour mix_picture qui m'a pris beaucoup de temps, notamment à cause du double free.
+
+    + Mentionner l'incohérence potentielle entre le contenu d'un fichier (P5/P6) et son extension (ppm/pgm, dans l'ordre inverse fait exprès)
+    et ce que j'ai fait pour y remédier. Notamment mix_picture: recombinaison des fichiers BW en fichiers PPM...
+
     + Section spécifique pour le bonus.
 
     + Section spécifique pour mes ajouts personnels: rotation puis plus généralement matrice de transformation (entrable en ligne de commande).
@@ -103,7 +110,9 @@ OBJECTIF / DATE LIMITE : TOUT FINIR AVANT LE MARDI 31 DEC.
 
     + Mentionner le manuel d'utilisation avec --help, les limites du programme.
 
-    + Mention
+    + Mentionner les 2 phénomènes mémoire que je n'ai pas encore compris: le problème de malloc avec fsanitize (cf. git log)
+        et l'absence de double free après resampling (cf. git log aussi)
+
 
     + Parler de la performance du programme (occupation mémoire mesurée avec ..., vitesse mesurée avec timespec ou similaire.)
     et de la façon dont il pourrait être amélioré, du plus simple au plus complexe:
@@ -114,7 +123,12 @@ OBJECTIF / DATE LIMITE : TOUT FINIR AVANT LE MARDI 31 DEC.
 
 
 
-- Faire lire le tout à MS
+
+- Faire une première archive tar contenant tout ce travail sans aucune exception 
+
+- Faire une seconde archive tar avec un .git modifié pour faire disparaître toute trace du fichier TODO.txt
+    (permet de travailler git sur un exemple concret !)
+
 
 - Faire une archive tar sans fichier git ni ce fichier TODO.
 
