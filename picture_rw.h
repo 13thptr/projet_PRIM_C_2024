@@ -2,6 +2,8 @@
 #define _PICTURE_RW_
 #include "pictures.h"
 
+void reset_picture_to_zero(picture *p);
+
 picture read_picture(const char *filename);
 int write_picture(picture p, char * filename);
 

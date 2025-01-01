@@ -27,8 +27,6 @@ double abs_double(double x){
     return x>0?x:-x;
 }
 
-
-
 /**
  * Création d'une image (sans)
  * @param [in] width la largeur de l'image à créer
