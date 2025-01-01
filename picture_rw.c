@@ -29,20 +29,42 @@ void reset_picture_to_zero(picture *p){
     p->height = 0;
     p->chan_num = 0;
 }
+/*Renvoie faux en cas d'échec de lecture, vrai sinon.*/
+bool fgets_encapsulator(char *buf, FILE *f, int line_counter){
+
+    char *fgets_return_value = fgets(buf,BUFFER_SIZE, f);
+
+    if(fgets_return_value == NULL){
+        fprintf(stderr,"Could not read line %d (omitting comments) properly.\n",line_counter);
+        fprintf(stderr,"Returning empty picture...\n");
+        return false;
+    }
+    return true;
+}   
+
 
 picture read_picture(const char *filename){
     FILE *to_be_read = NULL;
     int max_val;/*Pourrait être un type byte si l'entrée était GARANTIE entre 0 et 255 mais on ne sait jamais...*/
+    
 
     picture res;
+ 
+
     reset_picture_to_zero(&res);
 
+    
+
     to_be_read = fopen(filename,"r");
+    /*On a besoin d'un compteur pour savoir à quelle "vraie ligne" on est dans le traitement des commentaires 
+    
+    (on ne compte pas les lignes commençant par #)*/
+    int line_counter = 1;
 
     if(to_be_read == NULL){
         fprintf(stderr,"Problem opening file. Returning empty picture...\n");
         /*Convention : en cas d'échec, on renvoie une structure "picture" vide.*/
-        //exit(1);
+       
         fclose(to_be_read);
         return res;
     }
@@ -50,7 +72,11 @@ picture read_picture(const char *filename){
     char buffer[BUFFER_SIZE];
 
     /*On va passer de fgets à getline pour plus de sécurité. */
-    fgets (buffer,BUFFER_SIZE, to_be_read);
+    if(!fgets_encapsulator(buffer,to_be_read,line_counter)){
+        reset_picture_to_zero(&res);
+        fclose(to_be_read);
+        return res;
+    }
    
 
     if(!strcmp(buffer,"P6\n")){
@@ -66,11 +92,17 @@ picture read_picture(const char *filename){
         fprintf(stderr,"\nNot a valid binary ppm nor pgm file. Returning empty picture...\n");
         fclose(to_be_read);
         return res;
-        //exit(1);
+       
+    }
+    line_counter++;/*On a lu la première ligne: il peut  désormais y a voir des commentaires.*/
+    /*Gestion des commentaires: Après la première ligne et jusqu'à la quatrième, il peut y avoir des commentaires.*/
+
+    if(!fgets_encapsulator(buffer,to_be_read,line_counter)){
+        reset_picture_to_zero(&res);
+        fclose(to_be_read);
+        return res;
     }
     /*Lire attentivement le man de sscanf pour être sûr de son comportement.*/
-    fgets(buffer, BUFFER_SIZE, to_be_read);
-    
     int status = sscanf(buffer,"%d %d", &res.width, &res.height);
 
     if(status<NB_ITEMS_2_DIMENSIONS){
@@ -79,14 +111,16 @@ picture read_picture(const char *filename){
         fclose(to_be_read);
         return res;
     }
-    assert(status>0);
 
-    //assert(res.width>0&&res.height>0&&(res.chan_num==RGB_PIXEL_SIZE||res.chan_num==BW_PIXEL_SIZE));
 
     printf("\nWidth read:%d\nHeight read:%d\n",res.width,res.height);
 
     /*On lit la troisième ligne, censée contenir la valeur maximale des pixels à lire.*/
-    fgets(buffer, BUFFER_SIZE, to_be_read );
+    if(!fgets_encapsulator(buffer,to_be_read,line_counter)){
+        reset_picture_to_zero(&res);
+        fclose(to_be_read);
+        return res;
+    }
 
     status = sscanf(buffer,"%d",&max_val);
     if(status<NB_ITEM_1_MAX_VAL){
@@ -94,7 +128,7 @@ picture read_picture(const char *filename){
         reset_picture_to_zero(&res);
         fclose(to_be_read);
         return res;
-        //exit(1);
+       
     }
     if(!(1 <= max_val && max_val <= 255)){
         fprintf(stderr,"\nError: invalid max byte value. Returning empty picture...\n");

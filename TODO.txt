@@ -48,11 +48,13 @@ OBJECTIF / DATE LIMITE : TOUT FINIR AVANT LE JEUDI 2 JAN AU SOIR.
 - 3 bis: (optionnel) Encapsuler les checks réalisés à l'étape 3 dans des fonctions pour les réutiliser 
     afin de vérifier la validité des images produites. + commit
 
-- 3 ter: faire en sorte de prendre en compte la valeur maximale des pixels (cf. énoncé)
+- 3 ter: Créer ma propre image de test pour invalid_max puisque M. Burel a mis deux fois la même image "invalid_height.ppm"
+
+- 3 quater: faire en sorte de prendre en compte la valeur maximale des pixels (cf. énoncé)
 
 - 4: Ajouter les @assigns, @requires, @ensures et en profiter pour relire mon code, attentivement.+commit
 
-- 5: Ajouter les "assert" qui vont bien, où il faut.+commit 
+- 5: Ajouter les "assert" qui vont bien, où il faut. +commit 
 
 - 6: supprimer les fonctions et constantes inutilisées (je pense à la manipulation de pixels, à MAX_BYTE...) mentionner dans le rapport. + commit.
 
