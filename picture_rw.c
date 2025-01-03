@@ -111,7 +111,7 @@ picture read_picture(const char *filename){
     }
     else if(!strcmp(buffer,"P5\n")){
         printf("Reading pgm file...\n");
-        res.chan_num = BW_PIXEL_SIZE;
+        res.chan_num = GREY_PIXEL_SIZE;
     }
     else{
         printf("%s:",filename);fflush(stdout);
@@ -196,7 +196,7 @@ int write_picture(picture p, char * filename){
     }
     if(p.chan_num == RGB_PIXEL_SIZE){
         fprintf(f, "P6\n%d %d\n255\n", p.width, p.height);
-    }else if(p.chan_num == BW_PIXEL_SIZE){
+    }else if(p.chan_num == GREY_PIXEL_SIZE){
         fprintf(f, "P5\n%d %d\n255\n", p.width, p.height);
     }else{
         fprintf(stderr,"Erreur de canal dans la fonction write_picture.\n");

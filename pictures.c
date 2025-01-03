@@ -17,33 +17,63 @@ TODO :
 - prendre en compte la valeur maximale de la troisième ligne (en "bonus").
 */
 
+/*-------------------------------------------------------Fonctions utilitaires------------------------------------------*/
+
+/**
+ * Minimum entre deux entiers.
+ * @param [in] n1 int
+ * @param [in] n2 int 
+ * @requires: rien
+ * @assigns: rien
+ * @ensures: cf. return
+ * @return: min(n1,n2)
+ */
+int min_int(int n1, int n2){
+    return n1<n2?n1:n2;
+}
+/**
+ * Minimum entre deux doubles.
+ * @param [in] d1 double 
+ * @param [in] d2 double 
+ * @requires: rien
+ * @assigns: rien
+ * @ensures: cf. return
+ * @return: min(d1,d2)
+ */
 double min_double(double d1, double d2){
     return d1<d2?d1:d2;
 }
-int min_int(int a, int b){
-    return a<b?a:b;
-}
+/**
+ * Valeur absolue d'un double
+ * @param [in] x double
+ * @requires: rien
+ * @assigns: rien
+ * @ensures: cf. return
+ * @return: |x|
+ */
 double abs_double(double x){
     return x>0?x:-x;
 }
 
+
+/*-----------------------------Fonctions principales----------------------------------------------------------------------------------*/
+
+
+/*-----------------------------------------------Création, copie et nettoyage---------------------------------------------------------*/
 /**
- * Création d'une image (sans)
+ * Création d'une image
  * @param [in] width la largeur de l'image à créer
  * @param [in] height la hauteur de l'image à créer
  * @param [in] channels le nombre de canaux
 
- * @assigns value  zones de mémoires modifiéres
+ * @assigns: le tas est modifié avec un appel à malloc() (cf. safe_malloc.c)
  * 
- * @ensures 
- * @ensures
- *   
- * @return rien
+ * @ensures: L'image renvoyée est bien initialisée. Plantage si l'une des préconditions n'est pas respectée.
+ * 
+ * @return nouvelle image créée
  */
 picture create_picture(unsigned int width, unsigned int height, unsigned int channels){
-    //assert(width>0&&height>0);
-    assert(channels == RGB_PIXEL_SIZE||channels == BW_PIXEL_SIZE);
-    //printf("max:%d\n",max);//éviter "unused parameter". à enlever.
+    assert(channels == RGB_PIXEL_SIZE||channels == GREY_PIXEL_SIZE);
     picture res;
     res.width = width;
     res.height = height;
@@ -51,6 +81,16 @@ picture create_picture(unsigned int width, unsigned int height, unsigned int cha
     res.data = myalloc(width*height*channels);
     return res;
 }
+/**
+ * Nettoyage d'une image
+ * @param [in] p pointeur vers une image dont le champ data est bien initialisé.
+
+ * @assigns: le tas est modifié avec un appel à free()
+ * 
+ * @ensures: La mémoire occupée par le champ data est bien libérée. Plantage si l'une des préconditions n'est pas respectée.
+ * 
+ * @return rien
+ */
 void clean_picture(picture *p){
     assert(p!=NULL);
     p->chan_num = 0;
@@ -61,10 +101,21 @@ void clean_picture(picture *p){
     }
     p->data = NULL;
 }
+/**
+ * Copie d'une image
+ * @param [in] p 
+ * @assigns: le tas est modifié avec un appel à malloc() via create_picture.
+ * 
+ * @ensures: Plantage si l'une des préconditions n'est pas respectée. Sinon, une nouvelle image est initialisée en mémoire
+ * contenant les mêmes informations d'image que le paramètre.
+ * 
+ * @return La copie nouvellement créée
+*/
+
 picture copy_picture(picture p){
     assert(p.width>0&&p.height>0);
     assert(p.data!=NULL);
-    assert(p.chan_num == BW_PIXEL_SIZE || p.chan_num == RGB_PIXEL_SIZE);
+    assert(p.chan_num == GREY_PIXEL_SIZE || p.chan_num == RGB_PIXEL_SIZE);
 
     picture res = create_picture(p.width,p.height,p.chan_num);
     for(int k = 0; k<p.width*p.height*(int)p.chan_num;k++){
@@ -72,23 +123,54 @@ picture copy_picture(picture p){
     }
    
     return res;
-}/*
-Obtention d’informations sur une image
+}
+/*------------------------------------------------------------Obtention d’informations sur une image-----------------------------------*/
 
-    Indication d’image vide (si un de ses champs est nul) : int is_empty_picture(picture p);
-
-        [in] p l’image à inspecter
-        [out] une valeur non nulle si p est vide, 0 sinon.
+/**
+ * is_empty_picture
+ * @param [in] p 
+ * @assigns: rien
+ * 
+ * @ensures: cf. return
+ * 
+ * @return booléen: vrai si aucune des valeurs ne vaut 0, faux sinon.
 */
 bool is_empty_picture(picture p){
     return !(p.width&&p.height&&p.chan_num);
 }
+/**
+ * is_gray_picture
+ * @param [in] p 
+ * @assigns: rien
+ * 
+ * @ensures: cf. return
+ * 
+ * @return booléen: vrai si l'image est en niveaux de gris, faux sinon
+*/
 bool is_gray_picture(picture p){
-    return p.chan_num == BW_PIXEL_SIZE;
+    return p.chan_num == GREY_PIXEL_SIZE;
 }
+/**
+ * is_color_picture
+ * @param [in] p 
+ * @assigns: rien
+ * 
+ * @ensures: cf. return
+ * 
+ * @return booléen: vrai si l'image est en couleurs, faux sinon
+*/
 bool is_color_picture(picture p){
     return p.chan_num == RGB_PIXEL_SIZE;
 }
+/**
+ * info_picture
+ * @param [in] p 
+ * @assigns: rien
+ * 
+ * @ensures: rien
+ * 
+ * @return rien
+*/
 void info_picture(picture p){
     printf("%d x% d x %d\n",p.width,p.height,p.chan_num);
 }
@@ -109,7 +191,7 @@ picture convert_to_color_picture(picture p){
     if(p.chan_num == RGB_PIXEL_SIZE){
         return copy_picture(p);
     }
-    assert(p.chan_num == BW_PIXEL_SIZE);
+    assert(p.chan_num == GREY_PIXEL_SIZE);
     picture res = create_picture(p.width,p.height,RGB_PIXEL_SIZE);
     
     for(int i=0;i<res.height;i++){
@@ -136,7 +218,7 @@ picture convert_to_gray_picture(picture p){
         return copy_picture(p); //Enoncé: on se contentera d'en faire une copie
     }
     assert(is_color_picture(p));
-    picture res = create_picture(p.width,p.height,BW_PIXEL_SIZE);
+    picture res = create_picture(p.width,p.height,GREY_PIXEL_SIZE);
 
     for(int i=0;i<res.height;i++){
         for(int j=0;j<res.width;j++){
@@ -167,11 +249,11 @@ picture *split_picture(picture p){
     }
     picture *arr = malloc(sizeof(picture)*p.chan_num);
     for(int n=0;n<(int)p.chan_num;n++){
-        arr[n] = create_picture(p.width,p.height,BW_PIXEL_SIZE);
+        arr[n] = create_picture(p.width,p.height,GREY_PIXEL_SIZE);
        
         for(int i= 0;i<p.height;i++){
             for(int j=0;j<p.width;j++){
-                byte component = (p.chan_num==BW_PIXEL_SIZE?read_component_bw(p,i,j):read_component_rgb(p,i,j,n));
+                byte component = (p.chan_num==GREY_PIXEL_SIZE?read_component_bw(p,i,j):read_component_rgb(p,i,j,n));
                 write_pixel_bw(arr[n],i,j,component); //ici il n'y a pas de disjonction, on écrit toujours dans une image en niveau de gris.
             }
         }
@@ -224,7 +306,7 @@ picture melt_picture(picture p, int number){
 
     picture melted = copy_picture(p);
 
-    if(p.chan_num == BW_PIXEL_SIZE){
+    if(p.chan_num == GREY_PIXEL_SIZE){
         for(int pix = 0;pix<number;pix++){
             //On sélectionne abcisse et ordonnée au hasard.
             int i = rand()%(p.height);
@@ -367,7 +449,7 @@ picture mult_picture(picture p1, picture p2){
         return p1;
     }
    
-    if(p1.chan_num==BW_PIXEL_SIZE&&p2.chan_num==RGB_PIXEL_SIZE){
+    if(p1.chan_num==GREY_PIXEL_SIZE&&p2.chan_num==RGB_PIXEL_SIZE){
         return mult_picture(p2,p1);
     }
     if(p1.width!=p2.width||p1.height!=p2.height){
@@ -385,13 +467,13 @@ picture mult_picture(picture p1, picture p2){
    /*Rmq: encore un cas de disjonction de cas indépendante de i,j à commenter dans le rapport.*/
     for(int i=0;i<p1.height;++i){
         for(int j=0;j<p1.width;++j){
-            if(p1.chan_num == BW_PIXEL_SIZE && p2.chan_num == BW_PIXEL_SIZE){
+            if(p1.chan_num == GREY_PIXEL_SIZE && p2.chan_num == GREY_PIXEL_SIZE){
                 double new = (d_from_b(read_component_bw(p1,i,j))/255.0)*d_from_b(read_component_bw(p2,i,j));
                 new = min_double(new,255.0);
                 byte value = (byte)new;
                 write_pixel_bw(res,i,j,value);
             }
-            else if(p1.chan_num == RGB_PIXEL_SIZE &&p2.chan_num == BW_PIXEL_SIZE){
+            else if(p1.chan_num == RGB_PIXEL_SIZE &&p2.chan_num == GREY_PIXEL_SIZE){
                 double bw_val = d_from_b(read_component_bw(p2,i,j))/255.0;
 
                 double new_red_d = d_from_b(read_component_rgb(p1,i,j,RED))*bw_val;
@@ -425,7 +507,7 @@ picture mult_picture(picture p1, picture p2){
 /*Mélange*/
 
 void mix_reformat(picture p1,picture *q1){
-    if(p1.chan_num == BW_PIXEL_SIZE){
+    if(p1.chan_num == GREY_PIXEL_SIZE){
         *q1 = convert_to_color_picture(p1);
     }else{
         *q1 = copy_picture(p1);
@@ -437,7 +519,7 @@ picture mix_picture(picture p1, picture p2, picture p3){
     picture q2;
     picture q3;
 
-    bool gray = (p1.chan_num == p2.chan_num && p2.chan_num == p3.chan_num && p3.chan_num == BW_PIXEL_SIZE);
+    bool gray = (p1.chan_num == p2.chan_num && p2.chan_num == p3.chan_num && p3.chan_num == GREY_PIXEL_SIZE);
 
     /*
         On fait en sorte que q1,q2,q3 soient des images RGB représentant les mêmes données que p1,p2,p3 qui peuvent

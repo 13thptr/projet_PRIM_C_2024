@@ -59,7 +59,7 @@ void apply_lut(picture p, lut table){
             }
         }
     }
-    else if(p.chan_num == BW_PIXEL_SIZE){
+    else if(p.chan_num == GREY_PIXEL_SIZE){
         for(int i=0;i<p.height;i++){
             for(int j=0;j<p.width;j++){
                 byte value = read_component_bw(p,i,j);

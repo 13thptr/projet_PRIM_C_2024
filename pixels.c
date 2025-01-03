@@ -19,7 +19,7 @@
  * 
  */
 void write_component_rgb(picture p, int i, int j, enum PIXEL_TYPES c,int value){
-    assert(!is_empty_picture);
+    assert(!is_empty_picture(p));
     assert(0<=i&&i<p.height);
     assert(0<=j&&j<p.width);
     assert(c==RED||c==GREEN||c==BLUE);
