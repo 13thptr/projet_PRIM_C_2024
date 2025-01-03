@@ -19,7 +19,7 @@ typedef unsigned char byte; /* sizeof(char) == 1 */
 
 double d_from_b(byte b);
 
-enum channel_number{GREY_PIXEL_SIZE = 1, RGB_PIXEL_SIZE = 3};
+enum channel_number{GRAY_PIXEL_SIZE = 1, RGB_PIXEL_SIZE = 3};
 
 typedef struct{
     int width;

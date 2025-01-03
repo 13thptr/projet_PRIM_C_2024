@@ -73,7 +73,7 @@ double abs_double(double x){
  * @return nouvelle image créée
  */
 picture create_picture(unsigned int width, unsigned int height, unsigned int channels){
-    assert(channels == RGB_PIXEL_SIZE||channels == GREY_PIXEL_SIZE);
+    assert(channels == RGB_PIXEL_SIZE||channels == GRAY_PIXEL_SIZE);
     picture res;
     res.width = width;
     res.height = height;
@@ -115,7 +115,7 @@ void clean_picture(picture *p){
 picture copy_picture(picture p){
     assert(p.width>0&&p.height>0);
     assert(p.data!=NULL);
-    assert(p.chan_num == GREY_PIXEL_SIZE || p.chan_num == RGB_PIXEL_SIZE);
+    assert(p.chan_num == GRAY_PIXEL_SIZE || p.chan_num == RGB_PIXEL_SIZE);
 
     picture res = create_picture(p.width,p.height,p.chan_num);
     for(int k = 0; k<p.width*p.height*(int)p.chan_num;k++){
@@ -148,7 +148,7 @@ bool is_empty_picture(picture p){
  * @return booléen: vrai si l'image est en niveaux de gris, faux sinon
 */
 bool is_gray_picture(picture p){
-    return p.chan_num == GREY_PIXEL_SIZE;
+    return p.chan_num == GRAY_PIXEL_SIZE;
 }
 /**
  * is_color_picture
@@ -174,16 +174,31 @@ bool is_color_picture(picture p){
 void info_picture(picture p){
     printf("%d x% d x %d\n",p.width,p.height,p.chan_num);
 }
+/**
+ * same_dimensions
+ * @param [in] p1
+ * @param [in] p2 
+ * @assigns: rien
+ * 
+ * @ensures: rien
+ * 
+ * @return vrai ssi les deux images ont les mêmes dimensions
+*/
 bool same_dimensions(picture p1, picture p2){
     return p1.chan_num==p2.chan_num&&p1.width==p2.width&&p1.height==p2.height;
 }
-/*
-Convertir une image en niveau de gris vers une image en couleur : picture convert_to_color_picture(picture p);
-        en répétant les valeurs de niveau de gris dans chaque canal R, V, B.
-        [in] p l’image à convertir en couleurs
-        [out] l’image couleur convertie en couleurs.
-            Si p était déjà en couleur on se contentera de faire une copie
-            Si pétait une image en niveaux de gris on répétera la composante de niveau de gris dans chacune des composantes (rouge, vert, bleu) de l’image résultat.
+
+/*-----------------------------------------------------------FONCTIONS PRINCIPALES (MANIPULATION)------------------------------------*/
+
+/**
+ * convert_to_color_picture
+ * @param [in] p 
+ * @assigns: modifie le tas en créant ou bien une copie de l'image en cours, ou bien une nouvelle image (nouvelle allocation 
+ * dans les deux cas)
+ * 
+ * @ensures: Plantage si l'un e des préconditions n'est pas respectée; cf. @return pour le comportement normal.
+ * 
+ * @return image en couleur, copie de l'image d'entrée ou résultat de la duplication des canaux.
 */
 picture convert_to_color_picture(picture p){
     assert(!is_empty_picture(p));
@@ -191,7 +206,7 @@ picture convert_to_color_picture(picture p){
     if(p.chan_num == RGB_PIXEL_SIZE){
         return copy_picture(p);
     }
-    assert(p.chan_num == GREY_PIXEL_SIZE);
+    assert(p.chan_num == GRAY_PIXEL_SIZE);
     picture res = create_picture(p.width,p.height,RGB_PIXEL_SIZE);
     
     for(int i=0;i<res.height;i++){
@@ -202,6 +217,17 @@ picture convert_to_color_picture(picture p){
     }
     return res;
 }
+/**
+ * convert_to_gray_picture
+ * @param [in] p 
+ * @assigns: modifie le tas en créant ou bien une copie de l'image en cours, ou bien une nouvelle image (nouvelle allocation 
+ * dans les deux cas)
+ * 
+ * @ensures: Plantage si l'un e des préconditions n'est pas respectée; cf. @return pour le comportement normal.
+ * 
+ * @return image en couleur, copie de l'image d'entrée ou résultat de la duplication des canaux.
+*/
+
 
 /* 
     Convertir une image en couleur vers une image en niveaux de gris : picture convert_to_gray_picture(picture p);
@@ -218,7 +244,7 @@ picture convert_to_gray_picture(picture p){
         return copy_picture(p); //Enoncé: on se contentera d'en faire une copie
     }
     assert(is_color_picture(p));
-    picture res = create_picture(p.width,p.height,GREY_PIXEL_SIZE);
+    picture res = create_picture(p.width,p.height,GRAY_PIXEL_SIZE);
 
     for(int i=0;i<res.height;i++){
         for(int j=0;j<res.width;j++){
@@ -249,11 +275,11 @@ picture *split_picture(picture p){
     }
     picture *arr = malloc(sizeof(picture)*p.chan_num);
     for(int n=0;n<(int)p.chan_num;n++){
-        arr[n] = create_picture(p.width,p.height,GREY_PIXEL_SIZE);
+        arr[n] = create_picture(p.width,p.height,GRAY_PIXEL_SIZE);
        
         for(int i= 0;i<p.height;i++){
             for(int j=0;j<p.width;j++){
-                byte component = (p.chan_num==GREY_PIXEL_SIZE?read_component_bw(p,i,j):read_component_rgb(p,i,j,n));
+                byte component = (p.chan_num==GRAY_PIXEL_SIZE?read_component_bw(p,i,j):read_component_rgb(p,i,j,n));
                 write_pixel_bw(arr[n],i,j,component); //ici il n'y a pas de disjonction, on écrit toujours dans une image en niveau de gris.
             }
         }
@@ -306,7 +332,7 @@ picture melt_picture(picture p, int number){
 
     picture melted = copy_picture(p);
 
-    if(p.chan_num == GREY_PIXEL_SIZE){
+    if(p.chan_num == GRAY_PIXEL_SIZE){
         for(int pix = 0;pix<number;pix++){
             //On sélectionne abcisse et ordonnée au hasard.
             int i = rand()%(p.height);
@@ -449,7 +475,7 @@ picture mult_picture(picture p1, picture p2){
         return p1;
     }
    
-    if(p1.chan_num==GREY_PIXEL_SIZE&&p2.chan_num==RGB_PIXEL_SIZE){
+    if(p1.chan_num==GRAY_PIXEL_SIZE&&p2.chan_num==RGB_PIXEL_SIZE){
         return mult_picture(p2,p1);
     }
     if(p1.width!=p2.width||p1.height!=p2.height){
@@ -467,13 +493,13 @@ picture mult_picture(picture p1, picture p2){
    /*Rmq: encore un cas de disjonction de cas indépendante de i,j à commenter dans le rapport.*/
     for(int i=0;i<p1.height;++i){
         for(int j=0;j<p1.width;++j){
-            if(p1.chan_num == GREY_PIXEL_SIZE && p2.chan_num == GREY_PIXEL_SIZE){
+            if(p1.chan_num == GRAY_PIXEL_SIZE && p2.chan_num == GRAY_PIXEL_SIZE){
                 double new = (d_from_b(read_component_bw(p1,i,j))/255.0)*d_from_b(read_component_bw(p2,i,j));
                 new = min_double(new,255.0);
                 byte value = (byte)new;
                 write_pixel_bw(res,i,j,value);
             }
-            else if(p1.chan_num == RGB_PIXEL_SIZE &&p2.chan_num == GREY_PIXEL_SIZE){
+            else if(p1.chan_num == RGB_PIXEL_SIZE &&p2.chan_num == GRAY_PIXEL_SIZE){
                 double bw_val = d_from_b(read_component_bw(p2,i,j))/255.0;
 
                 double new_red_d = d_from_b(read_component_rgb(p1,i,j,RED))*bw_val;
@@ -507,7 +533,7 @@ picture mult_picture(picture p1, picture p2){
 /*Mélange*/
 
 void mix_reformat(picture p1,picture *q1){
-    if(p1.chan_num == GREY_PIXEL_SIZE){
+    if(p1.chan_num == GRAY_PIXEL_SIZE){
         *q1 = convert_to_color_picture(p1);
     }else{
         *q1 = copy_picture(p1);
@@ -519,7 +545,7 @@ picture mix_picture(picture p1, picture p2, picture p3){
     picture q2;
     picture q3;
 
-    bool gray = (p1.chan_num == p2.chan_num && p2.chan_num == p3.chan_num && p3.chan_num == GREY_PIXEL_SIZE);
+    bool gray = (p1.chan_num == p2.chan_num && p2.chan_num == p3.chan_num && p3.chan_num == GRAY_PIXEL_SIZE);
 
     /*
         On fait en sorte que q1,q2,q3 soient des images RGB représentant les mêmes données que p1,p2,p3 qui peuvent
@@ -543,17 +569,9 @@ picture mix_picture(picture p1, picture p2, picture p3){
     for(int i=0;i<p1.height;++i){
         for(int j=0;j<p1.width;++j){
             for(int c=RED;c<=BLUE;++c){
-
                 double alpha = d_from_b(read_component_rgb(q3,i,j,c))/255.0;
-                assert(0<=alpha&&alpha<=255);
                 double bary = (1.0-alpha)*d_from_b(read_component_rgb(q1,i,j,c));
-
                 bary += alpha*d_from_b(read_component_rgb(q2,i,j,c));
-                
-
-                /*Un peu inutile: un barycentre entre 2 valeurs comprises entre 0 et 255 l'est aussi.*/
-                //bary = min_double(bary,255.0);
-
                 byte val = (byte)bary;
                 write_component_rgb(res,i,j,c,val);
             }        
@@ -573,7 +591,8 @@ picture mix_picture(picture p1, picture p2, picture p3){
     
     return res;
 }
-/*Fonction d'aide: utilisée deux fois
+/*
+Fonction d'aide: utilisée deux fois
 Modifie par référence les ratios de redimensionnement horizontal et vertical
 Affiche un avertissement lorsque l'on déforme l'image.
 */
