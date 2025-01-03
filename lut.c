@@ -7,18 +7,15 @@
 #include "safe_malloc.h"
 #include "pictures.h"
 
-/*NB: la consigne spécifie la création d'un type ABSTRAIT. On le précisera donc dans lut.c*/
-/*
-NB: J'ai été obligé de copier la définition / précision du type lut_s dans pictures.c pour éviter une erreur de type incomplet,
-peut-on éviter cela ?
-*/
 struct lut_s{
     int n;
     byte *array;
 };
 typedef struct lut_s* lut;
 
+/*
 
+*/
 lut create_lut(unsigned int n){
     assert(n>0);
     lut res = malloc(sizeof(struct lut_s));

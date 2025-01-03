@@ -8,34 +8,39 @@
  * @param [in] i ligne du pixel à modifier
  * @param [in] j colonne du pixel à modifier
  * @param [in] value valeur du pixel à modifier
- * @ensures p structure valide
- * @ensures i,j indices valides (assert)
- * @ensures red,green,blue entre 0 et 255.
  * 
- * @assigns p.data
- *   
+ * @requires: p n'est pas vide.
+ * @requires: c canal valide (RED=0 ou GREEN=1 ou BLUE = 2)
+ * @requires: i,j indices valides (entre 0 et hauteur, resp. largeur moins 1)
+ * @assigns: p.data
+ * 
+ * @ensures: p.data est modifié et contient le pixel de la bonne couleur. 
  * @return rien
  * 
  */
 void write_component_rgb(picture p, int i, int j, enum PIXEL_TYPES c,int value){
+    assert(!is_empty_picture);
     assert(0<=i&&i<p.height);
     assert(0<=j&&j<p.width);
     assert(c==RED||c==GREEN||c==BLUE);
+
     int index =  ((i*p.width)+j)*3;
     p.data[index+c] = value;
 }
+
 /**
  * Ecriture du pixel/triplet de valeurs red,green,blue dans la "case" i,j du champ "data" de p.
  * @param [in] p la structure "picture" à modifier.
  * @param [in] i ligne du pixel à modifier
  * @param [in] j colonne du pixel à modifier
  * 
- * @ensures p structure valide
- * @ensures i,j indices valides (assert)
- * @ensures red,green,blue entre 0 et 255.
+ * @requires: p structure valide (image non vide)
+ * @requires: i,j indices valides (assert)
+ * @requires:
  * 
- * @assigns p.data
- *   
+ * @assigns: p.data
+ * @ensures: p.data est modifié et contient un pixel des bonnes couleurs au bon endroit. 
+ * 
  * @return rien
  * 
  */
@@ -53,12 +58,13 @@ void write_pixel_rgb(picture p, int i, int j, byte red, byte green, byte blue){
  * @param [in] i ligne du pixel à modifier
  * @param [in] j colonne du pixel à modifier
  * 
- * @ensures p structure valide
- * @ensures i,j indices valides (assert)
- * @ensures value entre 0 et 255.
+ * @requires: p structure valide
+ * @requires: i,j indices valides (assert)
+ * @requires: value entre 0 et 255.
  * 
- * @assigns p.data
- *   
+ * @assigns: p.data
+ * 
+ * @ensures: plantage en cas de non respect des préconditions, sinon le pixel écrit est le bon.
  * @return rien
  */
 void write_pixel_bw(picture p, int i, int j,byte value){
@@ -73,12 +79,13 @@ void write_pixel_bw(picture p, int i, int j,byte value){
  * @param [in] j colonne du pixel à lire (entier)
  * @param [in] c la composante à extraire.
 
- * @ensures p structure valide
- * @ensures i,j indices valides (assert)
- * @ensures c entre 0 et 2.
+ * @requires: p structure valide
+ * @requires: i,j indices valides (assert)
+ * @requires: c entre 0 et 2.
  * 
- * @assigns rien
+ * @assigns: rien
  *   
+ * @ensure: plantage en cas de non-respect des préconditions,sinon la valeur de la composante renvoyée est la bonne.
  * @return p.data[(i*p.width+j)*3+c];
  */
 byte read_component_rgb(picture p, int i, int j, enum PIXEL_TYPES c){
@@ -93,12 +100,14 @@ byte read_component_rgb(picture p, int i, int j, enum PIXEL_TYPES c){
  * @param [in] i ligne du pixel à lire (entier)
  * @param [in] j colonne du pixel à lire (entier)
 
- * @ensures p structure valide
- * @ensures i,j indices valides (assert)
+ * @requires: p structure valide
+ * @requires: i,j indices valides (assert)
  * 
- * @assigns rien
+ * @assigns: rien
  *   
- * @return p.data[(i*p.width+j)*3+c];
+ * @ensures: plantage en cas de non-respect des préconditions, le bon résultat sinon.
+ * 
+ * @return p.data[i*p.width+j];
  */
 byte read_component_bw(picture p, int i, int j){
     assert(0<=i&&i<p.height);
@@ -113,12 +122,13 @@ byte read_component_bw(picture p, int i, int j){
  * @param [in] red pointeur stockant l'addresse d'une case mémoire stockant la valeur du canal "rouge" 
  * @param [in] green pointeur stockant l'addresse d'une case mémoire stockant la valeur du canal "vert" 
  * @param [in] blue pointeur stockant l'addresse d'une case mémoire stockant la valeur du canal "bleu" 
- * @ensures p structure valide
- * @ensures i,j indices valides (assert)
- * @ensures *red,*green,*blue entre 0 et 255. ? (à vérifier).
  * 
- * @assigns red,green,blue (modification par effet de bord)
- *   
+ * @requires: p structure valide
+ * @requires: i,j indices valides (assert)
+ * @requires: *red,*green,*blue entre 0 et 255. ? (à vérifier).
+ * 
+ * @assigns: red,green,blue (modification par effet de bord)
+ * @ensures: plantage si les préconditions ne sont pas respectées, le bon résultat sinon.
  * @return rien
  */
 void read_pixel_rgb(picture p, int i, int j, byte *red, byte *green, byte *blue){
@@ -137,12 +147,13 @@ void read_pixel_rgb(picture p, int i, int j, byte *red, byte *green, byte *blue)
  * @param [in] j colonne du pixel à lire (entier)
  * @param [in] value pointeur stockant l'addresse d'une case mémoire stockant la valeur du pixel.
 
- * @ensures p structure valide
- * @ensures i,j indices valides (assert)
- * @ensures value entre 0 et 255.
+ * @requires: p structure valide
+ * @requires: i,j indices valides (assert)
+ * @requires: value entre 0 et 255.
  * 
- * @assigns value (modification par effet de bord)
- *   
+ * @assigns: value (modification par effet de bord)
+ *  
+ * @ensure: plantage si non-respect des préconditions, sinon *value contient la valeur du pixel (i,j).
  * @return rien
  */
 

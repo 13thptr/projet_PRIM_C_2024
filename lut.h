@@ -2,8 +2,8 @@
 #define LUT_H
 
 #include "pictures.h"
-/*NB: la consigne spécifie la création d'un type ABSTRAIT. On le précisera donc dans lut.c*/
 
+/*NB: la consigne spécifie la création d'un type ABSTRAIT. On le précisera donc dans lut.c*/
 typedef struct lut_s* lut;
 
 lut create_lut(unsigned int n);
