@@ -3,7 +3,7 @@
 #include <stdlib.h>//Pour exit
 #include <string.h>//Pour strcmp, entre autres.
 #include <assert.h>//Self-explanatory 
-#include <limits.h>
+#include <limits.h>//Pour INT_MAX, INT_MIN
 
 #include "safe_malloc.h"
 #include "picture_rw.h"
@@ -41,12 +41,12 @@ bool fgets_encapsulator(char *buf, FILE *f, int line_counter){
 }   
 
 bool read_correctly_block(bool *read_correctly, char *buffer, FILE *to_be_read, picture *res, int *lc_p){
-    /*On pourrait probablement utiliser une boucle do while ici.*/
-
-
+    /*On pourrait probablement utiliser une boucle "do while" ici.*/
     bool first_pass = true;
-    /*Argument de terminaison: first_pass est faux à partir du second tour de boucle, et le fichier est de longueur
-    finie, ce qui cause un retour "early return" via le pointeur nul renvoyé par fgets.
+    /*
+        Argument de terminaison: first_pass est faux à partir du second tour de boucle, et le fichier est de longueur
+        finie, ce qui cause un retour "early return" via le pointeur nul renvoyé par fgets dans le cas où toutes les lignes sont des
+        commentaires. Si une ligne ne commence pas par un croisillon, on s'arrête encore avant.
     */
     while(first_pass || buffer[0] == '#'){
         first_pass = false;
@@ -59,11 +59,17 @@ bool read_correctly_block(bool *read_correctly, char *buffer, FILE *to_be_read, 
         *lc_p = 1 + *lc_p;
         if(buffer[0]=='#'){
             printf("Comment on line %d.\n",*lc_p);
-        }/*débogage*/
+        }
     }
     return true;
 }
 
+/*
+    Convention/explication du nom des variables: on considère qu'une ligne
+    est "intéressante" si elle n'est pas un commentaire.
+    interesting_line_counter compte le nombre de lignes intéressantes
+    true_line_counter compte le nombre de lignes total (avec les commentaires, donc.)
+*/
 
 picture read_picture(const char *filename){
     FILE *to_be_read = NULL;
@@ -73,9 +79,6 @@ picture read_picture(const char *filename){
     reset_picture_to_zero(&res);
 
     to_be_read = fopen(filename,"r");
-    /*On a besoin d'un compteur pour savoir à quelle "vraie ligne" on est dans le traitement des commentaires 
-    
-    (on ne compte pas les lignes commençant par #)*/
 
     /*Avant l'ouverture du fichier, on n'a lu aucune ligne: on est à la ligne "0" (on comptera à partir de 1)*/
     int interesting_line_counter = 0;
@@ -101,7 +104,7 @@ picture read_picture(const char *filename){
     /*On a lu la première ligne avec succès:*/
     interesting_line_counter++;
     true_line_counter++;
-
+    /*----------------------------------------------Identification du "magic number"--------------------------------------------------*/
     if(!strcmp(buffer,"P6\n")){
         printf("Reading ppm file...\n");
         res.chan_num = RGB_PIXEL_SIZE;
@@ -116,18 +119,11 @@ picture read_picture(const char *filename){
         fclose(to_be_read);
         return res;
     }
-    /*On a lu la première ligne: il peut  désormais y a voir des commentaires.*/
-
-    /*
-        Terminaison de cette boucle while: fgets finit par renvoyer NULL si l'on ne peut plus rien lire.
-        Sinon la boucle termine dès que le premier caractère de la ligne n'est pas un croisillon.
-    */
+    /*-------------------------------Commentaires éventuels : entre lignes "intéressantes" 1 et 2 ---------------------------------------*/
     if(!read_correctly_block(&read_correctly,buffer,to_be_read,&res,&true_line_counter)){
         return res;
     }
-    
-
-
+    /*Lecture des dimensions de l'image.*/
     int status = sscanf(buffer,"%d %d", &res.width, &res.height);
     
     if(status<NB_ITEMS_2_DIMENSIONS){
@@ -136,23 +132,25 @@ picture read_picture(const char *filename){
         fclose(to_be_read);
         return res;
     }
+    printf("\nWidth read:%d\nHeight read:%d\n",res.width,res.height);
+
+
     /*On est arrivé à la deuxième ligne, sans compter les commentaires.*/
     interesting_line_counter++;
 
-    printf("\nWidth read:%d\nHeight read:%d\n",res.width,res.height);
-    /*Commentaires éventuels entre la deuxième et la troisième ligne:*/
 
+    /*-------------------------------Commentaires éventuels : entre lignes "intéressantes" 2 et 3 ---------------------------------------*/
     if(!read_correctly_block(&read_correctly,buffer,to_be_read,&res,&true_line_counter)){
         return res;
     }
 
+    /*Lecture de la valeur maximale:*/
     status = sscanf(buffer,"%d",&max_val);
     if(status<NB_ITEM_1_MAX_VAL){
         fprintf(stderr,"\nError while reading max byte value. Returning empty picture...\n");
         reset_picture_to_zero(&res);
         fclose(to_be_read);
         return res;
-       
     }
     if(!(1 <= max_val && max_val <= 255)){
         fprintf(stderr,"\nError: invalid max byte value. Returning empty picture...\n");
@@ -160,22 +158,15 @@ picture read_picture(const char *filename){
         fclose(to_be_read);
         return res;
     }
-    /*Commentaires éventuels entre la troisième et la quatrième ligne:*/
+    /*-------------------------------On a lu la "vraie"troisième ligne: plus de commentaires. ---------------------------------------*/
 
-
-    //assert(1 <= max_val && max_val <= 255);
-    /*Après la première ligne et avant la quatrième ligne il peut y avoir un nombre indéterminé de lignes
-     commençant par le caractère # que l’on doit considérer comme des lignes de commentaires et donc ignorer.
-    La quatrième ligne ... ou tout ce qui suit correspond aux données binaires des pixels. 
-    Dans le cas présenté ci-dessus il y a donc 512×512×3=786432 octets à lire avant la fin du fichier.*/
-
-    size_t alloc_size = res.width*res.height*res.chan_num*ITEM_SIZE;
+    size_t alloc_size = res.width * res.height * res.chan_num * ITEM_SIZE;
     res.data = myalloc(alloc_size);
     
     size_t nb_read_items = fread(res.data,ITEM_SIZE,alloc_size, to_be_read);
     printf("\n%ld items read.\n",nb_read_items);
     /*Peut-on détecter à ce stade le problème invalid_read_count ?*/
-    if(alloc_size!=nb_read_items){
+    if(alloc_size != nb_read_items){
         free(res.data);
         reset_picture_to_zero(&res);
         fprintf(stderr,"Expected number of items doesn't match number of items read.\n");
@@ -186,7 +177,6 @@ picture read_picture(const char *filename){
     }
     /*Important: Ne pas oublier de fermer le fichier. */
     fclose(to_be_read);
-
     return res;
 }
 /*
