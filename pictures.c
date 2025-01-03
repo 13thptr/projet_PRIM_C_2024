@@ -271,7 +271,7 @@ struct lut_s{
     int n;
     byte *array;
 };
-typedef struct lut_s* lut;
+/*typedef struct lut_s* lut;*/
 
 picture inverse_picture(picture p){
     picture res = copy_picture(p);
