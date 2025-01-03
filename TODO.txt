@@ -1,44 +1,6 @@
 Reste à faire sur le projet C:
 
-OBJECTIF / DATE LIMITE : TOUT FINIR AVANT LE JEUDI 2 JAN AU SOIR.
-
-- OK Meta: Mettre le projet sur mon GitHub (dépôt privé, en tout cas pour le moment) et le pousser après chaque modification. OK
-
-
-- OK 0: Faire en sorte que les fichiers images produits aillent dans Lenna_output au lieu de Lenna_input (jeu sur les chemins). + commit
-
-    -> j'ai créé un fichier main_temp.txt pour travailler avec un main allégé et avoir l'esprit plus clair,
-    sans perdre mon travail. Mentionner ce problème de précipitation dans le compte-rendu.
-
-
-    -> Mentionner le fait que j'ai lu la consigne trop vite et que j'ai mal interprété le format d'entrée, ce qui m'a conduit à modifier le main
-    par la suite.
-
-
-    -> Choix à effectuer (en parler dans le compte rendu): 
-    
-        auparavant, j'avais le même nom, dir, ext pour tous les fichiers (puisque je n'avais en fait qu'une seule entrée).
-
-        Je dois maintenant choisir de conserver ce système alors que j'ai plusieurs entrées, ce qui pose bien des problèmes (à détailler dans le rapport)
-        ou plutôt garder séparément pour chaque fichier passé en argument son nom "nom", son répertoire "dir", et son extension "ext".
-
-        Je choisis la 2ème option. Pour ce faire, j'utilise des tableaux de chaînes de caractères.
-
-        -> Réalisation: des tableaux ?pour quoi faire ? Je n'ai pas besoin des précédents: je reviens sur de simples variables
-        dir,name,ext que je vais mettre à jour à chaque tour de boucle.
-
-
-
-- OK 1: Formater le main comme demandé. Factoriser au maximum pour la lisibilité. + commit
-
-
-- OK 2: Terminer les fonctions voulues. + commit
-
 - 2 bis: Faire le bonus. + commit
-
-- 2 ter: ajouter une fonction de rotation d'image pour le fun. Test + commit
-
-- 2 quater: Application d'une matrice de transformation globale. (généralisation de 2 ter).
 
 - 3: Reprendre toutes les fonctions qui prennent une entrée utilisateur (en particulier read_picture)
     pour garantir la validité des images traitées. Tester sur les images incorrectes fournies + commit.

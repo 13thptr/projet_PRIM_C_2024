@@ -35,7 +35,7 @@ bool fgets_encapsulator(char *buf, FILE *f, int line_counter){
     char *fgets_return_value = fgets(buf,BUFFER_SIZE, f);
 
     if(fgets_return_value == NULL){
-        fprintf(stderr,"Could not read line %d (omitting comments) properly.\n",line_counter);
+        fprintf(stderr,"Could not read line %d properly.\n",line_counter);
         fprintf(stderr,"Returning empty picture...\n");
         return false;
     }
@@ -46,38 +46,39 @@ bool fgets_encapsulator(char *buf, FILE *f, int line_counter){
 picture read_picture(const char *filename){
     FILE *to_be_read = NULL;
     int max_val;/*Pourrait être un type byte si l'entrée était GARANTIE entre 0 et 255 mais on ne sait jamais...*/
-    
-
     picture res;
- 
-
+    bool read_correctly = true; /*Sera utile pour déterminer si une ligne a été lue correctement ou pas.*/
     reset_picture_to_zero(&res);
-
-    
 
     to_be_read = fopen(filename,"r");
     /*On a besoin d'un compteur pour savoir à quelle "vraie ligne" on est dans le traitement des commentaires 
     
     (on ne compte pas les lignes commençant par #)*/
-    int line_counter = 1;
+
+    /*Avant l'ouverture du fichier, on n'a lu aucune ligne: on est à la ligne "0" (on comptera à partir de 1)*/
+    int interesting_line_counter = 0;
+    int true_line_counter = 0;
 
     if(to_be_read == NULL){
         fprintf(stderr,"Problem opening file. Returning empty picture...\n");
         /*Convention : en cas d'échec, on renvoie une structure "picture" vide.*/
-       
         fclose(to_be_read);
         return res;
     }
+    printf("File opened successfullly.\n");
     //On compare maintenant l'en-tête à celui attendu pour un fichier PGM ou PPM.
     char buffer[BUFFER_SIZE];
 
-    /*On va passer de fgets à getline pour plus de sécurité. */
-    if(!fgets_encapsulator(buffer,to_be_read,line_counter)){
+    read_correctly = fgets_encapsulator(buffer,to_be_read,true_line_counter);
+    if(!read_correctly){
+        /*Il y a déjà un message d'erreur affiché par fgets_encapsulator dans ce cas.*/
         reset_picture_to_zero(&res);
         fclose(to_be_read);
         return res;
     }
-   
+    /*On a lu la première ligne avec succès:*/
+    interesting_line_counter++;
+    true_line_counter++;
 
     if(!strcmp(buffer,"P6\n")){
         printf("Reading ppm file...\n");
@@ -92,34 +93,79 @@ picture read_picture(const char *filename){
         fprintf(stderr,"\nNot a valid binary ppm nor pgm file. Returning empty picture...\n");
         fclose(to_be_read);
         return res;
-       
     }
-    line_counter++;/*On a lu la première ligne: il peut  désormais y a voir des commentaires.*/
-    /*Gestion des commentaires: Après la première ligne et jusqu'à la quatrième, il peut y avoir des commentaires.*/
+    /*On a lu la première ligne: il peut  désormais y a voir des commentaires.*/
 
-    if(!fgets_encapsulator(buffer,to_be_read,line_counter)){
+    /*
+        Terminaison de cette boucle while: fgets finit par renvoyer NULL si l'on ne peut plus rien lire.
+        Sinon la boucle termine dès que le premier caractère de la ligne n'est pas un croisillon.
+    */
+
+    
+    /*Utiliser une structure do while ?*/
+
+    read_correctly = fgets_encapsulator(buffer,to_be_read,true_line_counter);
+    if(!read_correctly){
+        /*Il y a déjà un message affiché par fgets_encapsulator dans ce cas */
         reset_picture_to_zero(&res);
         fclose(to_be_read);
         return res;
+    }else{
+        /*Else techniquement pas nécessaire grâce au return mais rend le code plus clair à mon goût.*/
+        true_line_counter++;
     }
-    /*Lire attentivement le man de sscanf pour être sûr de son comportement.*/
-    int status = sscanf(buffer,"%d %d", &res.width, &res.height);
 
+    while(buffer[0] == '#'){
+        read_correctly = fgets_encapsulator(buffer,to_be_read,true_line_counter);
+        if(!read_correctly){
+            /*Il y a déjà un message affiché par fgets_encapsulator dans ce cas */
+            reset_picture_to_zero(&res);
+            fclose(to_be_read);
+            return res;
+        }else{
+            /*Else techniquement pas nécessaire grâce au return mais rend le code plus clair à mon goût.*/
+            true_line_counter++;
+        }
+        printf("Comment on line %d.\n",true_line_counter);/*débogage*/
+    }
+
+    int status = sscanf(buffer,"%d %d", &res.width, &res.height);
+    
     if(status<NB_ITEMS_2_DIMENSIONS){
         fprintf(stderr,"\nError while reading image dimensions. Returning empty picture...\n");
         reset_picture_to_zero(&res);
         fclose(to_be_read);
         return res;
     }
-
+    /*On est arrivé à la deuxième ligne, sans compter les commentaires.*/
+    interesting_line_counter++;
 
     printf("\nWidth read:%d\nHeight read:%d\n",res.width,res.height);
+    /*Commentaires éventuels entre la deuxième et la troisième ligne:*/
 
-    /*On lit la troisième ligne, censée contenir la valeur maximale des pixels à lire.*/
-    if(!fgets_encapsulator(buffer,to_be_read,line_counter)){
+    read_correctly = fgets_encapsulator(buffer,to_be_read,true_line_counter);
+    if(!read_correctly){
+        /*Il y a déjà un message affiché par fgets_encapsulator dans ce cas */
         reset_picture_to_zero(&res);
         fclose(to_be_read);
         return res;
+    }else{
+        /*Else techniquement pas nécessaire grâce au return mais rend le code plus clair à mon goût.*/
+        true_line_counter++;
+    }
+
+    while(buffer[0] == '#'){
+        read_correctly = fgets_encapsulator(buffer,to_be_read,true_line_counter);
+        if(!read_correctly){
+            /*Il y a déjà un message affiché par fgets_encapsulator dans ce cas */
+            reset_picture_to_zero(&res);
+            fclose(to_be_read);
+            return res;
+        }else{
+            /*Else techniquement pas nécessaire grâce au return mais rend le code plus clair à mon goût.*/
+            true_line_counter++;
+        }
+        printf("Comment on line %d.\n",true_line_counter);/*débogage*/
     }
 
     status = sscanf(buffer,"%d",&max_val);
@@ -136,6 +182,9 @@ picture read_picture(const char *filename){
         fclose(to_be_read);
         return res;
     }
+    /*Commentaires éventuels entre la troisième et la quatrième ligne:*/
+
+
     //assert(1 <= max_val && max_val <= 255);
     /*Après la première ligne et avant la quatrième ligne il peut y avoir un nombre indéterminé de lignes
      commençant par le caractère # que l’on doit considérer comme des lignes de commentaires et donc ignorer.

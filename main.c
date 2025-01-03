@@ -48,6 +48,7 @@ int main(int argc, char* argv[]){
     /*Chargement de la troisième image (optionnel)*/
 
     if(argc == 4){
+        printf("Reading mask...\n");
         mask = read_picture(argv[3]);
         THIRD_IMAGE_FLAG = true;
     }
@@ -58,6 +59,9 @@ int main(int argc, char* argv[]){
         dir = dir_from_path(argv[i]);
         name = name_from_path(argv[i]);
         ext = ext_from_path(argv[i]);
+
+        /*Print file info for debugging purposes*/
+        printf("\nCurrent file:%s/%s.%s\n",dir,name,ext);
 
         /*Read the i-th picture.*/
         current_pic = read_picture(argv[i]);
