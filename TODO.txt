@@ -2,14 +2,6 @@ Reste à faire sur le projet C:
 
 - 2 bis: Faire le bonus. + commit
 
-- 3: Reprendre toutes les fonctions qui prennent une entrée utilisateur (en particulier read_picture)
-    pour garantir la validité des images traitées. Tester sur les images incorrectes fournies + commit.
-    Rendre read_picture plus robuste ou plus stricte ? Cf. espace P5 \n vs P5\n. La fonction doit-elle accepter la 1ère entrée ?
-
-
-- 3 bis: (optionnel) Encapsuler les checks réalisés à l'étape 3 dans des fonctions pour les réutiliser 
-    afin de vérifier la validité des images produites. + commit
-
 - 3 ter: Créer ma propre image de test pour invalid_max puisque M. Burel a mis deux fois la même image "invalid_height.ppm"
 
 - 3 quater: faire en sorte de prendre en compte la valeur maximale des pixels (cf. énoncé)

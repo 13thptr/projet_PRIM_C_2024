@@ -41,10 +41,11 @@ double abs_double(double x){
  * @return rien
  */
 picture create_picture(unsigned int width, unsigned int height, unsigned int channels){
-    //assert(width>0&&height>0);
-    assert(channels == RGB_PIXEL_SIZE||channels == BW_PIXEL_SIZE);
-    //printf("max:%d\n",max);//éviter "unused parameter". à enlever.
     picture res;
+    assert(width>0&&height>0);
+    assert(channels == RGB_PIXEL_SIZE || channels == BW_PIXEL_SIZE);
+    //printf("max:%d\n",max);//éviter "unused parameter". à enlever.
+    
     res.width = width;
     res.height = height;
     res.chan_num = channels;
@@ -62,11 +63,13 @@ void clean_picture(picture *p){
     p->data = NULL;
 }
 picture copy_picture(picture p){
+    picture res;
+
     assert(p.width>0&&p.height>0);
     assert(p.data!=NULL);
     assert(p.chan_num == BW_PIXEL_SIZE || p.chan_num == RGB_PIXEL_SIZE);
 
-    picture res = create_picture(p.width,p.height,p.chan_num);
+    res = create_picture(p.width,p.height,p.chan_num);
     for(int k = 0; k<p.width*p.height*(int)p.chan_num;k++){
         res.data[k] = p.data[k];
     }
@@ -104,13 +107,17 @@ Convertir une image en niveau de gris vers une image en couleur : picture conver
             Si pétait une image en niveaux de gris on répétera la composante de niveau de gris dans chacune des composantes (rouge, vert, bleu) de l’image résultat.
 */
 picture convert_to_color_picture(picture p){
-    assert(!is_empty_picture(p));
 
+    picture res;
+
+    assert(!is_empty_picture(p));
+    /*Si l'image est déjà en couleur, on en renvoie simplement une copie*/
     if(p.chan_num == RGB_PIXEL_SIZE){
         return copy_picture(p);
     }
     assert(p.chan_num == BW_PIXEL_SIZE);
-    picture res = create_picture(p.width,p.height,RGB_PIXEL_SIZE);
+    
+    res = create_picture(p.width,p.height,RGB_PIXEL_SIZE);
     
     for(int i=0;i<res.height;i++){
         for(int j=0;j<res.width;j++){
@@ -130,13 +137,14 @@ picture convert_to_color_picture(picture p){
 
 */
 picture convert_to_gray_picture(picture p){
+    picture res;
     assert(!is_empty_picture(p));
 
     if(is_gray_picture(p)){
         return copy_picture(p); //Enoncé: on se contentera d'en faire une copie
     }
     assert(is_color_picture(p));
-    picture res = create_picture(p.width,p.height,BW_PIXEL_SIZE);
+    res = create_picture(p.width,p.height,BW_PIXEL_SIZE);
 
     for(int i=0;i<res.height;i++){
         for(int j=0;j<res.width;j++){
@@ -162,10 +170,11 @@ Séparation ou mélange des composantes d’une image
 
 */
 picture *split_picture(picture p){
+    picture *arr;
     if(is_empty_picture(p)){
         return NULL;
     }
-    picture *arr = malloc(sizeof(picture)*p.chan_num);
+    arr = malloc(sizeof(picture)*p.chan_num);
     for(int n=0;n<(int)p.chan_num;n++){
         arr[n] = create_picture(p.width,p.height,BW_PIXEL_SIZE);
        
@@ -191,13 +200,13 @@ picture *split_picture(picture p){
 
 */
 picture merge_picture(picture red, picture green, picture blue){
-    int width = red.width * (red.width==green.width&&green.width == blue.width);
-    //printf("width:%d\n",width);
-    int height = red.height *(red.height==green.height&&green.height==blue.height);
-    //printf("height:%d\n",height);
+    picture res;
     enum channel_number chan_num = 3;
+    int width = red.width * (red.width==green.width&&green.width == blue.width);
 
-    picture res = create_picture(width,height,chan_num);
+    int height = red.height *(red.height==green.height&&green.height==blue.height);
+    
+    res = create_picture(width,height,chan_num);
     for(int i=0;i<height;i++){
         for(int j=0;j<width;j++){
             byte r = read_component_bw(red,i,j);
@@ -271,15 +280,17 @@ struct lut_s{
     int n;
     byte *array;
 };
-typedef struct lut_s* lut;
+/*typedef struct lut_s* lut;*/
 
 picture inverse_picture(picture p){
     picture res = copy_picture(p);
+    lut invert_lut;
+
     if(is_empty_picture(p)){
         return res;
     }
     /*On crée la LUT d'inversion*/
-    lut invert_lut = create_lut(MAX_BYTE+1);
+    invert_lut = create_lut(MAX_BYTE+1);
 
     for(int c=0;c<MAX_BYTE;c++){
         invert_lut->array[c] = 255-c;
@@ -290,13 +301,16 @@ picture inverse_picture(picture p){
 }
 picture normalize_dynamic_picture(picture p){
     picture res = copy_picture(p);
+    int max;
+    int min;
+    lut normalize_lut;
     if(is_empty_picture(p)){
         return res;
     }
     /*On crée la LUT de normalisation*/
     /*Première étape: trouver le min et le max.*/
-    int max = p.data[0];
-    int min = p.data[0];
+    max = p.data[0];
+    min = p.data[0];
     for(int k=0;k<(int)p.chan_num*p.width*p.height;k++){
         if(p.data[k]>max){
             max = p.data[k];
@@ -306,7 +320,7 @@ picture normalize_dynamic_picture(picture p){
         }
     }
 
-    lut normalize_lut = create_lut(MAX_BYTE+1);
+    normalize_lut = create_lut(MAX_BYTE+1);
 
     for(int c=min;c<=max;c++){
         double val = 0;
@@ -327,11 +341,13 @@ picture normalize_dynamic_picture(picture p){
 
 picture set_levels_picture(picture p, byte nb_levels){
     picture res = copy_picture(p);
+    lut set_lut;
+
     if(is_empty_picture(p)){
         return res;
     }
     /*On crée la LUT de réduction*/
-    lut set_lut = create_lut(nb_levels);
+    set_lut = create_lut(nb_levels);
 
     for(int c=0;c<nb_levels;c++){
         set_lut->array[c] = c; //Identité.
@@ -342,6 +358,7 @@ picture set_levels_picture(picture p, byte nb_levels){
 }
 /*Différence absolue*/
 picture distance_picture(picture p1, picture p2){
+    picture res;
     if(is_empty_picture(p1)&&is_empty_picture(p2)){
         return p1;
     }
@@ -349,7 +366,8 @@ picture distance_picture(picture p1, picture p2){
     assert(p1.width==p2.width);
     assert(p1.height==p2.height);
     assert(p1.chan_num==p2.chan_num);
-    picture res = create_picture(p1.width,p2.height,p1.chan_num);
+    
+    res = create_picture(p1.width,p2.height,p1.chan_num);
     for(int k=0;k<(int)res.chan_num*res.width*res.height;k++){
         signed int diff = p1.data[k]-p2.data[k]; //même problème que d'habitude avec le type (byte)
         diff = diff>0 ?diff:-diff; //même effet que diff = abs(diff) sans la fonction abs.

@@ -1,6 +1,6 @@
-#CFLAGS += -std=c99
+CFLAGS += -std=c99
 CFLAGS += -Wpedantic -pedantic-errors
-#CFLAGS += -Werror
+CFLAGS += -Werror
 CFLAGS += -Wall
 CFLAGS += -Wextra
 #CFLAGS += -Waggregate-return Il est explicitement demandé de renvoyer une structure "picture" dans read_picture
@@ -8,7 +8,7 @@ CFLAGS += -Wbad-function-cast
 CFLAGS += -Wcast-align
 CFLAGS += -Wcast-qual
 CFLAGS += -Wdisabled-optimization 
-#CFLAGS += -Wdeclaration-after-statement
+CFLAGS += -Wdeclaration-after-statement
 CFLAGS += -Wfloat-equal
 CFLAGS += -Wformat=2
 CFLAGS += -Wlogical-op

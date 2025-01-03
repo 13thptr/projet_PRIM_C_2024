@@ -20,13 +20,21 @@
 
 int main(int argc, char* argv[]){
  
-
+    
 
     /*-------------------------Déclaration des variables en amont (conforme à la norme ISO C)-------------------------------*/
+
+    const int NB_FILES = argc-1;
+    
+    bool THIRD_IMAGE_FLAG = false;
 
     picture current_pic; /*Variable qui sera mise à jour au fur et à mesure dans une boucle sur les arguments.*/
     picture mask;  /*Le 3ème argument éventuel*/
     picture save; /*Sauvegarder l'image inversée pour la réutiliser comme l'énoncé semble le demander.*/
+
+    char *dir;
+    char *name; 
+    char *ext;
  
     char output_dir[13] = "Lenna_output"; /*Chemin pour produire les images afin de ne pas mélanger les entrées et les sorties*/
 
@@ -39,12 +47,7 @@ int main(int argc, char* argv[]){
         return EXIT_FAILURE;
     }
 
-    const int NB_FILES = argc-1;
-    char *dir;
-    char *name; 
-    char *ext;
-
-    bool THIRD_IMAGE_FLAG = false;
+    
     /*Chargement de la troisième image (optionnel)*/
 
     if(argc == 4){
