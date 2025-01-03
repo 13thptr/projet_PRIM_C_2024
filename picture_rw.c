@@ -31,9 +31,7 @@ void reset_picture_to_zero(picture *p){
 }
 /*Renvoie faux en cas d'échec de lecture, vrai sinon.*/
 bool fgets_encapsulator(char *buf, FILE *f, int line_counter){
-
     char *fgets_return_value = fgets(buf,BUFFER_SIZE, f);
-
     if(fgets_return_value == NULL){
         fprintf(stderr,"Could not read line %d properly.\n",line_counter);
         fprintf(stderr,"Returning empty picture...\n");
@@ -43,29 +41,25 @@ bool fgets_encapsulator(char *buf, FILE *f, int line_counter){
 }   
 
 bool read_correctly_block(bool *read_correctly, char *buffer, FILE *to_be_read, picture *res, int *lc_p){
-    /*Utiliser une structure do while ?*/
+    /*On pourrait probablement utiliser une boucle do while ici.*/
 
-    *read_correctly = fgets_encapsulator(buffer,to_be_read,*lc_p);
-    if(!*read_correctly){
-        /*Il y a déjà un message affiché par fgets_encapsulator dans ce cas */
-        reset_picture_to_zero(res);
-        fclose(to_be_read);
-        return false;
-    }
-    /*Else techniquement pas nécessaire*/
-    *lc_p = 1 + *lc_p;
-    
-    while(buffer[0] == '#'){
+
+    bool first_pass = true;
+    /*Argument de terminaison: first_pass est faux à partir du second tour de boucle, et le fichier est de longueur
+    finie, ce qui cause un retour "early return" via le pointeur nul renvoyé par fgets.
+    */
+    while(first_pass || buffer[0] == '#'){
+        first_pass = false;
         *read_correctly = fgets_encapsulator(buffer,to_be_read,*lc_p);
         if(!*read_correctly){
-            /*Il y a déjà un message affiché par fgets_encapsulator dans ce cas */
             reset_picture_to_zero(res);
             fclose(to_be_read);
             return false;
         }
         *lc_p = 1 + *lc_p;
-        
-        printf("Comment on line %d.\n",*lc_p);/*débogage*/
+        if(buffer[0]=='#'){
+            printf("Comment on line %d.\n",*lc_p);
+        }/*débogage*/
     }
     return true;
 }
