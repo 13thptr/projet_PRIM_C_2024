@@ -42,6 +42,34 @@ bool fgets_encapsulator(char *buf, FILE *f, int line_counter){
     return true;
 }   
 
+bool read_correctly_block(bool *read_correctly, char *buffer, FILE *to_be_read, picture *res, int *lc_p){
+    /*Utiliser une structure do while ?*/
+
+    *read_correctly = fgets_encapsulator(buffer,to_be_read,*lc_p);
+    if(!*read_correctly){
+        /*Il y a déjà un message affiché par fgets_encapsulator dans ce cas */
+        reset_picture_to_zero(res);
+        fclose(to_be_read);
+        return false;
+    }
+    /*Else techniquement pas nécessaire*/
+    *lc_p = 1 + *lc_p;
+    
+    while(buffer[0] == '#'){
+        *read_correctly = fgets_encapsulator(buffer,to_be_read,*lc_p);
+        if(!*read_correctly){
+            /*Il y a déjà un message affiché par fgets_encapsulator dans ce cas */
+            reset_picture_to_zero(res);
+            fclose(to_be_read);
+            return false;
+        }
+        *lc_p = 1 + *lc_p;
+        
+        printf("Comment on line %d.\n",*lc_p);/*débogage*/
+    }
+    return true;
+}
+
 
 picture read_picture(const char *filename){
     FILE *to_be_read = NULL;
@@ -100,34 +128,11 @@ picture read_picture(const char *filename){
         Terminaison de cette boucle while: fgets finit par renvoyer NULL si l'on ne peut plus rien lire.
         Sinon la boucle termine dès que le premier caractère de la ligne n'est pas un croisillon.
     */
-
-    
-    /*Utiliser une structure do while ?*/
-
-    read_correctly = fgets_encapsulator(buffer,to_be_read,true_line_counter);
-    if(!read_correctly){
-        /*Il y a déjà un message affiché par fgets_encapsulator dans ce cas */
-        reset_picture_to_zero(&res);
-        fclose(to_be_read);
+    if(!read_correctly_block(&read_correctly,buffer,to_be_read,&res,&true_line_counter)){
         return res;
-    }else{
-        /*Else techniquement pas nécessaire grâce au return mais rend le code plus clair à mon goût.*/
-        true_line_counter++;
     }
+    
 
-    while(buffer[0] == '#'){
-        read_correctly = fgets_encapsulator(buffer,to_be_read,true_line_counter);
-        if(!read_correctly){
-            /*Il y a déjà un message affiché par fgets_encapsulator dans ce cas */
-            reset_picture_to_zero(&res);
-            fclose(to_be_read);
-            return res;
-        }else{
-            /*Else techniquement pas nécessaire grâce au return mais rend le code plus clair à mon goût.*/
-            true_line_counter++;
-        }
-        printf("Comment on line %d.\n",true_line_counter);/*débogage*/
-    }
 
     int status = sscanf(buffer,"%d %d", &res.width, &res.height);
     
@@ -143,29 +148,8 @@ picture read_picture(const char *filename){
     printf("\nWidth read:%d\nHeight read:%d\n",res.width,res.height);
     /*Commentaires éventuels entre la deuxième et la troisième ligne:*/
 
-    read_correctly = fgets_encapsulator(buffer,to_be_read,true_line_counter);
-    if(!read_correctly){
-        /*Il y a déjà un message affiché par fgets_encapsulator dans ce cas */
-        reset_picture_to_zero(&res);
-        fclose(to_be_read);
+    if(!read_correctly_block(&read_correctly,buffer,to_be_read,&res,&true_line_counter)){
         return res;
-    }else{
-        /*Else techniquement pas nécessaire grâce au return mais rend le code plus clair à mon goût.*/
-        true_line_counter++;
-    }
-
-    while(buffer[0] == '#'){
-        read_correctly = fgets_encapsulator(buffer,to_be_read,true_line_counter);
-        if(!read_correctly){
-            /*Il y a déjà un message affiché par fgets_encapsulator dans ce cas */
-            reset_picture_to_zero(&res);
-            fclose(to_be_read);
-            return res;
-        }else{
-            /*Else techniquement pas nécessaire grâce au return mais rend le code plus clair à mon goût.*/
-            true_line_counter++;
-        }
-        printf("Comment on line %d.\n",true_line_counter);/*débogage*/
     }
 
     status = sscanf(buffer,"%d",&max_val);
