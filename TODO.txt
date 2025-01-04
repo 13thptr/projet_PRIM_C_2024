@@ -2,17 +2,9 @@ Reste à faire sur le projet C:
 
 - 2 bis: Faire le bonus. + commit
 
-
-
 - 3 ter: Créer ma propre image de test pour invalid_max puisque M. Burel a mis deux fois la même image "invalid_height.ppm"
 
 - 3 quater: faire en sorte de prendre en compte la valeur maximale des pixels (cf. énoncé)
-
-- 4: Ajouter les @assigns, @requires, @ensures et en profiter pour relire mon code, attentivement.+commit
-
-- 5: Ajouter les "assert" qui vont bien, où il faut. +commit 
-
-- 6: supprimer les fonctions et constantes inutilisées (je pense à la manipulation de pixels, à MAX_BYTE...) mentionner dans le rapport. + commit.
 
 - 7: vérifier que tous les prototypes de fonctions correspondent bien à ce qui était demandé.
 
@@ -20,14 +12,9 @@ Reste à faire sur le projet C:
 
 - 9: uniformiser mes conventions de code, les espaces, etc. "Prettifier" dans CLion ou avec une extension ? Un logiciel ?
 
-- Remettre les options maximales de compilation, y compris ISO C / W old style / Werror
-
-- Remplacer tous les "malloc" et "calloc" par "myalloc" (vérifier partout avec une recherche textuelle)
-
 - Tester avec Valgrind. (désactiver fsanitize=address pour ce faire)
 
 - Modifier le makefile pour utiliser une cible "all" tel que prescrit dans le cours.
-
 
 
 - Ecrire un manuel d'utilisation du programme, affichable dans le terminal avec
@@ -46,7 +33,6 @@ Reste à faire sur le projet C:
     + Mentionner les histoires de if dans une double boucle (cf. pictures.c) et mon choix de factoriser (boucle d'abord, if ensuite)
       + le choix de l'optimisation à la compilation -O2 pour "compenser" ce genre de choses.
       
-
     + Mentionner l'autre modification apportée à filename.h - > Demander à momo ?
 
     + Parler de l'évolution des fonctions dans le temps: ajout de checks à la fin, difficultés éventuelles ou même absence de difficultés.
@@ -60,7 +46,6 @@ Reste à faire sur le projet C:
 
     + Section spécifique pour le bonus.
 
-    + Section spécifique pour mes ajouts personnels: rotation puis plus généralement matrice de transformation (entrable en ligne de commande).
 
     + Dans une section spécifique "Outils et débogage", parler de la gestion avec git, des choix du Makefile,
     du débogage avec -fsanitize=address et Valgrind et éventuellement
@@ -78,8 +63,6 @@ Reste à faire sur le projet C:
      - programmation multithread
      - GPU,
      - support de différents formats d'image: lecture, conversion de formats...
-
-
 
 
 - Faire une première archive tar contenant tout ce travail sans aucune exception 

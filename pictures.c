@@ -288,7 +288,7 @@ picture *split_picture(picture p){
     if(is_empty_picture(p)){
         return NULL;
     }
-    picture *arr = malloc(sizeof(picture)*p.chan_num);
+    picture *arr = myalloc(sizeof(picture)*p.chan_num);
     for(int n=0;n<(int)p.chan_num;n++){
         arr[n] = create_picture(p.width,p.height,GRAY_PIXEL_SIZE);
        
