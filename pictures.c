@@ -225,17 +225,7 @@ picture convert_to_color_picture(picture p){
  * 
  * @ensures: Plantage si l'un e des préconditions n'est pas respectée; cf. @return pour le comportement normal.
  * 
- * @return image en couleur, copie de l'image d'entrée ou résultat de la duplication des canaux.
-*/
-
-
-/* 
-    Convertir une image en couleur vers une image en niveaux de gris : picture convert_to_gray_picture(picture p);
-        [in] p l’image à convertir en niveaux de gris
-        [out] l’image convertie en niveaux de gris
-            Si p était un image en couleur on a convertie les couleurs en niveau de gris en utilisant la règle suivante : G=(0.299×R)+(0.587×V)+(0.114×B).
-            Si p était déjà une image en niveau de gris on se contentera d’en faire une copie
-
+ * @return image en niveaux de gris, copie de l'image d'entrée ou résultat de la moyenne pondérée des 3 canaux pixel par pixel.
 */
 picture convert_to_gray_picture(picture p){
     assert(!is_empty_picture(p));
@@ -269,6 +259,17 @@ Séparation ou mélange des composantes d’une image
             Si p est une image en niveaux de gris on renverra un tableau ne contenant qu’un seul élément.
 
 */
+
+/**
+ * split_picture
+ * @param [in] p 
+ * @assigns: modifie le tas en créant ou bien une copie de l'image en cours, ou bien une nouvelle image (nouvelle allocation 
+ * dans les deux cas)
+ * 
+ * @ensures: Plantage si l'un e des préconditions n'est pas respectée; cf. @return pour le comportement normal.
+ * 
+ * @return image en niveaux de gris, copie de l'image d'entrée ou résultat de la moyenne pondérée des 3 canaux pixel par pixel.
+*/
 picture *split_picture(picture p){
     if(is_empty_picture(p)){
         return NULL;
@@ -283,7 +284,6 @@ picture *split_picture(picture p){
                 write_pixel_bw(arr[n],i,j,component); //ici il n'y a pas de disjonction, on écrit toujours dans une image en niveau de gris.
             }
         }
-
     }
     return arr;
 }

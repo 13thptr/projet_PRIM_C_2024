@@ -13,9 +13,6 @@ struct lut_s{
 };
 typedef struct lut_s* lut;
 
-/*
-
-*/
 lut create_lut(unsigned int n){
     assert(n>0);
     lut res = malloc(sizeof(struct lut_s));
@@ -59,7 +56,7 @@ void apply_lut(picture p, lut table){
             }
         }
     }
-    else if(p.chan_num == GREY_PIXEL_SIZE){
+    else if(p.chan_num == GRAY_PIXEL_SIZE){
         for(int i=0;i<p.height;i++){
             for(int j=0;j<p.width;j++){
                 byte value = read_component_bw(p,i,j);

@@ -56,6 +56,7 @@ int main(int argc, char* argv[]){
     /*----------------------------------------------Boucle principale-------------------------------------------------------------------*/
 
     for(int i = 1;i <= min_int(NB_FILES,2);++i){
+        
         dir = dir_from_path(argv[i]);
         name = name_from_path(argv[i]);
         ext = ext_from_path(argv[i]);

@@ -9,10 +9,10 @@
 #include "picture_rw.h"
 /*
     Fonction read_picture
-    @param filename chemin vers un fichier
-    @requires filename chemin valide vers un fichier .pgm ou .ppm valide
-    @assigns rien
-    @return une structure de type "picture"
+    @param: filename chemin vers un fichier
+    @requires: filename chemin valide vers un fichier .pgm ou .ppm valide
+    @assigns: rien
+    @return: une structure de type "picture"
 
     TODO: replace strcmp with strncmp ? + Increase general safety 
 */
@@ -123,7 +123,7 @@ picture read_picture(const char *filename){
     if(!read_correctly_block(&read_correctly,buffer,to_be_read,&res,&true_line_counter)){
         return res;
     }
-    /*Lecture des dimensions de l'image.*/
+    /*-------------------------------Lecture des dimensions de l'image.------------------------------------------------------------------*/
     int status = sscanf(buffer,"%d %d", &res.width, &res.height);
     
     if(status<NB_ITEMS_2_DIMENSIONS){
@@ -181,11 +181,11 @@ picture read_picture(const char *filename){
 }
 /*
     Fonction write_picture
-    @param filename chemin vers un fichier
-    @requires "p" structure de type "picture" valide (avec champs width, height, chan_num et data valides).
-    @requires "filename" chemin (potentiel) valide.
-    @assigns rien
-    @ensures ce qu'il faut
+    @param: filename chemin vers un fichier
+    @requires: "p" structure de type "picture" valide (avec champs width, height, chan_num et data valides).
+    @requires: "filename" chemin (potentiel) valide.
+    @assigns: rien
+    @ensures: ce qu'il faut
     @return un entier indiquant le statut de succès(0) ou d'échec de l'appel à la fonction.
 */
 int write_picture(picture p, char * filename){
