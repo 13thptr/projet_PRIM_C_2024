@@ -32,6 +32,18 @@ int min_int(int n1, int n2){
     return n1<n2?n1:n2;
 }
 /**
+ * Maximum entre deux entiers.
+ * @param [in] n1 int
+ * @param [in] n2 int 
+ * @requires: rien
+ * @assigns: rien
+ * @ensures: cf. return
+ * @return: max(n1,n2)
+ */
+int max_int(int n1, int n2){
+    return n1>n2?n1:n2;
+}
+/**
  * Minimum entre deux doubles.
  * @param [in] d1 double 
  * @param [in] d2 double 
@@ -947,9 +959,102 @@ picture brighten_picture_lut(picture p, double factor){
     clean_lut(&brighten_lut);
     return res;
 }
+/*Manipulation de noyaux*/
+
+
+double **create_square_matrix(int n){
+    assert(n>0);
+    double **res = myalloc(n*sizeof(double*));
+    for(int i=0;i<n;++i){
+        res[i] = myalloc(n*sizeof(double));
+        for(int j=0;j<n;++j){
+            res[i][j]=0;
+        }
+    }
+    return res;
+}
+void delete_square_matrix(double **matrix, int n){
+    assert(matrix!=NULL);
+    for(int i=0;i<n;++i){
+        assert(matrix[i]!=NULL);
+        free(matrix[i]);
+    }
+    free(matrix);
+}
+void insert_square_matrix(double **matrix, int n, int i,int j, double coefficient){
+    assert(0<=i&&i<n);
+    assert(0<=j&&j<n);
+    matrix[i][j] = coefficient;
+}
+double **copy_square_matrix(double **matrix, int n){
+    double **res = create_square_matrix(n);
+    for(int i=0;i<n;++i){
+        for(int j=0;i<n;++j){
+            insert_square_matrix(res,n,i,j,matrix[i][j]);
+        }
+    }
+    return res;
+}
+void print_square_matrix(double **matrix, int n){
+    printf("\nSquare matrix (convolution kernel):\n");
+    for(int i=0;i<n;++i){
+        for(int j=0;j<n;++j){
+            printf("%lf ",matrix[i][j]);
+        }
+        printf("\n");
+    }
+    printf("\n");
+}
+
+void apply_matrix_affine_transformation(double **matrix, int n, double factor, double offset){
+    for(int i=0;i<n;++i){
+        for(int j=0;j<n;++j){
+            matrix[i][j] = factor*matrix[i][j]+offset;
+        }
+    }
+}
+
+/*@requires p is greyscale picture*/
+double get_convolved_value(double **matrix, int n, picture p, int i, int j){
+
+    double sum = 0.0;/*Element neutre pour la somme*/
+    for(int k=0;k<n;++k){
+        int new_i = min_int(max_int(i-n/2+k,0),p.height-1);
+        for(int l=0;l<n;++l){
+            int new_j = min_int(max_int(j-n/2+l,0),p.height-1);
+            double value = d_from_b(read_component_bw(p,new_i,new_j));
+            sum += value*matrix[k][l];
+        }
+    }
+    return sum;
+}
+
+/*On fait d'abord marcher la fonction pour des images en niveaux de gris.*/
+picture apply_kernel_to_copy(const picture p, const kernel k){
+    picture res = copy_picture(p);
+    double **copy = copy_square_matrix(k.matrix,k.n);
+
+    apply_matrix_affine_transformation(copy,k.n,k.factor,k.offset);
+
+    assert(!is_empty_picture(p));//pas sûr de ça.
+    assert(is_gray_picture(p));
+
+    for(int i=0;i<p.height;++i){
+        for(int j=0;j<p.width;++j){
+            double convolved = get_convolved_value(copy,k.n,p,i,j);
+            assert(0<convolved&&convolved<(double)MAX_BYTE);
+            byte value = (byte)convolved;
+            write_pixel_bw(res,i,j,value);
+        }
+    }
+    delete_square_matrix(copy,k.n);
+    return res;
+}
+
 /*
     Définir une fonction d'ordre supérieur qui applique une fonction prenant des images en noir et blanc 
     aux composantes RGB d'une image couleur passée en argument, puis renvoie la fusion des trois résultats.
 
     Utiliser cette fonction pour améliorer / factoriser resample et melt_picture ?
 */
+

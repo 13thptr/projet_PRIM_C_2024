@@ -10,6 +10,7 @@
 #include <stdbool.h>
 
 int min_int(int n1, int n2);
+int max_int(int n1, int n2);
 double min_double(double d1, double d2);
 double abs_double(double x);
 
@@ -89,5 +90,35 @@ picture resample_picture_bilinear(picture image, unsigned int width, unsigned in
 
 /*Brighten - LUT version*/
 picture brighten_picture_lut(picture p, double factor);
+
+/*Manipulation de noyaux*/
+
+typedef struct kernel_s{
+    unsigned int n;/*taille du noyau*/
+    double **matrix;/*de dimensions n*n, pour stocker les coefficients*/
+    double factor;
+    double offset;
+}kernel;
+
+double **create_square_matrix(int n);
+void delete_square_matrix(double **matrix, int n);
+void insert_square_matrix(double **matrix, int n, int i,int j, double coefficient);
+double **copy_square_matrix(double **matrix, int n);
+void print_square_matrix(double **matrix, int n);
+
+void apply_matrix_affine_transformation(double **matrix, int n, double factor, double offset);
+
+/*@requires p is greyscale picture*/
+double get_convolved_value(double **matrix, int n, picture p, int i, int j);
+
+/*On fait d'abord marcher la fonction pour des images en niveaux de gris.*/
+picture apply_kernel_to_copy(const picture p, const kernel k);
+
+
+
+
+
+
+
 
 #endif /*PICTURES_H*/
