@@ -251,8 +251,8 @@ picture convert_to_gray_picture(picture p){
             double red = (double)0.299*read_component_rgb(p,i,j,RED);
             double green = (double)0.587*read_component_rgb(p,i,j,GREEN);
             double blue = (double)0.114*read_component_rgb(p,i,j,BLUE);
-            double sum = red+green+blue;
-            byte value = (byte)(sum<255?sum:255);
+            double sum = min_double(red+green+blue,(double)MAX_BYTE);
+            byte value = (byte)(sum);
             write_pixel_bw(res,i,j,value);
         }
     }
@@ -315,7 +315,8 @@ picture *split_picture(picture p){
 
 /**
  * merge_picture
- * @param [in] p 
+ * @param [in] red, green, blue
+ * @requires: red,green,blue images 
  * @assigns: modifie le tas en créant:
  *  une picture "res" et donc un pointeur vers un tableau alloué dans le tas via create_picture pour res.data;
  * 
@@ -325,6 +326,9 @@ picture *split_picture(picture p){
  * @return image nommée res(type picture)
 */
 picture merge_picture(picture red, picture green, picture blue){
+    assert(is_gray_picture(red));
+    assert(is_gray_picture(green));
+    assert(is_gray_picture(blue));
     int width = red.width * (red.width==green.width&&green.width == blue.width);
 
     int height = red.height *(red.height==green.height&&green.height==blue.height);
@@ -345,39 +349,40 @@ picture merge_picture(picture red, picture green, picture blue){
 }
 /**
  * brighten_picture
- * @param [in] p 
+ * @param [in] p, factor
+ * @requires: p image valide, factor>0.
  * @assigns: modifie le tas en créant:
  *  une copie via copy_picture, donc un nouvau champ data contenant un pointeur vers un tableau de bytes.
  *  
  *
- * @ensures: Plantage si...
+ * @ensures: Plantage si les préconditions de copy_picture ne sont pas respectées
  * 
  * @return image nommée res(type picture)
 */
 picture brighten_picture(picture p, double factor){
     picture res = copy_picture(p);
+    assert(factor>0);
     for(int k=0;k<(int)res.width*(int)res.height*(int)res.chan_num;k++){
         double value = (double)res.data[k]*factor;
-        value = (value <(double)MAX_BYTE)?value:(double)MAX_BYTE; 
+        value = min_double(value,MAX_BYTE); 
         res.data[k] = (byte)value;
     }
     return res;
 }
 /**
  * melt_picture
- * @param [in] p 
- * @assigns: modifie le tas en créant:
- *   
- *  
  * 
- * @ensures: 
+ * @param [in] p, number
+ * 
+ * @requires: p: image valide, number: nombre positifs de pixels à faire fondre.
+ * @assigns: modifie le tas en créant une copie que l'on va modifier pour l'effet de fonte.
+ * @ensures: Plantage si les préconditions de copy_picture ne sont pas respectées
  * 
  * @return image nommée melted (type picture)
 */
-
 picture melt_picture(picture p, int number){
     /*Il faut distinguer deux cas: image en niveaux de gris ou couleur.*/
-
+    assert(number>=0);
     picture melted = copy_picture(p);
 
     if(p.chan_num == GRAY_PIXEL_SIZE){
@@ -427,7 +432,17 @@ struct lut_s{
     int n;
     byte *array;
 };
-/*typedef struct lut_s* lut;*/
+
+/**
+ * inverse_picture
+ * @param [in] p 
+ * 
+ * @requires: p image valide
+ * @assigns: nouvelle copie de l'image p dans le tas (heap), modifiée par une lut via apply_lut.
+ * @ensures: Plantage si les préconditions de copy_picture, create_lut, apply_lut ne sont pas respectées
+ * 
+ * @return image de type picture contenant un champ data avec les données d'image de p.data "inversées" (involution)
+*/
 
 picture inverse_picture(picture p){
     picture res = copy_picture(p);
@@ -444,6 +459,18 @@ picture inverse_picture(picture p){
     clean_lut(&invert_lut);
     return res;
 }
+/**
+ * normalize_dynamic_picture
+ * @param [in] p 
+ * 
+ * @requires: p image valide
+ * @assigns: copie en mémoire de p effectuée avant modificaiton par lut. lut stockée temporairement dans le tas le temps 
+ * d'effectuer le traitement.
+ * @ensures: plantage si les préconditions de copy_picture ne sont pas respectées, sinon res est renvoyée et contient les données
+ * normalisées.
+ * 
+ * @return res image normalisée de type picture.
+*/
 picture normalize_dynamic_picture(picture p){
     picture res = copy_picture(p);
     if(is_empty_picture(p)){
@@ -480,7 +507,18 @@ picture normalize_dynamic_picture(picture p){
     clean_lut(&normalize_lut);
     return res;
 }
-
+/**
+ * 
+ * @param [in] p 
+ * 
+ * @requires:
+ * @assigns: 
+ *   
+ * 
+ * @ensures: 
+ * 
+ * @return 
+*/
 picture set_levels_picture(picture p, byte nb_levels){
     picture res = copy_picture(p);
     if(is_empty_picture(p)){
@@ -496,6 +534,19 @@ picture set_levels_picture(picture p, byte nb_levels){
     clean_lut(&set_lut);
     return res;
 }
+/**
+ * 
+ * @param [in] p 
+ * 
+ * @requires:
+ * @assigns: 
+ *   
+ * 
+ * @ensures: 
+ * 
+ * @return 
+*/
+
 /*Différence absolue*/
 picture distance_picture(picture p1, picture p2){
     if(is_empty_picture(p1)&&is_empty_picture(p2)){
@@ -518,6 +569,18 @@ picture distance_picture(picture p1, picture p2){
 double d_from_b(byte b){
     return (double)b;
 }
+/**
+ * 
+ * @param [in] p 
+ * 
+ * @requires:
+ * @assigns: 
+ *   
+ * 
+ * @ensures: 
+ * 
+ * @return 
+*/
 picture mult_picture(picture p1, picture p2){
     if(is_empty_picture(p1)&&is_empty_picture(p2)){
         return p1;
@@ -587,12 +650,31 @@ void mix_reformat(picture p1,picture *q1){
         *q1 = copy_picture(p1);
     }
 }
+/**
+ * 
+ * @param [in] p1,p2,p3
+ * 
+ * @requires:p1,p2,p3 images valides de type pictures.
+ * @assigns: 
+ *   
+ * 
+ * @ensures: 
+ * 
+ * @return 
+*/
+
 picture mix_picture(picture p1, picture p2, picture p3){
 
     picture q1;
     picture q2;
     picture q3;
-
+    /*
+        On doit gérer le cas où les trois images d'entrées sont en niveaux de gris: mix_reformat doit se charger
+        de les transformer en image couleurs pour éviter d'écrire un traitement à part, mais alors pour des raisons de cohérence il 
+        faudra retransformer le résultat en image niveaux de gris, car on aurait pu effectuer tout le traitement en niveaux de gris.
+        Le résultat devrait être le même, j'ai fait ce choix pour éviter la duplication inutile de code, puisque
+        dans la majorité des cas les trois images doivent être converties (éventuellement de façon idempotente) en images couleurs.
+    */
     bool gray = (p1.chan_num == p2.chan_num && p2.chan_num == p3.chan_num && p3.chan_num == GRAY_PIXEL_SIZE);
 
     /*
@@ -607,6 +689,7 @@ picture mix_picture(picture p1, picture p2, picture p3){
    
     if(q1.width!=q3.width || q1.height!=q3.height){
         /*Cf énoncé: on pourra redimensionner...*/
+        printf("Input images for mix_picture are different sizes, resizing (bilinear interpolation)...\n");
         picture tmp = resample_picture_bilinear(q2,q1.width,q1.height);
         clean_picture(&q2);
         q2 = tmp; 
@@ -625,12 +708,14 @@ picture mix_picture(picture p1, picture p2, picture p3){
             }        
         }
     }
-    /*Si (et seulement si ?)les trois images d'entrée étaient en niveaux de gris, la conversion en RGB était artificielle 
-    et on aurait pu s'en passer (avec plus de code cependant). On reconvertit donc le résultat en image niveaux de gris.
-    */
+    
     clean_picture(&q1);
     clean_picture(&q2);
     clean_picture(&q3);
+    /*
+        Si, et seulement si les trois images d'entrée étaient en niveaux de gris, la conversion en RGB était artificielle,
+        et l'on aurait pu s'en passer (avec plus de code cependant). On reconvertit donc le résultat en image niveaux de gris.
+    */
     if(gray){
         picture res_gray = convert_to_gray_picture(res);
         clean_picture(&res);
@@ -660,7 +745,20 @@ void check_resamplable(picture image, unsigned int width, unsigned int height,do
         printf("Warning: the desired aspect ratio differs from that of the original image.\n");
     }
 }
+/**
+ * 
+ * @param [in] p 
+ * 
+ * @requires:
+ * @assigns: 
+ *   
+ * 
+ * @ensures: 
+ * 
+ * @return 
+*/
 /*Rééchantillonnage avec la politique du plus proche voisin.*/
+
 picture resample_picture_nearest(picture image, unsigned int width, unsigned int height){
     
     picture res = create_picture(width,height,image.chan_num);
@@ -697,6 +795,18 @@ picture resample_picture_nearest(picture image, unsigned int width, unsigned int
 }
 /*On gère d'abord le cas des images en niveaux de gris. En cas d'image couleur, on la sépare en composantes avec split_picture
 et on interpole les composantes séparément, puis on renvoie la fusion des résultats.
+*/
+/**
+ * 
+ * @param [in] p 
+ * 
+ * @requires:
+ * @assigns: 
+ *   
+ * 
+ * @ensures: 
+ * 
+ * @return 
 */
 picture resample_picture_bilinear(picture image, unsigned int width, unsigned int height){
     picture res; 
@@ -766,6 +876,18 @@ picture resample_picture_bilinear(picture image, unsigned int width, unsigned in
     }
     return res;
 }
+/**
+ * 
+ * @param [in] p 
+ * 
+ * @requires:
+ * @assigns: 
+ *   
+ * 
+ * @ensures: 
+ * 
+ * @return 
+*/
 
 picture brighten_picture_lut(picture p, double factor){
     lut brighten_lut = create_lut(MAX_BYTE+1);
