@@ -112,9 +112,10 @@ void apply_matrix_affine_transformation(double **matrix, int n, double factor, d
 double get_convolved_value(double **matrix, int n, picture p, int i, int j);
 
 /*On fait d'abord marcher la fonction pour des images en niveaux de gris.*/
+picture apply_kernel_to_copy_bw(const picture p, const kernel k);
+
+/*Puis on code une version générale avec split et merge.*/
 picture apply_kernel_to_copy(const picture p, const kernel k);
-
-
 
 
 

@@ -1035,28 +1035,50 @@ double get_convolved_value(double **matrix, int n, picture p, int i, int j){
 }
 
 /*On fait d'abord marcher la fonction pour des images en niveaux de gris.*/
-picture apply_kernel_to_copy(const picture p, const kernel k){
+picture apply_kernel_to_copy_bw(const picture p, const kernel k){
+
     picture res = copy_picture(p);
-    /*printf("Checking k.matrix...\n");
-    print_square_matrix(k.matrix,k.n); OK
-    */
+
     double **copy = copy_square_matrix(k.matrix,k.n);
 
     apply_matrix_affine_transformation(copy,k.n,k.factor,k.offset);
 
     assert(!is_empty_picture(p));//pas sûr de ça.
-    assert(is_gray_picture(p));//à enlever
+    //assert(is_gray_picture(p));//à enlever
 
     for(int i=0;i<p.height;++i){
         for(int j=0;j<p.width;++j){
             double convolved = get_convolved_value(copy,k.n,p,i,j);
-            //printf("convolved:%lf\n",convolved);
+            
             assert(0<convolved&&convolved<(double)MAX_BYTE);
             byte value = (byte)convolved;
             write_pixel_bw(res,i,j,value);
         }
     }
     delete_square_matrix(copy,k.n);
+    return res;
+}
+/*Version générale*/
+picture apply_kernel_to_copy(const picture p, const kernel k){
+    if(p.chan_num==GRAY_PIXEL_SIZE){
+        return apply_kernel_to_copy_bw(p,k);
+    }
+    assert(p.chan_num==RGB_PIXEL_SIZE);
+    picture *split = split_picture(p);
+
+    for(int c=RED;c<=BLUE;++c){
+        picture tmp = apply_kernel_to_copy_bw(split[c],k);
+        clean_picture(&split[c]);
+        split[c] = tmp;
+    }
+
+    
+    picture res = merge_picture(split[0],split[1],split[2]);
+
+    for(int c=RED;c<=BLUE;++c){
+        clean_picture(&split[c]);
+    }
+    free(split);
     return res;
 }
 

@@ -77,7 +77,7 @@ int main(int argc, char* argv[]){
         /*Certains traitements ne doivent être faits que pour des images en niveaux de gris, d'autres pour des images en couleur.*/
         if(is_gray_picture(current_pic)){
             convert_color_wrapper(current_pic,output_dir,name,ppm_ext);
-            gaussian_blur_wrapper(current_pic,5,10.0,output_dir,name,pgm_ext);
+            
         }
         if(is_color_picture(current_pic)){
             convert_gray_wrapper(current_pic,output_dir,name,pgm_ext);
@@ -89,6 +89,7 @@ int main(int argc, char* argv[]){
         brighten_picture_wrapper(current_pic,output_dir,name,ext,BRIGHTENING_FACTOR);
         melt_picture_wrapper(current_pic,output_dir,name,ext);
 
+      
 
         /*On sauvegarde l'image inversée si la troisième est présente, car alors on mixe et on en aura besoin plus tard.*/
         inverse_picture_wrapper(current_pic,output_dir,name,ext,THIRD_IMAGE_FLAG,&save);
@@ -115,12 +116,22 @@ int main(int argc, char* argv[]){
             mix_picture_wrapper(save,current_pic,mask,output_dir,name,ext);
         }
 
+
+        /*Bonus: flou gaussien*/
+        gaussian_blur_wrapper(current_pic,5,10.0,output_dir,name,pgm_ext);
+
+
+
         /*Free and reset memory*/
         
         clean_picture(&current_pic);
         if(THIRD_IMAGE_FLAG){
             clean_picture(&save);
         }
+
+        
+
+
         free(dir);
         free(name);
         free(ext);
