@@ -537,12 +537,12 @@ picture set_levels_picture(picture p, byte nb_levels){
  * @param [in] p1, @param[in] p2
  * 
  * @requires:p1,p2 images valides de type picture, de même tailles
- * @assigns: 
- *   
+ * @assigns: allocation d'une zone mémoire pour le champ data de la picture "res" crée dans le corps de la fonction
  * 
- * @ensures: 
  * 
- * @return 
+ * @ensures: plantage si p1,p2 ne vérifient pas les préconditions, cf. return sinon. p1 et p2 ne sont pas modifiées...
+ * 
+ * @return: image constituée de la distance "byte à byte" 
 */
 
 /*Différence absolue*/
@@ -552,7 +552,7 @@ picture distance_picture(picture p1, picture p2){
     }
     /*On vérifie que les tailles et les types (couleur ou niveaux de gris) sont les mêmes*/
     assert(same_dimensions(p1,p2));
-    picture res = create_picture(p1.width,p2.height,p1.chan_num);
+    picture res = create_picture(p1.width,p1.height,p1.chan_num);
     for(int k=0;k<(int)res.chan_num*res.width*res.height;k++){
         signed int diff = (signed int)p1.data[k]-(signed int)p2.data[k]; //même problème que d'habitude avec le type (byte)
         diff = diff>0 ?diff:-diff; //même effet que diff = abs(diff) sans la fonction abs.
@@ -561,28 +561,43 @@ picture distance_picture(picture p1, picture p2){
     return res;
 }
 /*Produit*/
-
+/*d_from_b
+Fonction utilitaire pour convertir (caster) en évitant un warning "pédant" (pedantic) sans créer trop de variables.
+    @param: b
+    @requires: rien
+    @assigns: rien
+    @ensures: rien
+    @return: cast de b en double.
+*/
 double d_from_b(byte b){
     return (double)b;
 }
 /**
+ * mult_picture
+ * @param [in] p1
+ * @param [in] p2
  * 
- * @param [in] p 
- * 
- * @requires:
- * @assigns: 
+ * @requires:p1,p2 images valides
+ * @assigns: le tas est modifié par la création d'une picture res.
  *   
+ * @ensures: res contient la multiplication "renormalisée" de p1 et p2 byte à byte
+ * "renormalisée" dans le sens où l'on divise le produit des byte convertis en doubles par 255 pour obtenir une résultat
+ * qui soit encore entre 0 et 255. On n'utilise pas renormalize_dynamic_picture car le but ici n'est pas d'optimiser la 
+ * dynamique.
  * 
- * @ensures: 
- * 
- * @return 
+ * @return picture res contenant le "produit" décrit ci-dessus.
 */
+
 picture mult_picture(picture p1, picture p2){
     if(is_empty_picture(p1)&&is_empty_picture(p2)){
         return p1;
     }
    
     if(p1.chan_num==GRAY_PIXEL_SIZE&&p2.chan_num==RGB_PIXEL_SIZE){
+        /*
+            Appel récursif: à l'appel suivant, la condition du if ne pourra pas s'évaluer à true grâce à l'interversion.
+            On garantit un ordre en quelque sorte.
+        */
         return mult_picture(p2,p1);
     }
     if(p1.width!=p2.width||p1.height!=p2.height){
@@ -593,11 +608,14 @@ picture mult_picture(picture p1, picture p2){
     }
     picture res = create_picture(p1.width,p1.height,p1.chan_num);
 
-    /*Justification de l'utilisation des doubles (à mettre dans le rapport):
-    on a besoin d'un type plus grand que "char/byte" pour saturer au lieu de cycler. Int ne suffit pas car on divise par 255.0
-    pour avoir un nombre entre 0 et 1. 
+    /*
+        Justification de l'utilisation des doubles (à mettre dans le rapport):
+        on a besoin d'un type plus grand que "char/byte" pour saturer au lieu de cycler. Le type "int" ne suffit pas car on divise par 255.0
+        pour avoir un nombre entre 0 et 1: un int prendrait la valuer 0. On pourrait sans doute éviter cela en ne divisant qu'après,
+        mais alors le code serait plus éloigné de l'énoncé car pour être cohérent il faudrait faire de même dans mix_picture, 
+        et donc changer la définition de alpha.
     */
-   /*Rmq: encore un cas de disjonction de cas indépendante de i,j à commenter dans le rapport.*/
+   /*Remarque: on a ici un cas de disjonction de cas indépendante de i,j à commenter dans le rapport.*/
     for(int i=0;i<p1.height;++i){
         for(int j=0;j<p1.width;++j){
             if(p1.chan_num == GRAY_PIXEL_SIZE && p2.chan_num == GRAY_PIXEL_SIZE){
@@ -639,6 +657,18 @@ picture mult_picture(picture p1, picture p2){
 
 /*Mélange*/
 
+/**
+ * Fonction utilitaire mix_reformat
+ * Intérêt: Permet de n'avoir à traiter que le cas (RGB,RGB,RGB) pour les arguments (p1,p2,p3) de mix_picture.
+ * @param [in] p1 image à "transformer" éventuellement en image couleur
+ * @param [in] q1 pointeur vers une image censée accueillir une copie ou une conversion en couleur de p1
+ * @requires:p1,p2,p3 images valides de type pictures.
+ * @assigns: modification du tas via convert_to_color picture ou copy_picture qui effectuent une allocation
+
+ * @ensures: *q1 contient une copie de p1 si celle-ci était en couleur, une conversion en couleur sinon.
+ * 
+ * @return: rien (void)
+*/
 void mix_reformat(picture p1,picture *q1){
     if(p1.chan_num == GRAY_PIXEL_SIZE){
         *q1 = convert_to_color_picture(p1);
@@ -651,7 +681,10 @@ void mix_reformat(picture p1,picture *q1){
  * @param [in] p1,p2,p3
  * 
  * @requires:p1,p2,p3 images valides de type pictures.
- * @assigns: 
+ * @assigns: modifications dans le tas
+ *          1) "Temporaires" (propres au corps de fonction)
+ *              - q1,q2,q3 sont modifiées par mix_reformat
+ *                
  *   
  * 
  * @ensures: 
@@ -682,9 +715,10 @@ picture mix_picture(picture p1, picture p2, picture p3){
     mix_reformat(p3,&q3);
    
     assert(q1.chan_num == q2.chan_num && q2.chan_num == q3.chan_num && q3.chan_num == RGB_PIXEL_SIZE); 
-   
+    printf("Check around line 720 of pictures.c for bizarre resizing condition.\n");
     if(q1.width!=q3.width || q1.height!=q3.height){
         /*Cf énoncé: on pourra redimensionner...*/
+        printf("Pretty sure this should cause a double free / segfault if the flow was to actually reach this point...\n");
         printf("Input images for mix_picture are different sizes, resizing (bilinear interpolation)...\n");
         picture tmp = resample_picture_bilinear(q2,q1.width,q1.height);
         clean_picture(&q2);
@@ -721,9 +755,9 @@ picture mix_picture(picture p1, picture p2, picture p3){
     return res;
 }
 /*
-Fonction d'aide: utilisée deux fois
-Modifie par référence les ratios de redimensionnement horizontal et vertical
-Affiche un avertissement lorsque l'on déforme l'image.
+    Fonction utilitaire: utilisée deux fois
+    Modifie par référence les ratios de redimensionnement horizontal et vertical
+    Affiche un avertissement lorsque l'on déforme l'image.
 */
 void check_resamplable(picture image, unsigned int width, unsigned int height,double *rx,double *ry){
     assert(width>0);

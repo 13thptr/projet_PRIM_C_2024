@@ -56,7 +56,7 @@ int main(int argc, char* argv[]){
     /*----------------------------------------------Boucle principale-------------------------------------------------------------------*/
 
     for(int i = 1;i <= min_int(NB_FILES,2);++i){
-        
+
         dir = dir_from_path(argv[i]);
         name = name_from_path(argv[i]);
         ext = ext_from_path(argv[i]);
@@ -132,5 +132,10 @@ int main(int argc, char* argv[]){
     if(THIRD_IMAGE_FLAG){
         clean_picture(&mask);
     }
+
+    printf("Reste à tester le code avec:\n\t1)Des images d'entrées rectangulaires\n");
+    printf("\t2)Des filtres en cascade\n");
+    printf("pour s'assurer qu'il n'y a de problème avec aucune combinaison possible (couleur, largeur, hauteur)\n");
+
     return EXIT_SUCCESS;
 }
