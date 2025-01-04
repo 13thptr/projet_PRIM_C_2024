@@ -682,15 +682,20 @@ void mix_reformat(picture p1,picture *q1){
  * 
  * @requires:p1,p2,p3 images valides de type pictures.
  * @assigns: modifications dans le tas
- *          1) "Temporaires" (propres au corps de fonction)
+ *          1) "Temporaires" (propres au corps de fonction):
  *              - q1,q2,q3 sont modifiées par mix_reformat
  *                
- *   
+ *          2) "Permanentes" (on passe la responsabilité de libérer la mémoire à une autre fonction, dans un wrapper de wrappers.c
  * 
- * @ensures: 
+ *          ou à la fonction main dans main.c):
+ *              - l'image res allouée est renvoyée.
  * 
- * @return 
-*/
+ * @ensures: res contient l'image "mélange" selon une politique de barycentre
+ *           des deux premières images d'entrée, pondéré par  la troisième image.
+ *           ou alors la fonction a planté car l'une des trois images d'entrée n'a pas vérifié une précondition.
+ * 
+ * @return cf. @ensures:
+ * */
 
 picture mix_picture(picture p1, picture p2, picture p3){
 
@@ -759,11 +764,18 @@ picture mix_picture(picture p1, picture p2, picture p3){
     Modifie par référence les ratios de redimensionnement horizontal et vertical
     Affiche un avertissement lorsque l'on déforme l'image.
 */
+/*
+ * @param: image, width, height, rx, ry
+ * @requires: image structure valide de type picture.
+ * @requires: width not 0
+ * @requires: height not 0
+ * @requires: rx,ry valid pointers
+*/
 void check_resamplable(picture image, unsigned int width, unsigned int height,double *rx,double *ry){
     assert(width>0);
     assert(height>0);
     assert(!is_empty_picture(image));
-
+    assert(rx!=NULL&&ry!=NULL);
     *rx = (double)width/(double)image.width;
     *ry = (double)height/(double)image.height;
     assert(*rx>EPSILON);
@@ -777,17 +789,16 @@ void check_resamplable(picture image, unsigned int width, unsigned int height,do
 }
 /**
  * 
- * @param [in] p 
- * 
- * @requires:
- * @assigns: 
+ * @param [in] image
+ * @param [in] width
+ * @param [in] height
+ * @requires: image, width, heigth vérifient les conditions de check_resamplable
+ * @assigns: le tas est modifié par la création de l'image renvoyée "res", à libérer dans une autre fonction.
  *   
+ * @ensures: sous condition de redimensionnabilité, "res" contient "image" redimensionnée avec la politique du plus proche voisin.
  * 
- * @ensures: 
- * 
- * @return 
+ * @return: res l'image d'entrée, mais redimensionnée.
 */
-/*Rééchantillonnage avec la politique du plus proche voisin.*/
 
 picture resample_picture_nearest(picture image, unsigned int width, unsigned int height){
     
@@ -829,15 +840,17 @@ et on interpole les composantes séparément, puis on renvoie la fusion des rés
 
 /**
  * 
- * @param [in] p 
- * 
- * @requires:
- * @assigns: 
+ * @param [in] image 
+ * @param [in] width
+ * @param [in] height
+ * @requires: image, width, heigth vérifient les conditions de check_resamplable
+ * @assigns: le tas est modifié par la création de l'image renvoyée "res", à libérer dans une autre fonction.
  *   
+ * @ensures: sous condition de redimensionnabilité, "res" contient "image" redimensionnée
+ *  avec la politique d'interpolation bilinéaire.
  * 
- * @ensures: 
- * 
- * @return 
+ * @return: res l'image d'entrée, mais redimensionnée.
+
 */
 picture resample_picture_bilinear(picture image, unsigned int width, unsigned int height){
     picture res; 
@@ -910,6 +923,7 @@ picture resample_picture_bilinear(picture image, unsigned int width, unsigned in
 /**
  * 
  * @param [in] p 
+ * @param [in] factor
  * 
  * @requires:
  * @assigns: 
@@ -921,6 +935,7 @@ picture resample_picture_bilinear(picture image, unsigned int width, unsigned in
 */
 
 picture brighten_picture_lut(picture p, double factor){
+    assert(factor>=0);
     lut brighten_lut = create_lut(MAX_BYTE+1);
     picture res = copy_picture(p);
     for(int c=0;c<MAX_BYTE;++c){
