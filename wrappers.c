@@ -225,7 +225,7 @@ void brighten_lut_wrapper(picture p, char *res_dir, char *name_p, char *res_ext,
     clean_picture(&brightened_lut);
     free(brighten_lut_path);
 }
-
+/*Fonction générale pour tester les noyaux dans le main si besoin*/
 void kernel_wrapper(picture p, kernel k,char *res_dir, char *name_p, char *res_ext){
     picture kernelized = apply_kernel_to_copy(p,k);
 
@@ -276,6 +276,34 @@ void gaussian_blur_wrapper(picture p,int matrix_size, double std_dev,char *res_d
 
     clean_picture(&blurred);
     free(blurred_path);
+
+    delete_square_matrix(k.matrix,k.n);
+}
+void horizontal_derivative_kernel_wrapper(picture p, char *res_dir, char *name_p, char *res_ext){
+
+    /*----------------On crée d'abord le noyau.--------------------*/
+    kernel k;
+    k.n = 3;
+    k.matrix = create_square_matrix(k.n);
+    k.offset = 0.0;
+    k.offset = 255.0/2.0;
+    k.factor = 1.0/4.0;
+
+    k.matrix[0][0]=-1.0; k.matrix[0][1] = 0.0; k.matrix[0][2] = 1.0;
+    k.matrix[1][0]=-2.0; k.matrix[1][1] = 0.0; k.matrix[1][2] = 2.0;
+    k.matrix[2][0]= 1.0; k.matrix[2][1] = 0.0; k.matrix[2][2] = 1.0;
+    
+    print_square_matrix(k.matrix,k.n);
+
+    picture horiz = apply_kernel_to_copy(p,k);
+
+    char derivative_op[30] = "derivative";
+    char *horiz_path = concat_parts(res_dir,name_p,derivative_op,res_ext);
+    write_picture(horiz,horiz_path);
+
+
+    clean_picture(&horiz);
+    free(horiz_path);
 
     delete_square_matrix(k.matrix,k.n);
 }

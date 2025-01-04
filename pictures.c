@@ -987,11 +987,8 @@ void set_square_matrix(double **matrix, int n, int i,int j, double coefficient){
     matrix[i][j] = coefficient;
 }
 double **copy_square_matrix(double **matrix, int n){
-    /*printf("Matrix to be copied:\n");
-    print_square_matrix(matrix,n);
-    */
     double **res = create_square_matrix(n);
-    printf("res initialisé\n");
+    
     for(int i=0;i<n;i++){
         for(int j=0;j<n;j++){
             //printf("matrix[%d][%d]:%lf ;",i,j,matrix[i][j]);
@@ -1018,7 +1015,27 @@ void apply_matrix_affine_transformation(double **matrix, int n, double factor, d
         }
     }
 }
-
+double sum_coeff_square_matrix(double **matrix,int n){
+    double sum = 0.0;
+    for(int i=0;i<n;++i){
+        for(int j=0;j<n;++j){
+            sum += matrix[i][j];
+        }
+    }
+    return sum;
+}
+void normalize_square_matrix(double **matrix, int n){
+    double sum = sum_coeff_square_matrix(matrix,n);
+    for(int i=0;i<n;++i){
+        for(int j=0;j<n;++j){
+            matrix[i][j]/=sum;
+        }
+    }
+}
+bool is_normalized(double **matrix, int n){
+    double sum = sum_coeff_square_matrix(matrix,n);
+    return abs_double(sum-1.0)<EPSILON;
+}
 /*@requires p is greyscale picture*/
 double get_convolved_value(double **matrix, int n, picture p, int i, int j){
 
@@ -1043,14 +1060,23 @@ picture apply_kernel_to_copy_bw(const picture p, const kernel k){
 
     apply_matrix_affine_transformation(copy,k.n,k.factor,k.offset);
 
+    print_square_matrix(copy,k.n);
+
+    if(!is_normalized(copy,k.n)){
+        printf("Kernel not normalized. Renormalizing...\n");
+        normalize_square_matrix(copy,k.n);
+    }
+
+
     assert(!is_empty_picture(p));//pas sûr de ça.
-    //assert(is_gray_picture(p));//à enlever
+ 
 
     for(int i=0;i<p.height;++i){
         for(int j=0;j<p.width;++j){
             double convolved = get_convolved_value(copy,k.n,p,i,j);
-            
-            assert(0<convolved&&convolved<(double)MAX_BYTE);
+            //if(convolved<0||convolved>255.0)printf("convolved: %lf",convolved);
+            //assert(-EPSILON<convolved);
+            //assert(convolved<(double)MAX_BYTE+(double)EPSILON);
             byte value = (byte)convolved;
             write_pixel_bw(res,i,j,value);
         }

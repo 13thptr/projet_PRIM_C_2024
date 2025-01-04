@@ -117,8 +117,9 @@ picture apply_kernel_to_copy_bw(const picture p, const kernel k);
 /*Puis on code une version générale avec split et merge.*/
 picture apply_kernel_to_copy(const picture p, const kernel k);
 
-
-
+double sum_coeff_square_matrix(double **matrix,int n);
+void normalize_square_matrix(double **matrix, int n);
+bool is_normalized(double **matrix, int n);
 
 
 

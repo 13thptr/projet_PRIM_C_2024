@@ -49,3 +49,5 @@ void brighten_lut_wrapper(picture p, char *res_dir, char *name_p, char *res_ext,
 void kernel_wrapper(picture p, kernel k,char *res_dir, char *name_p, char *res_ext);
 
 void gaussian_blur_wrapper(picture p,int matrix_size, double std_dev,char *res_dir, char *name_p, char *res_ext);
+
+void horizontal_derivative_kernel_wrapper(picture p, char *res_dir, char *name_p, char *res_ext);
