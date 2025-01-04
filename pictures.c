@@ -948,8 +948,8 @@ picture brighten_picture_lut(picture p, double factor){
     return res;
 }
 /*
-Définir une fonction d'ordre supérieur qui applique une fonction prenant des images en noir et blanc 
-aux composantes RGB d'une image couleur passée en argument, puis renvoie la fusion des trois résultats.
+    Définir une fonction d'ordre supérieur qui applique une fonction prenant des images en noir et blanc 
+    aux composantes RGB d'une image couleur passée en argument, puis renvoie la fusion des trois résultats.
 
-Utiliser cette fonction pour améliorer / factoriser resample et melt_picture ?
+    Utiliser cette fonction pour améliorer / factoriser resample et melt_picture ?
 */

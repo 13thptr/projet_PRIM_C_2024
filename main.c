@@ -17,11 +17,15 @@
 #define LARGER_FACTOR (1.36)
 #define BRIGHTENING_FACTOR (1.5)
 
-
+/*
+* @param [in]: argc
+* @param [in]: argv
+* @requires: argc > 1
+* @requires: argv contient des noms de fichiers ou d'options valide
+* @assigns modifications dans le tas (cf. wrappers.c pour les allocations et libérations)
+* @return: statut (EXIT_SUCCESS, ou EXIT_FAILURE)
+*/
 int main(int argc, char* argv[]){
- 
-
-
     /*-------------------------Déclaration des variables en amont (conforme à la norme ISO C)-------------------------------*/
 
     picture current_pic; /*Variable qui sera mise à jour au fur et à mesure dans une boucle sur les arguments.*/
