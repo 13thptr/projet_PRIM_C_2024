@@ -166,6 +166,7 @@ picture read_picture(const char *filename){
     size_t nb_read_items = fread(res.data,ITEM_SIZE,alloc_size, to_be_read);
     printf("\n%ld items read.\n",nb_read_items);
     /*Peut-on détecter à ce stade le problème invalid_read_count ?*/
+    
     if(alloc_size != nb_read_items){
         free(res.data);
         reset_picture_to_zero(&res);

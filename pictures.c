@@ -65,7 +65,8 @@ double abs_double(double x){
  * @param [in] width la largeur de l'image à créer
  * @param [in] height la hauteur de l'image à créer
  * @param [in] channels le nombre de canaux
-
+ * 
+ * @requires: channels vaut 1 ou 3. 
  * @assigns: le tas est modifié avec un appel à malloc() (cf. safe_malloc.c)
  * 
  * @ensures: L'image renvoyée est bien initialisée. Plantage si l'une des préconditions n'est pas respectée.
@@ -84,7 +85,8 @@ picture create_picture(unsigned int width, unsigned int height, unsigned int cha
 /**
  * Nettoyage d'une image
  * @param [in] p pointeur vers une image dont le champ data est bien initialisé.
-
+ * 
+ * @requires: p n'est pas le pointeur nul.
  * @assigns: le tas est modifié avec un appel à free()
  * 
  * @ensures: La mémoire occupée par le champ data est bien libérée. Plantage si l'une des préconditions n'est pas respectée.
@@ -104,6 +106,8 @@ void clean_picture(picture *p){
 /**
  * Copie d'une image
  * @param [in] p 
+ * 
+ * @requires: p non vide. (on n'a pas encore is_empty_picture)
  * @assigns: le tas est modifié avec un appel à malloc() via create_picture.
  * 
  * @ensures: Plantage si l'une des préconditions n'est pas respectée. Sinon, une nouvelle image est initialisée en mémoire
@@ -129,6 +133,8 @@ picture copy_picture(picture p){
 /**
  * is_empty_picture
  * @param [in] p 
+ * 
+ * @requires: rien
  * @assigns: rien
  * 
  * @ensures: cf. return
@@ -141,6 +147,8 @@ bool is_empty_picture(picture p){
 /**
  * is_gray_picture
  * @param [in] p 
+ * 
+ * @requires: rien
  * @assigns: rien
  * 
  * @ensures: cf. return
@@ -193,6 +201,7 @@ bool same_dimensions(picture p1, picture p2){
 /**
  * convert_to_color_picture
  * @param [in] p 
+ * @requires: p image valide, non vide.
  * @assigns: modifie le tas en créant ou bien une copie de l'image en cours, ou bien une nouvelle image (nouvelle allocation 
  * dans les deux cas)
  * 
@@ -220,6 +229,7 @@ picture convert_to_color_picture(picture p){
 /**
  * convert_to_gray_picture
  * @param [in] p 
+ * @requires: p image valide, non vide.
  * @assigns: modifie le tas en créant ou bien une copie de l'image en cours, ou bien une nouvelle image (nouvelle allocation 
  * dans les deux cas)
  * 
@@ -263,12 +273,16 @@ Séparation ou mélange des composantes d’une image
 /**
  * split_picture
  * @param [in] p 
- * @assigns: modifie le tas en créant ou bien une copie de l'image en cours, ou bien une nouvelle image (nouvelle allocation 
+ * @requires: p image valide;
+ * @assigns: modifie le tas en créant:
+ *  -1) Un pointeur de type picture* vers la première case d'un tableau de "picture"s de taille 1 ou 3 (selon 
+ *  la valeur de p.chan_num).
+ *  -2) Des tableaux "data" pour les composantes rouge, verte et bleue sous forme d'images en niveaux de gris.
  * dans les deux cas)
  * 
  * @ensures: Plantage si l'un e des préconditions n'est pas respectée; cf. @return pour le comportement normal.
  * 
- * @return image en niveaux de gris, copie de l'image d'entrée ou résultat de la moyenne pondérée des 3 canaux pixel par pixel.
+ * @return pointeur de type picture* 
 */
 picture *split_picture(picture p){
     if(is_empty_picture(p)){
@@ -281,7 +295,7 @@ picture *split_picture(picture p){
         for(int i= 0;i<p.height;i++){
             for(int j=0;j<p.width;j++){
                 byte component = (p.chan_num==GRAY_PIXEL_SIZE?read_component_bw(p,i,j):read_component_rgb(p,i,j,n));
-                write_pixel_bw(arr[n],i,j,component); //ici il n'y a pas de disjonction, on écrit toujours dans une image en niveau de gris.
+                write_pixel_bw(arr[n],i,j,component); //ici il n'y a pas de disjonction, on écrit toujours dans une image en niveaux de gris.
             }
         }
     }
@@ -298,14 +312,27 @@ picture *split_picture(picture p){
             Si l’image résultat ne peut pas être créée (si par exemple les trois images red, green et blue ne sont pas de même taille ou type) on se contentera de renvoyer une image vide.
 
 */
+
+/**
+ * merge_picture
+ * @param [in] p 
+ * @assigns: modifie le tas en créant:
+ *  une picture "res" et donc un pointeur vers un tableau alloué dans le tas via create_picture pour res.data;
+ * 
+ * @ensures: Plantage si les trois images n'ont pas la même dimension, via width=0 ou height=0 et create_picture
+ *  Renvoie la fusion des 3 images utilisées comme canaux sinon.
+ * 
+ * @return image nommée res(type picture)
+*/
 picture merge_picture(picture red, picture green, picture blue){
     int width = red.width * (red.width==green.width&&green.width == blue.width);
-    //printf("width:%d\n",width);
+
     int height = red.height *(red.height==green.height&&green.height==blue.height);
-    //printf("height:%d\n",height);
+    
     enum channel_number chan_num = 3;
 
     picture res = create_picture(width,height,chan_num);
+
     for(int i=0;i<height;i++){
         for(int j=0;j<width;j++){
             byte r = read_component_bw(red,i,j);
@@ -316,7 +343,17 @@ picture merge_picture(picture red, picture green, picture blue){
     }
     return res;
 }
-
+/**
+ * brighten_picture
+ * @param [in] p 
+ * @assigns: modifie le tas en créant:
+ *  une copie via copy_picture, donc un nouvau champ data contenant un pointeur vers un tableau de bytes.
+ *  
+ *
+ * @ensures: Plantage si...
+ * 
+ * @return image nommée res(type picture)
+*/
 picture brighten_picture(picture p, double factor){
     picture res = copy_picture(p);
     for(int k=0;k<(int)res.width*(int)res.height*(int)res.chan_num;k++){
@@ -326,6 +363,17 @@ picture brighten_picture(picture p, double factor){
     }
     return res;
 }
+/**
+ * melt_picture
+ * @param [in] p 
+ * @assigns: modifie le tas en créant:
+ *   
+ *  
+ * 
+ * @ensures: 
+ * 
+ * @return image nommée melted (type picture)
+*/
 
 picture melt_picture(picture p, int number){
     /*Il faut distinguer deux cas: image en niveaux de gris ou couleur.*/
