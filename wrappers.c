@@ -286,8 +286,9 @@ void horizontal_derivative_kernel_wrapper(picture p, char *res_dir, char *name_p
     k.n = 3;
     k.matrix = create_square_matrix(k.n);
     k.offset = 0.0;
-    k.offset = 255.0/2.0;
-    k.factor = 1.0/4.0;
+    k.factor = 1.0;
+    //k.offset = 1.0/2.0;
+    //k.factor = 1.0/4.0;
 
     k.matrix[0][0]=-1.0; k.matrix[0][1] = 0.0; k.matrix[0][2] = 1.0;
     k.matrix[1][0]=-2.0; k.matrix[1][1] = 0.0; k.matrix[1][2] = 2.0;

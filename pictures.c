@@ -1063,7 +1063,7 @@ picture apply_kernel_to_copy_bw(const picture p, const kernel k){
     print_square_matrix(copy,k.n);
 
     if(!is_normalized(copy,k.n)){
-        printf("Kernel not normalized. Renormalizing...\n");
+        printf("Warning: Kernel not normalized. Renormalizing...\n");
         normalize_square_matrix(copy,k.n);
     }
 
@@ -1077,6 +1077,7 @@ picture apply_kernel_to_copy_bw(const picture p, const kernel k){
             //if(convolved<0||convolved>255.0)printf("convolved: %lf",convolved);
             //assert(-EPSILON<convolved);
             //assert(convolved<(double)MAX_BYTE+(double)EPSILON);
+            convolved = min_double(convolved, (double)MAX_BYTE);
             byte value = (byte)convolved;
             write_pixel_bw(res,i,j,value);
         }

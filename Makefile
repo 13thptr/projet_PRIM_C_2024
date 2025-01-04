@@ -28,7 +28,7 @@ CFLAGS += -Wunused-but-set-parameter
 CFLAGS += -Wwrite-strings
 CFLAGS += -Wformat=2
 CFLAGS += -g
-CFLAGS += -fsanitize=address
+#CFLAGS += -fsanitize=address
 
 CC = gcc
 # Define a pattern rule that compiles every .c file into a .o file
@@ -40,7 +40,7 @@ CC = gcc
 #	$(CC) -c $(CFLAGS) $^ -o $@ 
 
 prog: main.o pictures.o safe_malloc.o pixels.o filename.o lut.o wrappers.o picture_rw.o
-	$(CC) $(CFLAGS) -O2 -lm $^ -o $@
+	$(CC) $(CFLAGS) -O2  $^ -o $@ -lm
 
 picture_rw.o : picture_rw.c
 	$(CC) -c $(CFLAGS) $^ -o $@
