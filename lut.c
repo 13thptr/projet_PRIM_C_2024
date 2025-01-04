@@ -12,10 +12,21 @@ struct lut_s{
     byte *array;
 };
 typedef struct lut_s* lut;
-
+/*
+ *
+ * create_lut
+ * @param [in]: n
+ * 
+ * @requires n non nul
+ * @assigns 
+ * @ensures
+ * 
+ * @returns
+ * 
+*/
 lut create_lut(unsigned int n){
     assert(n>0);
-    lut res = malloc(sizeof(struct lut_s));
+    lut res = myalloc(sizeof(struct lut_s));
 
     res->n = n;
     res->array = myalloc(n*sizeof(byte));//sizeof(byte)==1 mais on évite l'utilisation de constantes non nommées.
