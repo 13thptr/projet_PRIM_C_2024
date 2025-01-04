@@ -77,6 +77,7 @@ int main(int argc, char* argv[]){
         /*Certains traitements ne doivent être faits que pour des images en niveaux de gris, d'autres pour des images en couleur.*/
         if(is_gray_picture(current_pic)){
             convert_color_wrapper(current_pic,output_dir,name,ppm_ext);
+            gaussian_blur_wrapper(current_pic,5,10.0,output_dir,name,pgm_ext);
         }
         if(is_color_picture(current_pic)){
             convert_gray_wrapper(current_pic,output_dir,name,pgm_ext);

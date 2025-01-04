@@ -102,7 +102,7 @@ typedef struct kernel_s{
 
 double **create_square_matrix(int n);
 void delete_square_matrix(double **matrix, int n);
-void insert_square_matrix(double **matrix, int n, int i,int j, double coefficient);
+void set_square_matrix(double **matrix, int n, int i,int j, double coefficient);
 double **copy_square_matrix(double **matrix, int n);
 void print_square_matrix(double **matrix, int n);
 

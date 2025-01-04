@@ -40,4 +40,12 @@ void mult_picture_wrapper(picture p1, picture p2, char *res_dir, char *name_p, c
 /*Mélange/Mixture*/
 void mix_picture_wrapper(picture p1,picture p2, picture p3, char *res_dir, char *name_p, char *res_ext);
 
+
+/*--------------------------------------------------------------BONUS-------------------------------------------*/
+/*Eclaircissement via LUT*/
 void brighten_lut_wrapper(picture p, char *res_dir, char *name_p, char *res_ext, const double BRIGHTENING_FACTOR);
+
+/*------------------------------------------MANIPULATION DE NOYAUX-------------------------------*/
+void kernel_wrapper(picture p, kernel k,char *res_dir, char *name_p, char *res_ext);
+
+void gaussian_blur_wrapper(picture p,int matrix_size, double std_dev,char *res_dir, char *name_p, char *res_ext);

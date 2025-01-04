@@ -1,5 +1,6 @@
 #include <stdlib.h>
 //#include <string.h>
+#include <math.h> /*Pour la gaussienne de gaussian_blur_wrapper*/
 
 #include "wrappers.h"
 #include "filename.h"
@@ -214,6 +215,8 @@ void mix_picture_wrapper(picture p1,picture p2, picture p3, char *res_dir, char 
     clean_picture(&mixture);
     free(mixture_path);
 }
+
+/*----------------------------------------------------BONUS------------------------------------------------------*/
 void brighten_lut_wrapper(picture p, char *res_dir, char *name_p, char *res_ext, const double BRIGHTENING_FACTOR){
     picture brightened_lut = brighten_picture_lut(p,BRIGHTENING_FACTOR);
     char brighten_lut_op[30] = "brighten_lut";
@@ -221,4 +224,45 @@ void brighten_lut_wrapper(picture p, char *res_dir, char *name_p, char *res_ext,
     write_picture(brightened_lut,brighten_lut_path);
     clean_picture(&brightened_lut);
     free(brighten_lut_path);
+}
+
+void kernel_wrapper(picture p, kernel k,char *res_dir, char *name_p, char *res_ext){
+    picture kernelized = apply_kernel_to_copy(p,k);
+
+    char kernelized_op[30] = "kernelized";
+    char *kernelized_path = concat_parts(res_dir,name_p,kernelized_op,res_ext);
+    write_picture(kernelized,kernelized_path);
+    clean_picture(&kernelized);
+    free(kernelized_path);
+}
+
+
+
+void gaussian_blur_wrapper(picture p,int matrix_size, double std_dev,char *res_dir, char *name_p, char *res_ext){
+    /*On crée d'abord le noyau.*/
+    const double GAUSSIAN_HALVER = 2.0; /*Ne pas toucher*/
+    kernel k;
+    k.n = matrix_size;
+    k.matrix = create_square_matrix(k.n);
+    k.offset = 0.0;
+    int u0 = k.n/2;
+    int v0 = u0;
+    double sum = 0; /*Somme des coefficients*/
+    for(int u=0;u<(int)k.n;++u){
+        for(int v=0;v<(int)k.n;++v){
+            double sq_u = (u-u0)*(u-u0);
+            double sq_v = (v-v0)*(v-v0);
+            double sq_sigma = std_dev*std_dev;
+            double value = exp(-(sq_u+sq_v)/GAUSSIAN_HALVER/sq_sigma);
+            sum += value;
+            set_square_matrix(k.matrix,k.n,u,v,value);
+        }
+    }
+    printf("Gaussian kernel:initialized:\n");
+    print_square_matrix(k.matrix,k.n);
+    k.factor = 1/sum;
+    /*On appelle maintenant kernel_wrapper */
+    kernel_wrapper(p,k,res_dir,name_p,res_ext);
+
+    delete_square_matrix(k.matrix,k.n);
 }

@@ -981,16 +981,21 @@ void delete_square_matrix(double **matrix, int n){
     }
     free(matrix);
 }
-void insert_square_matrix(double **matrix, int n, int i,int j, double coefficient){
+void set_square_matrix(double **matrix, int n, int i,int j, double coefficient){
     assert(0<=i&&i<n);
     assert(0<=j&&j<n);
     matrix[i][j] = coefficient;
 }
 double **copy_square_matrix(double **matrix, int n){
+    /*printf("Matrix to be copied:\n");
+    print_square_matrix(matrix,n);
+    */
     double **res = create_square_matrix(n);
-    for(int i=0;i<n;++i){
-        for(int j=0;i<n;++j){
-            insert_square_matrix(res,n,i,j,matrix[i][j]);
+    printf("res initialisé\n");
+    for(int i=0;i<n;i++){
+        for(int j=0;j<n;j++){
+            //printf("matrix[%d][%d]:%lf ;",i,j,matrix[i][j]);
+            res[i][j] = matrix[i][j];
         }
     }
     return res;
@@ -1032,16 +1037,20 @@ double get_convolved_value(double **matrix, int n, picture p, int i, int j){
 /*On fait d'abord marcher la fonction pour des images en niveaux de gris.*/
 picture apply_kernel_to_copy(const picture p, const kernel k){
     picture res = copy_picture(p);
+    /*printf("Checking k.matrix...\n");
+    print_square_matrix(k.matrix,k.n); OK
+    */
     double **copy = copy_square_matrix(k.matrix,k.n);
 
     apply_matrix_affine_transformation(copy,k.n,k.factor,k.offset);
 
     assert(!is_empty_picture(p));//pas sûr de ça.
-    assert(is_gray_picture(p));
+    assert(is_gray_picture(p));//à enlever
 
     for(int i=0;i<p.height;++i){
         for(int j=0;j<p.width;++j){
             double convolved = get_convolved_value(copy,k.n,p,i,j);
+            //printf("convolved:%lf\n",convolved);
             assert(0<convolved&&convolved<(double)MAX_BYTE);
             byte value = (byte)convolved;
             write_pixel_bw(res,i,j,value);
