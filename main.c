@@ -14,8 +14,11 @@
 #include "safe_malloc.h"
 
 
-#define LARGER_FACTOR (1.36)
-#define BRIGHTENING_FACTOR (1.5)
+#define LARGER_FACTOR (1.36) /*resampling functions*/
+#define BRIGHTENING_FACTOR (1.5)/*brightening functions*/
+#define STANDARD_DEVIATION (10.0)
+#define KERNEL_SIZE (8) 
+
 
 /*
 * @param [in]: argc
@@ -118,7 +121,7 @@ int main(int argc, char* argv[]){
 
 
         /*Bonus: flou gaussien*/
-        gaussian_blur_wrapper(current_pic,5,10.0,output_dir,name,pgm_ext);
+        gaussian_blur_wrapper(current_pic,KERNEL_SIZE,STANDARD_DEVIATION,output_dir,name,pgm_ext);
 
 
 

@@ -239,8 +239,10 @@ void kernel_wrapper(picture p, kernel k,char *res_dir, char *name_p, char *res_e
 
 
 void gaussian_blur_wrapper(picture p,int matrix_size, double std_dev,char *res_dir, char *name_p, char *res_ext){
-    /*On crée d'abord le noyau.*/
+    
     const double GAUSSIAN_HALVER = 2.0; /*Ne pas toucher*/
+
+    /*----------------On crée d'abord le noyau.--------------------*/
     kernel k;
     k.n = matrix_size;
     k.matrix = create_square_matrix(k.n);
@@ -253,6 +255,8 @@ void gaussian_blur_wrapper(picture p,int matrix_size, double std_dev,char *res_d
             double sq_u = (u-u0)*(u-u0);
             double sq_v = (v-v0)*(v-v0);
             double sq_sigma = std_dev*std_dev;
+            /*Plus ou fois ? sq_u+sq_v est choisi conformément à la formule de l'article Wikipédia, je suppose que
+            le document contenait une typo.*/
             double value = exp(-(sq_u+sq_v)/GAUSSIAN_HALVER/sq_sigma);
             sum += value;
             set_square_matrix(k.matrix,k.n,u,v,value);
@@ -260,9 +264,18 @@ void gaussian_blur_wrapper(picture p,int matrix_size, double std_dev,char *res_d
     }
     printf("Gaussian kernel:initialized:\n");
     print_square_matrix(k.matrix,k.n);
-    k.factor = 1/sum;
+    k.factor = 1.0/sum;
     /*On appelle maintenant kernel_wrapper */
-    kernel_wrapper(p,k,res_dir,name_p,res_ext);
+    //kernel_wrapper(p,k,res_dir,name_p,res_ext);
+
+    picture blurred = apply_kernel_to_copy(p,k);
+    char blurred_op[30] = "blurred";
+    char *blurred_path = concat_parts(res_dir,name_p,blurred_op,res_ext);
+    write_picture(blurred,blurred_path);
+
+
+    clean_picture(&blurred);
+    free(blurred_path);
 
     delete_square_matrix(k.matrix,k.n);
 }
