@@ -554,7 +554,7 @@ picture distance_picture(picture p1, picture p2){
     assert(same_dimensions(p1,p2));
     picture res = create_picture(p1.width,p2.height,p1.chan_num);
     for(int k=0;k<(int)res.chan_num*res.width*res.height;k++){
-        signed int diff = p1.data[k]-p2.data[k]; //même problème que d'habitude avec le type (byte)
+        signed int diff = (signed int)p1.data[k]-(signed int)p2.data[k]; //même problème que d'habitude avec le type (byte)
         diff = diff>0 ?diff:-diff; //même effet que diff = abs(diff) sans la fonction abs.
         res.data[k] = (byte)diff;
     }
