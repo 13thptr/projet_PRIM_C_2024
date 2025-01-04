@@ -508,16 +508,14 @@ picture normalize_dynamic_picture(picture p){
     return res;
 }
 /**
+ * set_levels_picture
+ * @param [in] p, nb_levels
  * 
- * @param [in] p 
+ * @requires: p picture valide
+ * @assigns: modification du tas par copy_picture créant une nouvelle image qui sera renvoyée (res)
+ * @ensures: plantage par copy_picture, create_lut ou apply_lut via assert en cas de non-respect d'une précondition, sinon cf. @return
  * 
- * @requires:
- * @assigns: 
- *   
- * 
- * @ensures: 
- * 
- * @return 
+ * @return res image ne contenant que nb_levels niveaux de couleur
 */
 picture set_levels_picture(picture p, byte nb_levels){
     picture res = copy_picture(p);
@@ -536,9 +534,9 @@ picture set_levels_picture(picture p, byte nb_levels){
 }
 /**
  * 
- * @param [in] p 
+ * @param [in] p1, @param[in] p2
  * 
- * @requires:
+ * @requires:p1,p2 images valides de type picture, de même tailles
  * @assigns: 
  *   
  * 
@@ -553,9 +551,7 @@ picture distance_picture(picture p1, picture p2){
         return p1;
     }
     /*On vérifie que les tailles et les types (couleur ou niveaux de gris) sont les mêmes*/
-    assert(p1.width==p2.width);
-    assert(p1.height==p2.height);
-    assert(p1.chan_num==p2.chan_num);
+    assert(same_dimensions(p1,p2));
     picture res = create_picture(p1.width,p2.height,p1.chan_num);
     for(int k=0;k<(int)res.chan_num*res.width*res.height;k++){
         signed int diff = p1.data[k]-p2.data[k]; //même problème que d'habitude avec le type (byte)
@@ -796,6 +792,7 @@ picture resample_picture_nearest(picture image, unsigned int width, unsigned int
 /*On gère d'abord le cas des images en niveaux de gris. En cas d'image couleur, on la sépare en composantes avec split_picture
 et on interpole les composantes séparément, puis on renvoie la fusion des résultats.
 */
+
 /**
  * 
  * @param [in] p 
