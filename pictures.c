@@ -763,8 +763,8 @@ picture mix_picture(picture p1, picture p2, picture p3){
     Fonction utilitaire: utilisée deux fois
     Modifie par référence les ratios de redimensionnement horizontal et vertical
     Affiche un avertissement lorsque l'on déforme l'image.
-*/
-/*
+
+ * check_resamplable
  * @param: image, width, height, rx, ry
  * @requires: image structure valide de type picture.
  * @requires: width not 0
@@ -788,7 +788,7 @@ void check_resamplable(picture image, unsigned int width, unsigned int height,do
     }
 }
 /**
- * 
+ * resample_picture_nearest
  * @param [in] image
  * @param [in] width
  * @param [in] height
@@ -839,7 +839,7 @@ et on interpole les composantes séparément, puis on renvoie la fusion des rés
 */
 
 /**
- * 
+ * resample_picture_bilinear
  * @param [in] image 
  * @param [in] width
  * @param [in] height
@@ -921,15 +921,15 @@ picture resample_picture_bilinear(picture image, unsigned int width, unsigned in
     return res;
 }
 /**
- * 
+ * brighten_picture_lut
  * @param [in] p 
  * @param [in] factor
  * 
- * @requires:
- * @assigns: 
- *   
- * 
- * @ensures: 
+ * @requires:p image valide, factor >=0 (peut être nul, mais c'est un double...).
+ * @assigns: tas modifié par la création d'une copie qui sera renvoyée (res)
+ *  
+ * @ensures: res contient une image similaire à p, mais dont la "luminosité" a été changée (augmentée ou diminuée selon le facteur)
+ * par application d'une LUT.
  * 
  * @return 
 */
