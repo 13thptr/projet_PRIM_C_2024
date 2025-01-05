@@ -1,5 +1,4 @@
 #include <stdlib.h>
-//#include <string.h>
 #include <math.h> /*Pour la gaussienne de gaussian_blur_wrapper*/
 
 #include "wrappers.h"
@@ -282,7 +281,7 @@ void gaussian_blur_wrapper(picture p,int matrix_size, double std_dev,char *res_d
 /*Une recherche internet sur la dérivée d'une image m'a permis de découvrir la notion de filtre de sobel.*/
 void sobel_filter_wrapper(picture p, char *res_dir, char *name_p, char *res_ext){
 
-    const double THRESHOLD = 200.0;
+    const double THRESHOLD = 195.0; /*Valeur empirique*/
     /*----------------On crée d'abord le noyau pour le filtrage horizontal--------------------*/
     kernel k;
     k.n = 3;

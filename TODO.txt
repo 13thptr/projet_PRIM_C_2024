@@ -1,7 +1,5 @@
 Reste à faire sur le projet C:
 
-- 2 bis: Faire le bonus. + commit
-
 - 3 ter: Créer ma propre image de test pour invalid_max puisque M. Burel a mis deux fois la même image "invalid_height.ppm"
 
 - 3 quater: faire en sorte de prendre en compte la valeur maximale des pixels (cf. énoncé)
@@ -11,8 +9,6 @@ Reste à faire sur le projet C:
 - 8: fusionner wrappers.h|c et safe_malloc.h|c ?
 
 - 9: uniformiser mes conventions de code, les espaces, etc. "Prettifier" dans CLion ou avec une extension ? Un logiciel ?
-
-- Tester avec Valgrind. (désactiver fsanitize=address pour ce faire)
 
 - Modifier le makefile pour utiliser une cible "all" tel que prescrit dans le cours.
 
