@@ -403,7 +403,7 @@ picture melt_picture(picture p, int number){
             int i = rand()%(p.height);
             int j = rand()%(p.width);
             //Le pixel du dessus existe-t-il ?i>0
-            byte valeur_courante = read_component_bw(melted,i,j);//(on n'écrira pas valeur_actuelle)
+            byte valeur_courante = read_component_bw(melted,i,j);
             if(i>0&&read_component_bw(melted,i-1,j)<valeur_courante){
                 write_pixel_bw(melted,i,j,read_component_bw(melted,i-1,j));
             }
@@ -1007,7 +1007,7 @@ void print_square_matrix(double **matrix, int n){
     }
     printf("\n");
 }
-
+/*Cette fonction n'a pas lieu d'être, j'avais juste mal compris / lu trop vite la notation pour les noyaux.*/
 void apply_matrix_affine_transformation(double **matrix, int n, double factor, double offset){
     for(int i=0;i<n;++i){
         for(int j=0;j<n;++j){
@@ -1058,22 +1058,20 @@ picture apply_kernel_to_copy_bw(const picture p, const kernel k){
 
     double **copy = copy_square_matrix(k.matrix,k.n);
 
-    apply_matrix_affine_transformation(copy,k.n,k.factor,k.offset);
+    //apply_matrix_affine_transformation(copy,k.n,k.factor,k.offset);
 
     print_square_matrix(copy,k.n);
 
-    if(!is_normalized(copy,k.n)){
+    /*if(!is_normalized(copy,k.n)){
         printf("Warning: Kernel not normalized. Renormalizing...\n");
         normalize_square_matrix(copy,k.n);
     }
-
-
-    assert(!is_empty_picture(p));//pas sûr de ça.
- 
+    */
 
     for(int i=0;i<p.height;++i){
         for(int j=0;j<p.width;++j){
             double convolved = get_convolved_value(copy,k.n,p,i,j);
+            convolved = k.factor*convolved+k.offset;
             //if(convolved<0||convolved>255.0)printf("convolved: %lf",convolved);
             //assert(-EPSILON<convolved);
             //assert(convolved<(double)MAX_BYTE+(double)EPSILON);
