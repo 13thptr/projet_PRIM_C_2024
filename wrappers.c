@@ -279,16 +279,16 @@ void gaussian_blur_wrapper(picture p,int matrix_size, double std_dev,char *res_d
 
     delete_square_matrix(k.matrix,k.n);
 }
-void horizontal_derivative_kernel_wrapper(picture p, char *res_dir, char *name_p, char *res_ext){
+/*Une recherche internet sur la dérivée d'une image m'a permis de découvrir la notion de filtre de sobel.*/
+void sobel_filter_wrapper(picture p, char *res_dir, char *name_p, char *res_ext){
 
-    /*----------------On crée d'abord le noyau.--------------------*/
+    const double THRESHOLD = 200.0;
+    /*----------------On crée d'abord le noyau pour le filtrage horizontal--------------------*/
     kernel k;
     k.n = 3;
     k.matrix = create_square_matrix(k.n);
     k.offset = 255/2;
     k.factor = 0.25;
-    //k.offset = 1.0/2.0;
-    //k.factor = 1.0/4.0;
 
     k.matrix[0][0]=-1.0; k.matrix[0][1] = 0.0; k.matrix[0][2] = 1.0;
     k.matrix[1][0]=-2.0; k.matrix[1][1] = 0.0; k.matrix[1][2] = 2.0;
@@ -296,15 +296,49 @@ void horizontal_derivative_kernel_wrapper(picture p, char *res_dir, char *name_p
     
     print_square_matrix(k.matrix,k.n);
 
-    picture horiz = apply_kernel_to_copy(p,k);
+    picture horizontal = apply_kernel_to_copy(p,k);
 
-    char derivative_op[30] = "derivative";
-    char *horiz_path = concat_parts(res_dir,name_p,derivative_op,res_ext);
-    write_picture(horiz,horiz_path);
+    char left_derivative_op[30] = "left_derivative";
+
+    char *horiz_path = concat_parts(res_dir,name_p,left_derivative_op,res_ext);
+    write_picture(horizontal,horiz_path);
 
 
-    clean_picture(&horiz);
+    /*----------------Ensuite, filtrage vertical--------------------*/
+    /*On aurait aussi pu réutiliser la fonction transposée écrite dans un TP précédent*/
+    k.matrix[0][0]=-1.0; k.matrix[0][1] = -2.0; k.matrix[0][2] = -1.0;
+    k.matrix[1][0]= 0.0; k.matrix[1][1] = 0.0; k.matrix[1][2] = 0.0;
+    k.matrix[2][0]= 1.0; k.matrix[2][1] = 2.0; k.matrix[2][2] = 1.0;
+
+
+    picture vertical = apply_kernel_to_copy(p,k);
+
+    picture sobel = copy_picture(p);
+
+    for(int s=0;s<(int)p.chan_num*p.width*p.height;++s){
+        double value = min_double(255.0,sqrt(pow((double)horizontal.data[s],2.0)+pow((double)vertical.data[s],2.0)));
+        if(value>THRESHOLD){
+            sobel.data[s] = (byte)value;
+        }
+        else{
+            sobel.data[s] = 0;
+        }
+    }
+
+
+
+
+    char sobel_op[30] = "sobel";
+    char *sobel_path = concat_parts(res_dir,name_p,sobel_op,res_ext);
+    write_picture(sobel,sobel_path);
+
+    
+    clean_picture(&horizontal);
+    clean_picture(&vertical);
+    clean_picture(&sobel);
     free(horiz_path);
+    free(sobel_path);
+
 
     delete_square_matrix(k.matrix,k.n);
 }

@@ -1058,23 +1058,12 @@ picture apply_kernel_to_copy_bw(const picture p, const kernel k){
 
     double **copy = copy_square_matrix(k.matrix,k.n);
 
-    //apply_matrix_affine_transformation(copy,k.n,k.factor,k.offset);
-
-    print_square_matrix(copy,k.n);
-
-    /*if(!is_normalized(copy,k.n)){
-        printf("Warning: Kernel not normalized. Renormalizing...\n");
-        normalize_square_matrix(copy,k.n);
-    }
-    */
+    //print_square_matrix(copy,k.n);
 
     for(int i=0;i<p.height;++i){
         for(int j=0;j<p.width;++j){
             double convolved = get_convolved_value(copy,k.n,p,i,j);
             convolved = k.factor*convolved+k.offset;
-            //if(convolved<0||convolved>255.0)printf("convolved: %lf",convolved);
-            //assert(-EPSILON<convolved);
-            //assert(convolved<(double)MAX_BYTE+(double)EPSILON);
             convolved = min_double(convolved, (double)MAX_BYTE);
             byte value = (byte)convolved;
             write_pixel_bw(res,i,j,value);
@@ -1106,6 +1095,7 @@ picture apply_kernel_to_copy(const picture p, const kernel k){
     free(split);
     return res;
 }
+
 
 /*
     Définir une fonction d'ordre supérieur qui applique une fonction prenant des images en noir et blanc 

@@ -123,7 +123,7 @@ int main(int argc, char* argv[]){
         /*Bonus: flou gaussien*/
         gaussian_blur_wrapper(current_pic,KERNEL_SIZE,STANDARD_DEVIATION,output_dir,name,pgm_ext);
         /*Dérivée horizontale*/
-        horizontal_derivative_kernel_wrapper(current_pic,output_dir,name,pgm_ext);
+        sobel_filter_wrapper(current_pic,output_dir,name,pgm_ext);
 
 
         /*Free and reset memory*/
