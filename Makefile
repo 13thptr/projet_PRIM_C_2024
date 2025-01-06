@@ -68,5 +68,6 @@ main.o : main.c
 
 
 clean:
+	rm prog
 	rm -rf *.o
 	rm -rf Lenna_output/*
