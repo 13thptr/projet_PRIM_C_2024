@@ -87,8 +87,9 @@ int main(int argc, char* argv[]){
 
     /*----------------------------------------------Boucle principale-------------------------------------------------------------------*/
 
-    for(int i = 1;i <= min_int(NB_FILES,2);++i){
-        printf(" Début de boucle, indice:%d\n",i);
+    //for(int i = 1;i <= min_int(NB_FILES,2);++i){ //Permet d'éviter les traitements inutiles sur Lenna_BW.
+    for(int i = 1;i <= NB_FILES;++i){
+        //printf(" Début de boucle, indice:%d\n",i);
         dir = dir_from_path(argv[i]);
         name = name_from_path(argv[i]);
         ext = ext_from_path(argv[i]);
@@ -157,12 +158,9 @@ int main(int argc, char* argv[]){
 
         /*Dérivée horizontale*/
         sobel_filter_wrapper(current_pic,output_dir,name,pgm_ext);
-
-        printf("checkpoint\n");
         /*Free and reset memory*/
         
         clean_picture(&current_pic);
-        printf("checkpoint\n");
         if(THIRD_IMAGE_FLAG){
             clean_picture(&save);
         }
@@ -182,6 +180,10 @@ int main(int argc, char* argv[]){
     //clean_picture(&current_pic);
 
     if(THIRD_IMAGE_FLAG){
+        /*
+            Pas de risque de double free: l'image correspondant à mask a peut-être déjà été utilisée et libérée
+            dans le corps de boucle, mais mask elle-même a été initialisée séparément.
+        */
         clean_picture(&mask);
     }
 

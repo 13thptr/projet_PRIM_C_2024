@@ -261,8 +261,8 @@ void gaussian_blur_wrapper(picture p,int matrix_size, double std_dev,char *res_d
             set_square_matrix(k.matrix,k.n,u,v,value);
         }
     }
-    printf("Gaussian kernel:initialized:\n");
-    print_square_matrix(k.matrix,k.n);
+    //printf("Gaussian kernel:initialized:\n");
+    //print_square_matrix(k.matrix,k.n);
     k.factor = 1.0/sum;
     /*On appelle maintenant kernel_wrapper */
     //kernel_wrapper(p,k,res_dir,name_p,res_ext);
@@ -293,7 +293,7 @@ void sobel_filter_wrapper(picture p, char *res_dir, char *name_p, char *res_ext)
     k.matrix[1][0]=-2.0; k.matrix[1][1] = 0.0; k.matrix[1][2] = 2.0;
     k.matrix[2][0]= -1.0; k.matrix[2][1] = 0.0; k.matrix[2][2] = 1.0;
     
-    print_square_matrix(k.matrix,k.n);
+    //print_square_matrix(k.matrix,k.n);
 
     picture horizontal = apply_kernel_to_copy(p,k);
 
