@@ -7,19 +7,11 @@
 
 #include "safe_malloc.h"
 #include "picture_rw.h"
+
 /*
-    Fonction read_picture
-    @param: filename chemin vers un fichier
-    @requires: filename chemin valide vers un fichier .pgm ou .ppm valide
-    @assigns: rien
-    @return: une structure de type "picture"
-
-    TODO: replace strcmp with strncmp ? + Increase general safety 
+    Note: Le code pour les fonctions read_picture et write_picture était initialement inspiré de celui du cours. 
+    Je l'ai modifié au fur et à mesure pour inclure plus de vérifications et prendre en charge les commentaires.
 */
-
-/*Le code pour cette fonction était initialement inspiré de celui du cours. 
-Je l'ai modifié au fur et à mesure pour inclure plus de 
-vérifications et prendre en charge les commentaires.*/
 #define NB_ITEMS_2_DIMENSIONS (2) 
 #define NB_ITEM_1_MAX_VAL (1)
 #define ITEM_SIZE (1) /*Nombre d'octets par item lu */
@@ -29,7 +21,7 @@ void reset_picture_to_zero(picture *p){
     p->height = 0;
     p->chan_num = 0;
 }
-/*Renvoie faux en cas d'échec de lecture, vrai sinon.*/
+/*Renvoie faux en cas d'échec de lecture, vrai sinon. Cf. picture_rw.h pour plus de détails*/
 bool fgets_encapsulator(char *buf, FILE *f, int line_counter){
     char *fgets_return_value = fgets(buf,BUFFER_SIZE, f);
     if(fgets_return_value == NULL){
@@ -39,7 +31,7 @@ bool fgets_encapsulator(char *buf, FILE *f, int line_counter){
     }
     return true;
 }   
-
+/*cf picture_rw.h*/
 bool read_correctly_block(bool *read_correctly, char *buffer, FILE *to_be_read, picture *res, int *lc_p){
     /*On pourrait probablement utiliser une boucle "do while" ici.*/
     bool first_pass = true;
@@ -57,7 +49,7 @@ bool read_correctly_block(bool *read_correctly, char *buffer, FILE *to_be_read, 
             return false;
         }
         *lc_p = 1 + *lc_p;
-        if(buffer[0]=='#'){
+        if(buffer[0] == '#'){
             printf("Comment on line %d.\n",*lc_p);
         }
     }
@@ -71,6 +63,13 @@ bool read_correctly_block(bool *read_correctly, char *buffer, FILE *to_be_read, 
     true_line_counter compte le nombre de lignes total (avec les commentaires, donc.)
 */
 
+/*
+    Fonction read_picture
+    @param: filename chemin vers un fichier
+    @requires: filename chemin valide vers un fichier .pgm ou .ppm valide
+    @assigns: rien
+    @return: une structure de type "picture"
+*/
 picture read_picture(const char *filename){
     FILE *to_be_read = NULL;
     int max_val;/*Pourrait être un type byte si l'entrée était GARANTIE entre 0 et 255 mais on ne sait jamais...*/
