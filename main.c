@@ -57,7 +57,7 @@ int main(int argc, char* argv[]){
     bool THIRD_IMAGE_FLAG = false;
     /*Chargement de la troisième image (optionnel)*/
 
-    if(argc == 4){
+    if(argc >= 4){
         printf("Reading mask...\n");
         mask = read_picture(argv[3]);
         THIRD_IMAGE_FLAG = true;
@@ -82,13 +82,20 @@ int main(int argc, char* argv[]){
 
         /*Certains traitements ne doivent être faits que pour des images en niveaux de gris, d'autres pour des images en couleur.*/
         if(is_gray_picture(current_pic)){
+            /*L'extension est bien ppm car on CONVERTIT le fichier en niveaux 
+            de gris vers un fichier en couleur*/
+            
             convert_color_wrapper(current_pic,output_dir,name,ppm_ext);
+            /*Ici, c'est bien un pgm.*/
+            normalize_picture_wrapper(current_pic,output_dir,name,pgm_ext);
             
         }
         if(is_color_picture(current_pic)){
+            /*Les deux sont bien des pgm (conversion/canaux différents)*/
             convert_gray_wrapper(current_pic,output_dir,name,pgm_ext);
             split_picture_wrapper(current_pic,output_dir,name,pgm_ext);
-            normalize_color_picture_wrapper(current_pic,output_dir,name,ext);
+            /*Bien un ppm*/
+            normalize_color_picture_wrapper(current_pic,output_dir,name,ppm_ext);
         }
 
         /*Opérations ne dépendant pas du type d'image: brighten, melt,inverse, set_levels...*/
@@ -144,8 +151,8 @@ int main(int argc, char* argv[]){
         ext = NULL;
     }
     /*On traite à part la normalisation du fichier Lenna_gray pour éviter que Lenna_BW soit traité.*/
-    current_pic = read_picture("Lenna_input/Lenna_gray.pgm");
-    normalize_picture_wrapper(current_pic,"Lenna_output","Lenna_gray",pgm_ext);
+    //current_pic = read_picture("Lenna_input/Lenna_gray.pgm");
+    //normalize_picture_wrapper(current_pic,output_dir,"Lenna_gray",pgm_ext);
 
     clean_picture(&current_pic);
 

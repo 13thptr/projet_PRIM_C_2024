@@ -416,7 +416,7 @@ picture inverse_picture(picture p){
 /**
  * normalize_dynamic_picture
  * @param [in] p 
- * @requires: p image valide
+ * @requires: p image valide 
  * @assigns: copie en mémoire de p effectuée avant modificaiton par lut. lut stockée temporairement dans le tas le temps 
  * d'effectuer le traitement.
  * @ensures: plantage si les préconditions de copy_picture ne sont pas respectées, sinon res est renvoyée et contient les données

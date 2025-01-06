@@ -114,6 +114,8 @@ byte read_component_bw(picture p, int i, int j){
     assert(0<=j&&j<p.width);
     return p.data[i*p.width+j];
 }
+
+/*-FONCTIONS NON UTILISEES*/
 /**
  * Lecture du pixel/triplet de la "case" i,j du champ "data" de p. Assignation aux pointeurs red,green,blue de type byte*.
  * @param [in] p la structure "picture" à lire.
