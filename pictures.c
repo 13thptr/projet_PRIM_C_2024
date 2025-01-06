@@ -27,7 +27,7 @@ TODO :
  * @assigns: rien
  * @ensures: cf. return
  * @return: min(n1,n2)
- */
+ **/
 int min_int(int n1, int n2){
     return n1<n2?n1:n2;
 }
@@ -39,7 +39,7 @@ int min_int(int n1, int n2){
  * @assigns: rien
  * @ensures: cf. return
  * @return: max(n1,n2)
- */
+ **/
 int max_int(int n1, int n2){
     return n1>n2?n1:n2;
 }
@@ -51,7 +51,7 @@ int max_int(int n1, int n2){
  * @assigns: rien
  * @ensures: cf. return
  * @return: min(d1,d2)
- */
+ **/
 double min_double(double d1, double d2){
     return d1<d2?d1:d2;
 }
@@ -62,7 +62,7 @@ double min_double(double d1, double d2){
  * @assigns: rien
  * @ensures: cf. return
  * @return: |x|
- */
+ **/
 double abs_double(double x){
     return x>0?x:-x;
 }
@@ -145,12 +145,9 @@ picture copy_picture(picture p){
 /**
  * is_empty_picture
  * @param [in] p 
- * 
  * @requires: rien
  * @assigns: rien
- * 
  * @ensures: cf. return
- * 
  * @return booléen: vrai si aucune des valeurs ne vaut 0, faux sinon.
 */
 bool is_empty_picture(picture p){
@@ -159,14 +156,11 @@ bool is_empty_picture(picture p){
 /**
  * is_gray_picture
  * @param [in] p 
- * 
  * @requires: rien
  * @assigns: rien
- * 
  * @ensures: cf. return
- * 
  * @return booléen: vrai si l'image est en niveaux de gris, faux sinon
-*/
+**/
 bool is_gray_picture(picture p){
     return p.chan_num == GRAY_PIXEL_SIZE;
 }
@@ -174,11 +168,9 @@ bool is_gray_picture(picture p){
  * is_color_picture
  * @param [in] p 
  * @assigns: rien
- * 
  * @ensures: cf. return
- * 
  * @return booléen: vrai si l'image est en couleurs, faux sinon
-*/
+**/
 bool is_color_picture(picture p){
     return p.chan_num == RGB_PIXEL_SIZE;
 }
@@ -186,11 +178,9 @@ bool is_color_picture(picture p){
  * info_picture
  * @param [in] p 
  * @assigns: rien
- * 
  * @ensures: rien
- * 
  * @return rien
-*/
+**/
 void info_picture(picture p){
     printf("%d x% d x %d\n",p.width,p.height,p.chan_num);
 }
@@ -199,11 +189,9 @@ void info_picture(picture p){
  * @param [in] p1
  * @param [in] p2 
  * @assigns: rien
- * 
  * @ensures: rien
- * 
  * @return vrai ssi les deux images ont les mêmes dimensions
-*/
+**/
 bool same_dimensions(picture p1, picture p2){
     return p1.chan_num==p2.chan_num&&p1.width==p2.width&&p1.height==p2.height;
 }
@@ -216,11 +204,9 @@ bool same_dimensions(picture p1, picture p2){
  * @requires: p image valide, non vide.
  * @assigns: modifie le tas en créant ou bien une copie de l'image en cours, ou bien une nouvelle image (nouvelle allocation 
  * dans les deux cas)
- * 
- * @ensures: Plantage si l'un e des préconditions n'est pas respectée; cf. @return pour le comportement normal.
- * 
+ * @ensures: Plantage si l'un e des préconditions n'est pas respectée; cf. @return pour le comportement normal. 
  * @return image en couleur, copie de l'image d'entrée ou résultat de la duplication des canaux.
-*/
+**/
 picture convert_to_color_picture(picture p){
     assert(!is_empty_picture(p));
 
@@ -244,11 +230,9 @@ picture convert_to_color_picture(picture p){
  * @requires: p image valide, non vide.
  * @assigns: modifie le tas en créant ou bien une copie de l'image en cours, ou bien une nouvelle image (nouvelle allocation 
  * dans les deux cas)
- * 
  * @ensures: Plantage si l'un e des préconditions n'est pas respectée; cf. @return pour le comportement normal.
- * 
  * @return image en niveaux de gris, copie de l'image d'entrée ou résultat de la moyenne pondérée des 3 canaux pixel par pixel.
-*/
+**/
 picture convert_to_gray_picture(picture p){
     assert(!is_empty_picture(p));
 
@@ -270,17 +254,6 @@ picture convert_to_gray_picture(picture p){
     }
     return res;
 }
-/*
-Séparation ou mélange des composantes d’une image
-
-    Séparer les composantes d’une image couleur en 3 images en niveau de gris contenant les valeurs pour le rouge, le vert et le bleu respectivement : 
-    picture * split_picture(picture p);
-        [in] p l’image couleur dont on veut séparer les composantes
-        [out] un tableau de 3 images en niveau de gris contenant les valeurs des canaux R, V et B.
-            Si p ne peut pas être décomposée on se contentera de renvoyer NULL.
-            Si p est une image en niveaux de gris on renverra un tableau ne contenant qu’un seul élément.
-
-*/
 
 /**
  * split_picture
@@ -295,7 +268,7 @@ Séparation ou mélange des composantes d’une image
  * @ensures: Plantage si l'un e des préconditions n'est pas respectée; cf. @return pour le comportement normal.
  * 
  * @return pointeur de type picture* 
-*/
+**/
 picture *split_picture(picture p){
     if(is_empty_picture(p)){
         return NULL;
@@ -313,40 +286,25 @@ picture *split_picture(picture p){
     }
     return arr;
 }
-
-/*
-    Mélanger les composantes à partir de 3 images en niveau de gris pour composer une image couleurs : 
-    picture merge_picture(picture red, picture green, picture blue);
-        [in] red l’image en niveau de gris à utiliser pour fabriquer la composante rouge de l’image résultat.
-        [in] green l’image en niveau de gris à utiliser pour fabriquer la composante verte de l’image résultat.
-        [in] blue l’image en niveau de gris à utiliser pour fabriquer la composante bleue de l’image résultat.
-        [out] l’image composée
-            Si l’image résultat ne peut pas être créée (si par exemple les trois images red, green et blue ne sont pas de même taille ou type) on se contentera de renvoyer une image vide.
-
-*/
-
 /**
  * merge_picture
  * @param [in] red, green, blue
  * @requires: red,green,blue images 
  * @assigns: modifie le tas en créant:
  *  une picture "res" et donc un pointeur vers un tableau alloué dans le tas via create_picture pour res.data;
- * 
  * @ensures: Plantage si les trois images n'ont pas la même dimension, via width=0 ou height=0 et create_picture
  *  Renvoie la fusion des 3 images utilisées comme canaux sinon.
- * 
  * @return image nommée res(type picture)
-*/
+**/
 picture merge_picture(picture red, picture green, picture blue){
     assert(is_gray_picture(red));
     assert(is_gray_picture(green));
     assert(is_gray_picture(blue));
-    int width = red.width * (red.width==green.width&&green.width == blue.width);
 
+    int width = red.width * (red.width==green.width&&green.width == blue.width);
     int height = red.height *(red.height==green.height&&green.height==blue.height);
     
     enum channel_number chan_num = 3;
-
     picture res = create_picture(width,height,chan_num);
 
     for(int i=0;i<height;i++){
@@ -365,12 +323,9 @@ picture merge_picture(picture red, picture green, picture blue){
  * @requires: p image valide, factor>0.
  * @assigns: modifie le tas en créant:
  *  une copie via copy_picture, donc un nouvau champ data contenant un pointeur vers un tableau de bytes.
- *  
- *
  * @ensures: Plantage si les préconditions de copy_picture ne sont pas respectées
- * 
  * @return image nommée res(type picture)
-*/
+**/
 picture brighten_picture(picture p, double factor){
     picture res = copy_picture(p);
     assert(factor>0);
@@ -383,15 +338,12 @@ picture brighten_picture(picture p, double factor){
 }
 /**
  * melt_picture
- * 
  * @param [in] p, number
- * 
  * @requires: p: image valide, number: nombre positifs de pixels à faire fondre.
  * @assigns: modifie le tas en créant une copie que l'on va modifier pour l'effet de fonte.
  * @ensures: Plantage si les préconditions de copy_picture ne sont pas respectées
- * 
  * @return image nommée melted (type picture)
-*/
+**/
 picture melt_picture(picture p, int number){
     /*Il faut distinguer deux cas: image en niveaux de gris ou couleur.*/
     assert(number>=0);
@@ -438,7 +390,7 @@ picture melt_picture(picture p, int number){
     QUESTION/TODO:
     Pourrait-on mettre cette définition/précision de structure
     dans lut.c sans avoir une erreur de type "incomplete type" ? Et si oui, comment ? Poser la question à M. Burel ?
-    + faire une comparaison avec la situation du TP9 que j'ai fini par faire marcher.
+    + fcomparer à la situation du TP9 que j'ai fini par faire marcher.
 */
 struct lut_s{
     int n;
@@ -448,11 +400,9 @@ struct lut_s{
 /**
  * inverse_picture
  * @param [in] p 
- * 
  * @requires: p image valide
  * @assigns: nouvelle copie de l'image p dans le tas (heap), modifiée par une lut via apply_lut.
  * @ensures: Plantage si les préconditions de copy_picture, create_lut, apply_lut ne sont pas respectées
- * 
  * @return image de type picture contenant un champ data avec les données d'image de p.data "inversées" (involution)
 */
 
@@ -474,13 +424,11 @@ picture inverse_picture(picture p){
 /**
  * normalize_dynamic_picture
  * @param [in] p 
- * 
  * @requires: p image valide
  * @assigns: copie en mémoire de p effectuée avant modificaiton par lut. lut stockée temporairement dans le tas le temps 
  * d'effectuer le traitement.
  * @ensures: plantage si les préconditions de copy_picture ne sont pas respectées, sinon res est renvoyée et contient les données
  * normalisées.
- * 
  * @return res image normalisée de type picture.
 */
 picture normalize_dynamic_picture(picture p){
@@ -522,11 +470,9 @@ picture normalize_dynamic_picture(picture p){
 /**
  * set_levels_picture
  * @param [in] p, nb_levels
- * 
  * @requires: p picture valide
  * @assigns: modification du tas par copy_picture créant une nouvelle image qui sera renvoyée (res)
  * @ensures: plantage par copy_picture, create_lut ou apply_lut via assert en cas de non-respect d'une précondition, sinon cf. @return
- * 
  * @return res image ne contenant que nb_levels niveaux de couleur
 */
 picture set_levels_picture(picture p, byte nb_levels){
@@ -545,15 +491,11 @@ picture set_levels_picture(picture p, byte nb_levels){
     return res;
 }
 /**
- * 
+ * distance_picture (non nommée dans l'énoncé:mentionner dans le rapport)
  * @param [in] p1, @param[in] p2
- * 
  * @requires:p1,p2 images valides de type picture, de même tailles
  * @assigns: allocation d'une zone mémoire pour le champ data de la picture "res" crée dans le corps de la fonction
- * 
- * 
  * @ensures: plantage si p1,p2 ne vérifient pas les préconditions, cf. return sinon. p1 et p2 ne sont pas modifiées...
- * 
  * @return: image constituée de la distance "byte à byte" 
 */
 
@@ -588,17 +530,14 @@ double d_from_b(byte b){
  * mult_picture
  * @param [in] p1
  * @param [in] p2
- * 
  * @requires:p1,p2 images valides
  * @assigns: le tas est modifié par la création d'une picture res.
- *   
  * @ensures: res contient la multiplication "renormalisée" de p1 et p2 byte à byte
  * "renormalisée" dans le sens où l'on divise le produit des byte convertis en doubles par 255 pour obtenir une résultat
  * qui soit encore entre 0 et 255. On n'utilise pas renormalize_dynamic_picture car le but ici n'est pas d'optimiser la 
  * dynamique.
- * 
  * @return picture res contenant le "produit" décrit ci-dessus.
-*/
+**/
 
 picture mult_picture(picture p1, picture p2){
     if(is_empty_picture(p1)&&is_empty_picture(p2)){
@@ -676,11 +615,9 @@ picture mult_picture(picture p1, picture p2){
  * @param [in] q1 pointeur vers une image censée accueillir une copie ou une conversion en couleur de p1
  * @requires:p1,p2,p3 images valides de type pictures.
  * @assigns: modification du tas via convert_to_color picture ou copy_picture qui effectuent une allocation
-
  * @ensures: *q1 contient une copie de p1 si celle-ci était en couleur, une conversion en couleur sinon.
- * 
  * @return: rien (void)
-*/
+**/
 void mix_reformat(picture p1,picture *q1){
     if(p1.chan_num == GRAY_PIXEL_SIZE){
         *q1 = convert_to_color_picture(p1);
@@ -691,23 +628,19 @@ void mix_reformat(picture p1,picture *q1){
 /**
  * 
  * @param [in] p1,p2,p3
- * 
  * @requires:p1,p2,p3 images valides de type pictures.
  * @assigns: modifications dans le tas
  *          1) "Temporaires" (propres au corps de fonction):
  *              - q1,q2,q3 sont modifiées par mix_reformat
- *                
  *          2) "Permanentes" (on passe la responsabilité de libérer la mémoire à une autre fonction, dans un wrapper de wrappers.c
- * 
- *          ou à la fonction main dans main.c):
+ *              ou à la fonction main dans main.c):
  *              - l'image res allouée est renvoyée.
- * 
  * @ensures: res contient l'image "mélange" selon une politique de barycentre
  *           des deux premières images d'entrée, pondéré par  la troisième image.
  *           ou alors la fonction a planté car l'une des trois images d'entrée n'a pas vérifié une précondition.
  * 
  * @return cf. @ensures:
- * */
+ **/
 
 picture mix_picture(picture p1, picture p2, picture p3){
 
@@ -806,9 +739,7 @@ void check_resamplable(picture image, unsigned int width, unsigned int height,do
  * @param [in] height
  * @requires: image, width, heigth vérifient les conditions de check_resamplable
  * @assigns: le tas est modifié par la création de l'image renvoyée "res", à libérer dans une autre fonction.
- *   
  * @ensures: sous condition de redimensionnabilité, "res" contient "image" redimensionnée avec la politique du plus proche voisin.
- * 
  * @return: res l'image d'entrée, mais redimensionnée.
 */
 
@@ -861,9 +792,8 @@ et on interpole les composantes séparément, puis on renvoie la fusion des rés
  * @ensures: sous condition de redimensionnabilité, "res" contient "image" redimensionnée
  *  avec la politique d'interpolation bilinéaire.
  * 
- * @return: res l'image d'entrée, mais redimensionnée.
-
-*/
+ * @return: res l'image d'entrée, mais redimensionnée
+**/
 picture resample_picture_bilinear(picture image, unsigned int width, unsigned int height){
     picture res; 
 
