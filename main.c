@@ -6,12 +6,15 @@
 #include <string.h>
 #include <assert.h>
 
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <errno.h>
+
 #include "filename.h"
-
 #include "picture_rw.h"
-
 #include "wrappers.h"
 #include "safe_malloc.h"
+
 
 
 #define LARGER_FACTOR (1.36) /*resampling functions*/
@@ -36,7 +39,26 @@ int main(int argc, char* argv[]){
     picture save; /*Sauvegarder l'image inversée pour la réutiliser comme l'énoncé semble le demander.*/
  
     char output_dir[13] = "Lenna_output"; /*Chemin pour produire les images afin de ne pas mélanger les entrées et les sorties*/
+   
 
+    struct stat st;
+
+    if (stat(output_dir, &st) == 0) {
+        if (S_ISDIR(st.st_mode)) {
+            printf("Le dossier de sortie '%s' existe déjà, on continue...\n", output_dir);
+        } else {
+            fprintf(stderr, "'%s' existe mais n'est pas un dossier.\n", output_dir);
+            fprintf(stderr,"Ce n'est pas censé arriver...");
+            return EXIT_FAILURE;
+        }
+    } else {
+        if (mkdir(output_dir, 0755) == 0) {
+            printf("Dossier de sortie'%s' créé avec succès.\n", output_dir);
+        } else {
+            perror("mkdir");
+            return EXIT_FAILURE;
+        }
+    }
     char ppm_ext[4] = "ppm";
     char pgm_ext[4] = "pgm";
     
@@ -66,7 +88,7 @@ int main(int argc, char* argv[]){
     /*----------------------------------------------Boucle principale-------------------------------------------------------------------*/
 
     for(int i = 1;i <= min_int(NB_FILES,2);++i){
-
+        printf(" Début de boucle, indice:%d\n",i);
         dir = dir_from_path(argv[i]);
         name = name_from_path(argv[i]);
         ext = ext_from_path(argv[i]);
@@ -132,37 +154,36 @@ int main(int argc, char* argv[]){
 
         /*Bonus: flou gaussien*/
         gaussian_blur_wrapper(current_pic,KERNEL_SIZE,STANDARD_DEVIATION,output_dir,name,pgm_ext);
+
         /*Dérivée horizontale*/
         sobel_filter_wrapper(current_pic,output_dir,name,pgm_ext);
 
-
+        printf("checkpoint\n");
         /*Free and reset memory*/
         
         clean_picture(&current_pic);
+        printf("checkpoint\n");
         if(THIRD_IMAGE_FLAG){
             clean_picture(&save);
         }
-
+        /*
+            NOTE "bug" (pas de mon fait mais dû aux choix de filename.[h|c]
+            IL FAUT QUE DIR EXISTE, DONC LES ARGUMENTS DOIVENT ETRE PASSES SOUS LA FORME ./arg1, ./arg2, etc.
+        */
         free(dir);
         free(name);
+        
         free(ext);
+       
         dir = NULL;
         name = NULL;
         ext = NULL;
     }
-    /*On traite à part la normalisation du fichier Lenna_gray pour éviter que Lenna_BW soit traité.*/
-    //current_pic = read_picture("Lenna_input/Lenna_gray.pgm");
-    //normalize_picture_wrapper(current_pic,output_dir,"Lenna_gray",pgm_ext);
-
-    clean_picture(&current_pic);
+    //clean_picture(&current_pic);
 
     if(THIRD_IMAGE_FLAG){
         clean_picture(&mask);
     }
-
-    printf("Reste à tester le code avec:\n\t1)Des images d'entrées rectangulaires\n");
-    printf("\t2)Des filtres en cascade\n");
-    printf("pour s'assurer qu'il n'y a de problème avec aucune combinaison possible (couleur, largeur, hauteur)\n");
 
     return EXIT_SUCCESS;
 }
