@@ -2,9 +2,7 @@
 #define PICTURES_H
 
 #define MAX_BYTE 255
-
 #define BUFFER_SIZE (32)
-
 #define EPSILON (1e-3)
 
 #include <stdbool.h>

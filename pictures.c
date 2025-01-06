@@ -5,17 +5,9 @@
 #include <math.h>
 
 #include "safe_malloc.h"
-//#include "pictures.h"
 #include "pixels.h"
 #include "lut.h"
 #include "picture_rw.h"
-
-/*
-TODO :
-- implémenter: ignorer les commentaires
-- sanitize input...
-- prendre en compte la valeur maximale de la troisième ligne (en "bonus").
-*/
 
 /*-------------------------------------------------------Fonctions utilitaires------------------------------------------*/
 
@@ -788,10 +780,8 @@ et on interpole les composantes séparément, puis on renvoie la fusion des rés
  * @param [in] height
  * @requires: image, width, heigth vérifient les conditions de check_resamplable
  * @assigns: le tas est modifié par la création de l'image renvoyée "res", à libérer dans une autre fonction.
- *   
  * @ensures: sous condition de redimensionnabilité, "res" contient "image" redimensionnée
  *  avec la politique d'interpolation bilinéaire.
- * 
  * @return: res l'image d'entrée, mais redimensionnée
 **/
 picture resample_picture_bilinear(picture image, unsigned int width, unsigned int height){
@@ -866,14 +856,11 @@ picture resample_picture_bilinear(picture image, unsigned int width, unsigned in
  * brighten_picture_lut
  * @param [in] p 
  * @param [in] factor
- * 
  * @requires:p image valide, factor >=0 (peut être nul, mais c'est un double...).
  * @assigns: tas modifié par la création d'une copie qui sera renvoyée (res)
- *  
  * @ensures: res contient une image similaire à p, mais dont la "luminosité" a été changée (augmentée ou diminuée selon le facteur)
  * par application d'une LUT.
- * 
- * @return 
+ * @return picture (brightened) res.
 */
 
 picture brighten_picture_lut(picture p, double factor){

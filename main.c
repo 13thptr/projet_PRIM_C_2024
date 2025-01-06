@@ -42,8 +42,11 @@ int main(int argc, char* argv[]){
     
     /*Vérifications d'usage sur la bonne utilisation du programme. Proposer plus loin une aide pour les différentes options.*/
     if(argc<2){
-        fprintf(stderr,"Usage:./prog <f1.[pgm|ppm]>...<fn.[pgm|ppm]>\n");
+        fprintf(stderr,"Usage:./prog <f1.[pgm|ppm]> <f2.[pgm|ppm]> (opt) <f3.[pgm|ppm]>\n");
         return EXIT_FAILURE;
+    }
+    if(argc>4){
+        fprintf(stderr,"\nThe fourth argument and the subsequent ones will be ignored.\n");
     }
 
     const int NB_FILES = argc-1;
@@ -132,9 +135,6 @@ int main(int argc, char* argv[]){
         if(THIRD_IMAGE_FLAG){
             clean_picture(&save);
         }
-
-        
-
 
         free(dir);
         free(name);
