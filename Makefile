@@ -28,7 +28,7 @@ CFLAGS += -Wunused-but-set-parameter
 CFLAGS += -Wwrite-strings
 CFLAGS += -Wformat=2
 CFLAGS += -g
-CFLAGS += -fsanitize=address
+#CFLAGS += -fsanitize=address
 
 CC = gcc
 # Define a pattern rule that compiles every .c file into a .o file
