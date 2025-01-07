@@ -324,16 +324,14 @@ void sobel_filter_wrapper(picture p, char *res_dir, char *name_p, char *res_ext)
         }
     }
 
-
-
+    /*horizontal & vertical not needed anymore.*/
+    clean_picture(&horizontal);
+    clean_picture(&vertical);
 
     char sobel_op[30] = "sobel";
     char *sobel_path = concat_parts(res_dir,name_p,sobel_op,res_ext);
     write_picture(sobel,sobel_path);
 
-    
-    clean_picture(&horizontal);
-    clean_picture(&vertical);
     clean_picture(&sobel);
     free(horiz_path);
     free(sobel_path);

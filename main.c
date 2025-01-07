@@ -125,8 +125,6 @@ int main(int argc, char* argv[]){
         brighten_picture_wrapper(current_pic,output_dir,name,ext,BRIGHTENING_FACTOR);
         melt_picture_wrapper(current_pic,output_dir,name,ext);
 
-      
-
         /*On sauvegarde l'image inversée si la troisième est présente, car alors on mixe et on en aura besoin plus tard.*/
         inverse_picture_wrapper(current_pic,output_dir,name,ext,THIRD_IMAGE_FLAG,&save);
         
